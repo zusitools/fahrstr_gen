@@ -280,15 +280,14 @@ class Knoten:
                     kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.attrib.get("Wert", 0)))
                 elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
                     pass
-                elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE:
-                    # TODO: vom Fahrstrassen-Typ abhaengig machen
-                    pass
-                elif ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE:
-                    # TODO: vom Fahrstrassen-Typ abhaengig machen
+                elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
                     return None
-                elif ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE:
-                    # TODO: vom Fahrstrassen-Typ abhaengig machen
-                    pass
+                elif ereignis_nr == EREIGNIS_LZB_ENDE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
+                    return None
+                elif ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
+                    return None
+                elif ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
+                    return None
                 elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
                     # TODO: in Liste von Aufloesepunkten einfuegen
                     pass
