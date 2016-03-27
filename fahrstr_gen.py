@@ -2,6 +2,7 @@
 
 from fahrstr_gen import modulverwaltung, streckengraph, strecke
 from fahrstr_gen.konstanten import *
+from fahrstr_gen.strecke import writeuglyxml
 
 import xml.etree.ElementTree as ET
 import argparse
@@ -15,7 +16,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
-    modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname))
+    modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname).getroot())
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 
     fahrstrassen = []
@@ -33,5 +34,14 @@ if __name__ == '__main__':
 
                         fahrstrassen.extend(graph.get_knoten(modulverwaltung.dieses_modul, str_element).get_fahrstrassen(richtung))
 
-    for fahrstr in sorted(fahrstrassen, key = lambda f: f.name):
-        print(fahrstr.name)
+    strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
+    if strecke is not None:
+        for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
+            strecke.remove(fahrstrasse_alt)
+        for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
+            logging.info(fahrstrasse_neu.name)
+            strecke.append(fahrstrasse_neu.to_xml())
+        with open(args.dateiname, 'wb') as fp:
+            fp.write(b"\xef\xbb\xbf")
+            fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
+            writeuglyxml(fp, modulverwaltung.dieses_modul.root)

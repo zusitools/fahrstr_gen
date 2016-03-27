@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+import xml.etree.ElementTree as ET
 from collections import namedtuple, defaultdict
+
 from . import strecke
 from .konstanten import *
 from .strecke import ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, element_laenge
@@ -10,13 +12,18 @@ import logging
 # Eintrag in einer verketteten Liste
 ListenEintrag = namedtuple('Listeneintrag', ['eintrag', 'prev'])
 
+FahrstrWeichenstellung = namedtuple('FahrstrWeichenstellung', ['refpunkt', 'weichenlage'])
+FahrstrHauptsignal = namedtuple('FahrstrHauptsignal', ['refpunkt', 'zeile', 'ist_ersatzsignal'])
+FahrstrVorsignal = namedtuple('FahrstrVorsignal', ['refpunkt', 'spalte'])
+
 # Eine (simulatortaugliche) Fahrstrasse, die aus einer oder mehreren Einzeifahrstrassen besteht.
 class Fahrstrasse:
-    def __init__(self, einzelfahrstrassen):
+    def __init__(self, fahrstr_typ, einzelfahrstrassen):
+        self.fahrstr_typ = fahrstr_typ
         self.register = []  # [RefPunkt]
-        self.weichen = []  # [(RefPunkt, Weichenstellung)]
-        self.signale = []  # [(RefPunkt, Signalzeile)]
-        self.vorsignale = []  # [(RefPunkt, Signalspalte)]
+        self.weichen = []  # [FahrstrWeichenstellung]
+        self.signale = []  # [FahrstrHauptsignal]
+        self.vorsignale = []  # [FahrstrVorsignal]
         self.teilaufloesepunkte = [] # [RefPunkt]
         self.aufloesepunkte = [] # [RefPunkt]
         self.signalhaltfallpunkte = [] # [RefPunkt]
@@ -54,6 +61,49 @@ class Fahrstrasse:
                 self.signalhaltfallpunkte.extend(kante.signalhaltfallpunkte)
 
         # TODO: Aufloesepunkte suchen (= Teilaufloesepunkte der naechsten Einzelfahrstrassen am Zielknoten)
+
+    def to_xml(self):
+        # TODO: FahrstrStrecke, RglGgl, Zufallswert
+        result = ET.Element('Fahrstrasse', {
+            "FahrstrName": self.name,
+            "Laenge": "{:.1f}".format(self.laenge)
+        })
+        if self.fahrstr_typ == FAHRSTR_TYP_RANGIER:
+            result.attrib["FahrstrTyp"] = "TypRangier"
+        elif self.fahrstr_typ == FAHRSTR_TYP_ZUG:
+            result.attrib["FahrstrTyp"] = "TypZug"
+        elif self.fahrstr_typ == FAHRSTR_TYP_LZB:
+            result.attrib["FahrstrTyp"] = "TypLZB"
+
+        self.start.to_xml(ET.SubElement(result, 'FahrstrStart'))
+        self.ziel.to_xml(ET.SubElement(result, 'FahrstrZiel'))
+        for rp in self.register:
+            rp.to_xml(ET.SubElement(result, 'FahrstrRegister'))
+        for rp in self.aufloesepunkte:
+            rp.to_xml(ET.SubElement(result, 'FahrstrAufloesung'))
+        for rp in self.aufloesepunkte:
+            rp.to_xml(ET.SubElement(result, 'FahrstrTeilaufloesung'))
+        for rp in self.signalhaltfallpunkte:
+            rp.to_xml(ET.SubElement(result, 'FahrstrSigHaltfall'))
+        for weiche in self.weichen:
+            el = ET.SubElement(result, 'FahrstrWeiche')
+            if weiche.weichenlage != 0:
+                el.attrib["FahrstrWeichenlage"] = str(weiche.weichenlage)
+            weiche.refpunkt.to_xml(el)
+        for signal in self.signale:
+            el = ET.SubElement(result, 'FahrstrSignal')
+            if signal.zeile != 0:
+                el.attrib["FahrstrSignalZeile"] = str(signal.zeile)
+            if signal.ist_ersatzsignal:
+                el.attrib["FahrstrSignalErsatzsignal"] = "1"
+            signal.refpunkt.to_xml(el)
+        for vorsignal in self.vorsignale:
+            el = ET.SubElement(result, 'FahrstrVSignal')
+            if vorsignal.spalte != 0:
+                el.attrib["FahrstrSignalSpalte"] = str(vorsignal.spalte)
+            vorsignal.refpunkt.to_xml(el)
+
+        return result
 
 # Eine einzelne Fahrstrasse (= Liste von Kanten)
 # von einem Hauptsignal oder Aufgleispunkt zu einem Hauptsignal,
@@ -380,7 +430,7 @@ class Knoten:
             fahrstr_abschliessen, fahrstr_weiterfuehren))
 
         if fahrstr_abschliessen:
-            ziel_liste.append(Fahrstrasse(einzelfahrstr_liste))
+            ziel_liste.append(Fahrstrasse(self.graph.fahrstr_typ, einzelfahrstr_liste))
         if fahrstr_weiterfuehren:
             for einzelfahrstrasse in zielknoten.get_einzelfahrstrassen(zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)

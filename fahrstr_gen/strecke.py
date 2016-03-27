@@ -75,3 +75,81 @@ def nachfolger_elemente(element_richtung):
         nachfolger.append(ElementUndRichtung(nach_modul, nach_el, nach_richtung))
 
     return nachfolger
+
+st3_attrib_order = {
+    "AutorEintrag": ["AutorID", "AutorName", "AutorEmail", "AutorAufwand", "AutorLizenz", "AutorBeschreibung"],
+    "BefehlsKonfiguration": ["Dateiname", "NurInfo"],
+    "Beschreibung": ["Beschreibung"],
+    "b": ["X", "Y", "Z"],
+    "Datei": ["Dateiname", "NurInfo"],
+    "Ereignis": ["Er", "Beschr", "Wert"],
+    "Ersatzsignal": ["ErsatzsigBezeichnung", "ErsatzsigID"],
+    "Fahrstrasse": ["FahrstrName", "FahrstrStrecke", "RglGgl", "FahrstrTyp", "ZufallsWert", "Laenge"],
+    "FahrstrAufloesung": ["Ref"],
+    "FahrstrRegister": ["Ref"],
+    "FahrstrSigHaltfall": ["Ref"],
+    "FahrstrSignal": ["Ref", "FahrstrSignalZeile", "FahrstrSignalErsatzsignal"],
+    "FahrstrStart": ["Ref"],
+    "FahrstrTeilaufloesung": ["Ref"],
+    "FahrstrVSignal": ["Ref", "FahrstrSignalSpalte"],
+    "FahrstrWeiche": ["Ref", "FahrstrWeichenlage"],
+    "FahrstrZiel": ["Ref"],
+    "g": ["X", "Y", "Z"],
+    "HimmelTex": ["Dateiname", "NurInfo"],
+    "HintergrundDatei": ["Dateiname", "NurInfo"],
+    "HsigBegriff": ["HsigGeschw", "FahrstrTyp"],
+    "Info": ["DateiTyp", "Version", "MinVersion", "ObjektID", "Beschreibung", "EinsatzAb", "EinsatzBis", "DateiKategorie"],
+    "InfoGegenRichtung": ["vMax", "km", "pos", "Reg", "KoppelWeicheNr", "KoppelWeicheNorm"],
+    "InfoNormRichtung": ["vMax", "km", "pos", "Reg", "KoppelWeicheNr", "KoppelWeicheNorm"],
+    "Kachelpfad": ["Dateiname", "NurInfo"],
+    "lookat": ["X", "Y", "Z"],
+    "MatrixEintrag": ["Signalbild", "MatrixGeschw", "SignalID"],
+    "MondTex": ["Dateiname", "NurInfo"],
+    "NachGegenModul": ["Nr"],
+    "NachGegen": ["Nr"],
+    "NachNormModul": ["Nr"],
+    "NachNorm": ["Nr"],
+    "phi": ["X", "Y", "Z"],
+    "PunktXYZ": ["X", "Y", "Z"],
+    "p": ["X", "Y", "Z"],
+    "ReferenzElemente": ["ReferenzNr", "StrElement", "StrNorm", "RefTyp", "Info"],
+    "SignalFrame": ["WeichenbaugruppeIndex", "WeichenbaugruppeNr", "WeichenbaugruppeBeschreibung", "WeichenbaugruppePos0", "WeichenbaugruppePos1"],
+    "Signal": ["NameBetriebsstelle", "Stellwerk", "Signalname", "ZufallsWert", "SignalFlags", "SignalTyp", "BoundingR", "Zwangshelligkeit"],
+    "Skybox0": ["Dateiname", "NurInfo"],
+    "Skybox1": ["Dateiname", "NurInfo"],
+    "Skybox2": ["Dateiname", "NurInfo"],
+    "Skybox3": ["Dateiname", "NurInfo"],
+    "Skybox4": ["Dateiname", "NurInfo"],
+    "Skybox5": ["Dateiname", "NurInfo"],
+    "SonneHorizontTex": ["Dateiname", "NurInfo"],
+    "SonneTex": ["Dateiname", "NurInfo"],
+    "SternTex": ["Dateiname", "NurInfo"],
+    "StreckenStandort": ["StrInfo"],
+    "Strecke": ["RekTiefe", "Himmelsmodell"],
+    "StrElement": ["Nr", "Ueberh", "kr", "spTrass", "Anschluss", "Fkt", "Oberbau", "Volt", "Drahthoehe", "Zwangshelligkeit"],
+    "up": ["X", "Y", "Z"],
+    "UTM": ["UTM_WE", "UTM_NS", "UTM_Zone", "UTM_Zone2"],
+    "VsigBegriff": ["VsigGeschw"],
+}
+
+def _escape(txt):
+    # TODO: das ist nicht die beste Escape-Funktion, aber Zusi macht auch nicht viel mehr.
+    return txt.replace("&", "&amp;").replace(">", "&gt;").replace("<", "&lt;").replace('"', '&quot;').replace("'", "&apos;")
+
+# Schreibt eine Streckendatei im selben Format wie Zusi, um Diffs zu minimieren:
+# Keine Einrueckung, Attributreihenfolge gleich, Zeilenende CR+LF.
+def writeuglyxml(fp, elem):
+    tag = elem.tag
+
+    fp.write(u"<{}".format(tag).encode("utf-8"))
+
+    for k, v in sorted(elem.attrib.items(), key = lambda i: i[0] if tag not in st3_attrib_order else st3_attrib_order[tag].index(i[0])):
+      fp.write(u" {}=\"{}\"".format(k, _escape(v)).encode("utf-8"))
+
+    if len(elem):
+      fp.write(u">\r\n".encode("utf-8"))
+      for child in elem:
+        writeuglyxml(fp, child)
+      fp.write(u"</{}>\r\n".format(tag).encode("utf-8"))
+    else:
+      fp.write(u"/>\r\n".encode("utf-8"))

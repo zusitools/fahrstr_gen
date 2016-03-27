@@ -94,6 +94,10 @@ class RefPunkt(object):
     def signal(self):
         return self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal")
 
+    def to_xml(self, node):
+        node.attrib["Ref"] = str(self.refnr)
+        ET.SubElement(node, 'Datei', { "Dateiname": self.modul.relpath, "NurInfo": "1" })
+
 def normalize_zusi_relpath(relpath):
     return relpath.upper().replace('/', '\\')
 
