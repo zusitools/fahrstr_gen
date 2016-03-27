@@ -5,7 +5,7 @@ from collections import namedtuple, defaultdict
 
 from . import strecke
 from .konstanten import *
-from .strecke import ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, element_laenge
+from .strecke import ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, vorgaenger_elemente, element_laenge
 
 import logging
 
@@ -255,11 +255,21 @@ class Knoten:
             logging.debug("Suche Nachfolgerkanten ab {} {}{}".format(self.modul.relpath, self.element.attrib["Nr"], 'n' if richtung == NORM else 'g'))
             self.nachfolger_kanten[key] = []
             nachfolger = nachfolger_elemente(ElementUndRichtung(self.modul, self.element, richtung))
+
+            weichen_refpunkt = None
+            if len(nachfolger) > 1:
+                weichen_refpunkt = self.refpunkt(REFTYP_WEICHE, richtung)
+                if weichen_refpunkt is None:
+                    logging.warn(("Element {} hat mehr als einen Nachfolger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
+                            "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
+                            self.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
+                    self.nachfolger_kanten[key] = [None] * len(nachfolger)
+                    return
+
             for idx, n in enumerate(nachfolger):
                 kante = Kante(self, richtung)
-                if len(nachfolger) > 1:
-                    # TODO: Weichenstellung 'idx+1' des aktuellen Elements in die Kante einfuegen
-                    pass
+                if weichen_refpunkt is not None:
+                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
                 kante = self._neue_nachfolger_kante(kante, n)
                 self.nachfolger_kanten[key].append(kante)
         return self.nachfolger_kanten[key]
@@ -337,17 +347,39 @@ class Knoten:
             kante.laenge += element_laenge(element_richtung.element)
 
             if self.graph.ist_knoten(element_richtung.element):
-                # TODO: eventuelle stumpf befahrene Weiche als Weichenverknuepfung eintragen
                 break
 
             nachfolger = nachfolger_elemente(element_richtung)
             if len(nachfolger) == 0:
                 element_richtung = None
-            else:
-                assert(len(nachfolger) == 1)  # sonst waere es ein Knoten
-                element_richtung = nachfolger[0]
+                break
+
+            assert(len(nachfolger) == 1)  # sonst waere es ein Knoten
+            element_richtung_neu = nachfolger[0]
+
+            nachfolger_vorgaenger = vorgaenger_elemente(element_richtung_neu)
+            if nachfolger_vorgaenger is not None and len(nachfolger_vorgaenger) > 1:
+                # Stumpf befahrene Weiche stellen
+                weichen_refpunkt = self.graph.get_knoten(element_richtung_neu.modul, element_richtung_neu.element).refpunkt(REFTYP_WEICHE, NORM if element_richtung_neu.richtung == GEGEN else NORM)
+                if weichen_refpunkt is None:
+                    logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
+                            "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
+                            self.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
+                    return None
+
+                try:
+                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, nachfolger_vorgaenger.index(element_richtung) + 1))
+                except ValueError:
+                    logging.warn(("Stellung der stumpf befahrene Weiche an Element {} {} von Element {} {} kommend konnte nicht ermittelt werden. " +
+                            "Es werden keine Fahrstrassen ueber das letztere Element erzeugt.").format(
+                            element_richtung_neu.element.attrib["Nr"], "blau" if element_richtung_neu.richtung == NORM else "gruen",
+                            element_richtung.element.attrib["Nr"], "blau" if element_richtung.richtung == NORM else "gruen"))
+                    return None
+
+            element_richtung = element_richtung_neu
 
         if element_richtung is None:
+            # Fahrweg endet im Nichts, hier ist keine sinnvolle Fahrstrasse zu erzeugen
             return None
         else:
             kante.ziel = self.graph.get_knoten(element_richtung.modul, element_richtung.element)

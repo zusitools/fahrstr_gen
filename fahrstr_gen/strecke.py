@@ -76,6 +76,15 @@ def nachfolger_elemente(element_richtung):
 
     return nachfolger
 
+def gegenrichtung(element_richtung):
+    return ElementUndRichtung(element_richtung.modul, element_richtung.element, NORM if element_richtung.richtung == GEGEN else GEGEN)
+
+def vorgaenger_elemente(element_richtung):
+    if element_richtung is None:
+        return None
+
+    return [gegenrichtung(e) for e in nachfolger_elemente(gegenrichtung(element_richtung))]
+
 st3_attrib_order = {
     "AutorEintrag": ["AutorID", "AutorName", "AutorEmail", "AutorAufwand", "AutorLizenz", "AutorBeschreibung"],
     "BefehlsKonfiguration": ["Dateiname", "NurInfo"],
