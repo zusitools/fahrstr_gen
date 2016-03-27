@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 import argparse
 
 import logging
-logging.basicConfig(level = logging.INFO)
+logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=logging.INFO)
 
 def finde_fahrstrassen(args):
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
