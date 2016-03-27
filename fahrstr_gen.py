@@ -17,6 +17,7 @@ def finde_fahrstrassen(args):
     modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname).getroot())
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 
+    loeschfahrstrassen_namen = [n.attrib.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
     fahrstrassen = []
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         graph = streckengraph.Streckengraph(fahrstr_typ)
@@ -30,7 +31,8 @@ def finde_fahrstrassen(args):
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.richtung == richtung
                         ):
 
-                        fahrstrassen.extend(graph.get_knoten(modulverwaltung.dieses_modul, str_element).get_fahrstrassen(richtung))
+                        fahrstrassen.extend([f for f in graph.get_knoten(modulverwaltung.dieses_modul, str_element).get_fahrstrassen(richtung)
+                            if f.name not in loeschfahrstrassen_namen])
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
     if strecke is not None:
