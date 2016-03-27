@@ -197,7 +197,6 @@ class Kante:
         self.ziel = None  # Knoten
         self.zielrichtung = None  # Richtung
 
-        self.elemente = []  # Elemente+Richtungen, ausschliesslich Startknoten-Element, einschliesslich Zielknoten-Element
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
 
@@ -335,7 +334,6 @@ class Knoten:
                     # TODO: in Liste von Vorsignalen einfuegen
                     pass
 
-            kante.elemente.append(element_richtung)
             kante.laenge += element_laenge(element_richtung.element)
 
             if self.graph.ist_knoten(element_richtung.element):
