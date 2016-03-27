@@ -6,6 +6,8 @@ from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ
 
 import xml.etree.ElementTree as ET
 import argparse
+import operator
+from collections import defaultdict
 
 import logging
 logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=logging.INFO)
@@ -32,19 +34,56 @@ def finde_fahrstrassen(args):
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
     if strecke is not None:
-        for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
-            strecke.remove(fahrstrasse_alt)
-        for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
-            logging.info(fahrstrasse_neu.name)
-            strecke.append(fahrstrasse_neu.to_xml())
-        with open(args.dateiname, 'wb') as fp:
-            fp.write(b"\xef\xbb\xbf")
-            fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
-            writeuglyxml(fp, modulverwaltung.dieses_modul.root)
+        if args.modus == 'schreibe':
+            for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
+                strecke.remove(fahrstrasse_alt)
+            for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
+                logging.info(fahrstrasse_neu.name)
+                strecke.append(fahrstrasse_neu.to_xml())
+            with open(args.dateiname, 'wb') as fp:
+                fp.write(b"\xef\xbb\xbf")
+                fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
+                writeuglyxml(fp, modulverwaltung.dieses_modul.root)
+
+        elif args.modus == 'vergleiche':
+            alt_vs_neu = defaultdict(dict)
+            for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
+                alt_vs_neu[fahrstrasse_alt.attrib["FahrstrName"]]["alt"] = fahrstrasse_alt
+            for fahrstrasse_neu in fahrstrassen:
+                alt_vs_neu[fahrstrasse_neu.name]["neu"] = fahrstrasse_neu
+
+            for name, fahrstrassen in sorted(alt_vs_neu.items(), key = operator.itemgetter(0)):
+                try:
+                    fahrstr_alt = fahrstrassen["alt"]
+                except KeyError:
+                    print("{} existiert in Zusi nicht".format(name))
+                    continue
+                try:
+                    fahrstr_neu = fahrstrassen["neu"]
+                except KeyError:
+                    print("{} existiert in Zusi, wurde aber nicht erzeugt".format(name))
+                    continue
+
+                laenge_alt = float(fahrstr_alt.attrib.get("Laenge", 0))
+                if abs(laenge_alt - fahrstr_neu.laenge) > 1:
+                    print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
+
+                start_alt = fahrstr_alt.find("./FahrstrStart")
+                start_alt_refnr = int(start_alt.attrib.get("Ref", 0))
+                start_alt_modul = start_alt.find("./Datei").attrib.get("Dateiname", "")
+                if start_alt_refnr != fahrstr_neu.start.refnr or start_alt_modul.upper() != fahrstr_neu.start.modul.relpath.upper():
+                    print("{}: unterschiedlicher Start: {}@{} vs. {}@{}".format(name, start_alt_refnr, start_alt_modul, fahrstr_neu.start.refnr, fahrstr_neu.start.modul.relpath))
+
+                ziel_alt = fahrstr_alt.find("./FahrstrZiel")
+                ziel_alt_refnr = int(ziel_alt.attrib.get("Ref", 0))
+                ziel_alt_modul = ziel_alt.find("./Datei").attrib.get("Dateiname", "")
+                if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.modul.relpath.upper():
+                    print("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.modul.relpath))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
     parser.add_argument('dateiname')
+    parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help=argparse.SUPPRESS)
     parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
     args = parser.parse_args()
 
