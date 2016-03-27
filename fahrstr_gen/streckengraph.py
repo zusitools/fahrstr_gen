@@ -360,7 +360,7 @@ class Knoten:
     # Es wird moeglichst die Fahrstrasse mit der hoechsten Signalgeschwindigkeit behalten, als zweites Kriterium
     # wird die Fahrstrasse mit der kuerzesten Gesamtlaenge behalten.
     def _get_einzelfahrstrassen(self, richtung):
-        # Zielsignal-Knoten -> [EinzelFahrstrasse]
+        # Zielsignal-Refpunkt -> [EinzelFahrstrasse]
         einzelfahrstrassen_by_zielsignal = defaultdict(list)
         for kante in self.get_nachfolger_kanten(richtung):
             if kante is not None:
@@ -369,7 +369,7 @@ class Knoten:
                 self._get_einzelfahrstrassen_rek(f, einzelfahrstrassen_by_zielsignal)
 
         result = []
-        for zielsignal, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
+        for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
             # TODO: sortieren nach a) Signalgeschwindigkeit, b) Laenge
             result.append(einzelfahrstrassen[0])
 
@@ -382,7 +382,7 @@ class Knoten:
         signal = fahrstrasse.ziel.signal(fahrstrasse.zielrichtung)
         if ist_hsig_fuer_fahrstr_typ(signal, self.graph.fahrstr_typ):
             logging.debug("Zielsignal gefunden: {} {}".format(signal.attrib.get("NameBetriebsstelle", "?"), signal.attrib.get("Signalname", "?")))
-            ergebnis_dict[fahrstrasse.ziel].append(fahrstrasse)
+            ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL, fahrstrasse.zielrichtung)].append(fahrstrasse)
             return
 
         folgekanten = fahrstrasse.ziel.get_nachfolger_kanten(fahrstrasse.zielrichtung)
