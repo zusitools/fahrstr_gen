@@ -38,11 +38,13 @@ class Fahrstrasse:
         # TODO: Setze Regelgleis/Gegengleis
         # TODO: Setze Richtungsanzeiger
 
+        self.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
+
         if self.start.reftyp == REFTYP_AUFGLEISPUNKT:
-            self.name = "Aufgleispunkt"
+            self.name += "Aufgleispunkt"
         else:
             startsignal = self.start.signal()
-            self.name = "{} {}".format(startsignal.attrib.get("NameBetriebsstelle", ""), startsignal.attrib.get("Signalname", ""))
+            self.name += "{} {}".format(startsignal.attrib.get("NameBetriebsstelle", ""), startsignal.attrib.get("Signalname", ""))
 
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             self.laenge += einzelfahrstrasse.laenge
