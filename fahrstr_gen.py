@@ -82,6 +82,20 @@ def finde_fahrstrassen(args):
                 if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.modul.relpath.upper():
                     print("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.modul.relpath))
 
+                weichenstellungen_alt_vs_neu = defaultdict(dict)
+                for weiche_alt in fahrstr_alt.findall("./FahrstrWeiche"):
+                    weichenstellungen_alt_vs_neu[(int(weiche_alt.attrib.get("Ref", 0)), weiche_alt.find("./Datei").attrib.get("Dateiname", "").upper())]["alt"] = int(weiche_alt.attrib.get("FahrstrWeichenlage", 0))
+                for weiche_neu in fahrstr_neu.weichen:
+                    weichenstellungen_alt_vs_neu[(weiche_neu.refpunkt.refnr, weiche_neu.refpunkt.modul.relpath.upper())]["neu"] = weiche_neu.weichenlage
+
+                for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                    if "alt" not in weichenstellungen:
+                        print("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, weichen_refpunkt))
+                    elif "neu" not in weichenstellungen:
+                        print("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, weichen_refpunkt))
+                    elif weichenstellungen["alt"] != weichenstellungen["neu"]:
+                        print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, weichen_refpunkt, weichenstellungen["alt"], weichenstellungen["neu"]))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
     parser.add_argument('dateiname')
