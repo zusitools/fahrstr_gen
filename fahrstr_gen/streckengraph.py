@@ -185,10 +185,8 @@ class Streckengraph:
             self.knoten[element] = result
             return result
 
-# Eine Kante im Streckengraphen. Sie besteht aus einer Liste von gerichteten Streckenelementen
-# und enthaelt alle fahrstrassenrelevanten Daten (Signale, Weichen, Aufloesepunkte etc.)
-# Eine Kante wird nur erzeugt, wenn sie fuer die Fahrstrasse relevant ist, also an einem
-# Streckenelement mit Signal oder Weiche endet und kein Ereignis "Keine X-Fahrstrasse einrichten" enthaelt.
+# Eine Kante zwischen zwei Knoten im Streckengraphen. Sie enthaelt alle fahrstrassenrelevanten Daten (Signale, Weichen, Aufloesepunkte etc.)
+# einer Folge von gerichteten Streckenelementen zwischen den beiden Knoten (exklusive Start, inklusive Ziel, inklusive Start-Weichenstellung).
 class Kante:
     def __init__(self, start, startrichtung):
         self.start = start
@@ -252,6 +250,8 @@ class Knoten:
         return self.einzelfahrstrassen[key]
 
     # Gibt alle von diesem Knoten ausgehenden Nachfolgerkanten in der angegebenen Richtung zurueck.
+    # Eine Kante wird nur erzeugt, wenn sie fuer die Fahrstrasse relevant ist, also an einem
+    # Streckenelement mit Signal oder Weiche endet und kein Ereignis "Keine X-Fahrstrasse einrichten" enthaelt.
     def get_nachfolger_kanten(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.nachfolger_kanten[key] is None:
