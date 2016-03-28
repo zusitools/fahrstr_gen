@@ -44,7 +44,7 @@ class Fahrstrasse:
             self.name += "Aufgleispunkt"
         else:
             startsignal = self.start.signal()
-            self.name += "{} {}".format(startsignal.attrib.get("NameBetriebsstelle", ""), startsignal.attrib.get("Signalname", ""))
+            self.name += "{} {}".format(startsignal.get("NameBetriebsstelle", ""), startsignal.get("Signalname", ""))
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         zielsignal_geschw = self.ziel.signal().find("./MatrixEintrag/Ereignis[@Er='1']")
@@ -60,7 +60,7 @@ class Fahrstrasse:
 
             zielkante = einzelfahrstrasse.kanten.eintrag
             zielsignal = zielkante.ziel.signal()
-            self.name += " -> {} {}".format(zielsignal.attrib.get("NameBetriebsstelle", ""), zielsignal.attrib.get("Signalname", ""))
+            self.name += " -> {} {}".format(zielsignal.get("NameBetriebsstelle", ""), zielsignal.get("Signalname", ""))
 
             # Startsignal ansteuern
             if idx == 0:
@@ -302,9 +302,9 @@ class Knoten:
 
             # Ereignisse am aktuellen Element verarbeiten
             for ereignis in element_richtung.ereignisse():
-                ereignis_nr = int(ereignis.attrib.get("Er", 0))
+                ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
-                    kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.attrib.get("Wert", 0)))
+                    kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.get("Wert", 0)))
                 elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
                     pass
                 elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
@@ -342,7 +342,7 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
                     if kante.richtungsanzeiger == "":
-                        kante.richtungsanzeiger = ereignis.attrib.get("Beschr", "")
+                        kante.richtungsanzeiger = ereignis.get("Beschr", "")
                     else:
                         # TODO: Warnmeldung
                         pass
@@ -436,7 +436,7 @@ class Knoten:
         # Sind wir am Hauptsignal?
         signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.graph.fahrstr_typ):
-            logging.debug("Zielsignal gefunden: {} {}".format(signal.attrib.get("NameBetriebsstelle", "?"), signal.attrib.get("Signalname", "?")))
+            logging.debug("Zielsignal gefunden: {} {}".format(signal.get("NameBetriebsstelle", "?"), signal.get("Signalname", "?")))
             ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
             return
 
@@ -455,7 +455,7 @@ class Knoten:
         zielknoten = letzte_fahrstrasse.kanten.eintrag.ziel.knoten
         zielrichtung = letzte_fahrstrasse.kanten.eintrag.ziel.richtung
         zielsignal = zielknoten.signal(zielrichtung)
-        ziel_flags = int(zielsignal.attrib.get("SignalFlags", 0))
+        ziel_flags = int(zielsignal.get("SignalFlags", 0))
 
         fahrstr_abschliessen = True
         fahrstr_weiterfuehren = False
@@ -473,13 +473,13 @@ class Knoten:
                 # startknoten = erste_fahrstrasse.kanten.eintrag.start
                 # startrichtung = erste_fahrstrasse.kanten.eintrag.startrichtung
                 # startsignal = startknoten.signal(startrichtung)
-                # if startsignal is None or int(startsignal.attrib.get("SignalFlags", 0)) & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
+                # if startsignal is None or int(startsignal.get("SignalFlags", 0)) & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
 
         if ziel_flags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
             fahrstr_weiterfuehren = True
 
         logging.debug("Fahrstrassensuche: an {} {}, Kennlicht Vorgaenger={}, Kennlicht Nachfolger={}, abschl={}, weiter={}".format(
-            zielsignal.attrib.get("NameBetriebsstelle", ""), zielsignal.attrib.get("Signalname", ""),
+            zielsignal.get("NameBetriebsstelle", ""), zielsignal.get("Signalname", ""),
             ziel_flags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0, ziel_flags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0,
             fahrstr_abschliessen, fahrstr_weiterfuehren))
 

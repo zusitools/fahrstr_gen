@@ -80,7 +80,7 @@ class RefPunkt(object):
     def __repr__(self):
         global dieses_modul
         return "Element {}{}{}".format(
-            self.element.attrib.get("Nr", "0"),
+            self.element.get("Nr", "0"),
             'n' if self.richtung == NORM else 'g',
             "" if self.modul == dieses_modul else "[{}]".format(self.modul_kurz())
         )
@@ -123,21 +123,21 @@ class Modul:
         self.relpath = relpath
         self.root = root
         self.streckenelemente = dict(
-            (int(s.attrib.get("Nr", 0)), s)
+            (int(s.get("Nr", 0)), s)
             for s in root.findall("./Strecke/StrElement")
         )
 
         self.referenzpunkte = defaultdict(list)
         for r in root.findall("./Strecke/ReferenzElemente"):
             try:
-                element = self.streckenelemente[int(r.attrib.get("StrElement", 0))]
+                element = self.streckenelemente[int(r.get("StrElement", 0))]
                 self.referenzpunkte[element].append(RefPunkt(
                     self,
-                    int(r.attrib.get("ReferenzNr", 0)), 
-                    r.attrib.get("Info", ""),
-                    int(r.attrib.get("RefTyp", 0)),
+                    int(r.get("ReferenzNr", 0)),
+                    r.get("Info", ""),
+                    int(r.get("RefTyp", 0)),
                     element,
-                    NORM if int(r.attrib.get("StrNorm", 0)) == 1 else GEGEN
+                    NORM if int(r.get("StrNorm", 0)) == 1 else GEGEN
                 ))
             except KeyError:
                 pass

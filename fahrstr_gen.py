@@ -17,7 +17,7 @@ def finde_fahrstrassen(args):
     modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname).getroot())
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 
-    loeschfahrstrassen_namen = [n.attrib.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
+    loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
     fahrstrassen = []
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         graph = streckengraph.Streckengraph(fahrstr_typ)
@@ -66,25 +66,25 @@ def finde_fahrstrassen(args):
                     print("{} existiert in Zusi, wurde aber nicht erzeugt".format(name))
                     continue
 
-                laenge_alt = float(fahrstr_alt.attrib.get("Laenge", 0))
+                laenge_alt = float(fahrstr_alt.get("Laenge", 0))
                 if abs(laenge_alt - fahrstr_neu.laenge) > 1:
                     print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
 
                 start_alt = fahrstr_alt.find("./FahrstrStart")
-                start_alt_refnr = int(start_alt.attrib.get("Ref", 0))
-                start_alt_modul = start_alt.find("./Datei").attrib.get("Dateiname", "")
+                start_alt_refnr = int(start_alt.get("Ref", 0))
+                start_alt_modul = start_alt.find("./Datei").get("Dateiname", "")
                 if start_alt_refnr != fahrstr_neu.start.refnr or start_alt_modul.upper() != fahrstr_neu.start.modul.relpath.upper():
                     print("{}: unterschiedlicher Start: {}@{} vs. {}@{}".format(name, start_alt_refnr, start_alt_modul, fahrstr_neu.start.refnr, fahrstr_neu.start.modul.relpath))
 
                 ziel_alt = fahrstr_alt.find("./FahrstrZiel")
-                ziel_alt_refnr = int(ziel_alt.attrib.get("Ref", 0))
-                ziel_alt_modul = ziel_alt.find("./Datei").attrib.get("Dateiname", "")
+                ziel_alt_refnr = int(ziel_alt.get("Ref", 0))
+                ziel_alt_modul = ziel_alt.find("./Datei").get("Dateiname", "")
                 if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.modul.relpath.upper():
                     print("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.modul.relpath))
 
                 weichenstellungen_alt_vs_neu = defaultdict(dict)
                 for weiche_alt in fahrstr_alt.findall("./FahrstrWeiche"):
-                    weichenstellungen_alt_vs_neu[(int(weiche_alt.attrib.get("Ref", 0)), weiche_alt.find("./Datei").attrib.get("Dateiname", "").upper())]["alt"] = int(weiche_alt.attrib.get("FahrstrWeichenlage", 0))
+                    weichenstellungen_alt_vs_neu[(int(weiche_alt.get("Ref", 0)), weiche_alt.find("./Datei").get("Dateiname", "").upper())]["alt"] = int(weiche_alt.get("FahrstrWeichenlage", 0))
                 for weiche_neu in fahrstr_neu.weichen:
                     weichenstellungen_alt_vs_neu[(weiche_neu.refpunkt.refnr, weiche_neu.refpunkt.modul.relpath.upper())]["neu"] = weiche_neu.weichenlage
 
@@ -98,7 +98,7 @@ def finde_fahrstrassen(args):
 
                 hsig_alt_vs_neu = defaultdict(dict)
                 for hsig_alt in fahrstr_alt.findall("./FahrstrSignal"):
-                    hsig_alt_vs_neu[(int(hsig_alt.attrib.get("Ref", 0)), hsig_alt.find("./Datei").attrib.get("Dateiname", "").upper())]["alt"] = (int(hsig_alt.attrib.get("FahrstrSignalZeile", 0)), int(hsig_alt.attrib.get("FahrstrSignalErsatzsignal", 0)) == 1)
+                    hsig_alt_vs_neu[(int(hsig_alt.get("Ref", 0)), hsig_alt.find("./Datei").get("Dateiname", "").upper())]["alt"] = (int(hsig_alt.get("FahrstrSignalZeile", 0)), int(hsig_alt.get("FahrstrSignalErsatzsignal", 0)) == 1)
                 for hsig_neu in fahrstr_neu.signale:
                     hsig_alt_vs_neu[(hsig_neu.refpunkt.refnr, hsig_neu.refpunkt.modul.relpath.upper())]["neu"] = (hsig_neu.zeile, hsig_neu.ist_ersatzsignal)
 

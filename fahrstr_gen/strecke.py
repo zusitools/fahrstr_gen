@@ -8,9 +8,9 @@ import math
 class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
     def __repr__(self):
         if self.modul == modulverwaltung.dieses_modul:
-            return self.element.attrib.get("Nr", "0")
+            return self.element.get("Nr", "0")
         else:
-            return "{}[{}] {} {}".format(self.element.attrib.get("Nr", "0"), self.modul.name_kurz(), self.modul, modulverwaltung.dieses_modul)
+            return "{}[{}] {} {}".format(self.element.get("Nr", "0"), self.modul.name_kurz(), self.modul, modulverwaltung.dieses_modul)
 
     def richtung(self, richtung):
         return ElementUndRichtung(self.modul, self.element, richtung)
@@ -27,9 +27,9 @@ class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
 class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', 'richtung'])):
     def __repr__(self):
         if self.modul == modulverwaltung.dieses_modul:
-            return self.element.attrib.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
+            return self.element.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
         else:
-            return "{}{}[{}]".format(self.element.attrib.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
+            return "{}{}[{}]".format(self.element.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
 
     def signal(self):
         return self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal")
@@ -66,7 +66,7 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
-    return signal is not None and any(float(h.attrib.get("HsigGeschw", 0)) == 0 and int(h.attrib.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal.findall("./HsigBegriff"))
+    return signal is not None and any(float(h.get("HsigGeschw", 0)) == 0 and int(h.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal.findall("./HsigBegriff"))
 
 # Gibt die Matrixzeile zurueck, die im angegebenen Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
 # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
@@ -110,7 +110,7 @@ def element_laenge(element):
         knoten = element.find(knotenname)
         if knoten is not None:
             for idx, attribname in enumerate(["X", "Y", "Z"]):
-                pos[idx] = float(knoten.attrib.get(attribname, 0))
+                pos[idx] = float(knoten.get(attribname, 0))
 
     return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
 
@@ -118,7 +118,7 @@ def nachfolger_elemente(element_richtung):
     if element_richtung is None:
         return None
 
-    anschluss = int(element_richtung.element.attrib.get("Anschluss", 0))
+    anschluss = int(element_richtung.element.get("Anschluss", 0))
 
     nachfolger_knoten = [n for n in element_richtung.element if
         (element_richtung.richtung == NORM and (n.tag == "NachNorm" or n.tag == "NachNormModul")) or
@@ -130,7 +130,7 @@ def nachfolger_elemente(element_richtung):
         if "Modul" not in n.tag:
             nach_modul = element_richtung.modul
             try:
-                nach_el = nach_modul.streckenelemente[int(n.attrib.get("Nr", 0))]
+                nach_el = nach_modul.streckenelemente[int(n.get("Nr", 0))]
             except KeyError:
                 nachfolger.append(None)
                 continue
@@ -142,7 +142,7 @@ def nachfolger_elemente(element_richtung):
                 continue
 
             try:
-                nach_ref = nach_modul.referenzpunkte_by_nr[int(n.attrib.get("Nr", 0))]
+                nach_ref = nach_modul.referenzpunkte_by_nr[int(n.get("Nr", 0))]
             except KeyError:
                 nachfolger.append(None)
                 continue
