@@ -109,11 +109,15 @@ def element_laenge(element):
     p1 = [0, 0, 0]
     p2 = [0, 0, 0]
 
-    for (knotenname, pos) in [("b", p1), ("g", p2)]:
-        knoten = element.find(knotenname)
-        if knoten is not None:
-            for idx, attribname in enumerate(["X", "Y", "Z"]):
-                pos[idx] = float(knoten.get(attribname, 0))
+    for n in element:
+        if n.tag == "b":
+            p1[0] = float(n.get("X", 0))
+            p1[1] = float(n.get("Y", 0))
+            p1[2] = float(n.get("Z", 0))
+        elif n.tag == "g":
+            p2[0] = float(n.get("X", 0))
+            p2[1] = float(n.get("Y", 0))
+            p2[2] = float(n.get("Z", 0))
 
     return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
 
