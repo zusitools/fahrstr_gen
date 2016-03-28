@@ -91,7 +91,7 @@ def get_hsig_zeile(signal, fahrstr_typ, zielgeschwindigkeit):
             zeile_kleinergleich = zeile
             geschw_kleinergleich = geschw
 
-        elif geschw_kleiner(geschw, geschw_groesser) and geschw_kleiner(zielgeschwindigkeit, geschw):
+        elif (zeile_groesser is None or geschw_kleiner(geschw, geschw_groesser)) and geschw_kleiner(zielgeschwindigkeit, geschw):
             # geschw < geschw_groesser und geschw > zielgeschwindigkeit
             zeile_groesser = zeile
             geschw_groesser = geschw
