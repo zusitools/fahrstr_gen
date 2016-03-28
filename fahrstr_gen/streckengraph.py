@@ -30,7 +30,7 @@ class Fahrstrasse:
         self.laenge = 0
 
         self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
-        if self.start is None:
+        if self.start is None or not ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
             self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
 
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
