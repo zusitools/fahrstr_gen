@@ -105,6 +105,16 @@ def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
 
     return None
 
+def finde_ereignis_in_signal(signal, ereignis_nr):
+    for matrixeintrag in signal:
+        if matrixeintrag.tag != "MatrixEintrag":
+            continue
+        for ereignis in matrixeintrag:
+            if ereignis.tag == "Ereignis" and int(ereignis.get("Er", 0)) == ereignis_nr:
+                return ereignis
+
+    return None
+
 def element_laenge(element):
     p1 = [0, 0, 0]
     p2 = [0, 0, 0]

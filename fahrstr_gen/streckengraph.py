@@ -48,7 +48,7 @@ class Fahrstrasse:
             self.name += "{} {}".format(startsignal.get("NameBetriebsstelle", ""), startsignal.get("Signalname", ""))
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
-        zielsignal_geschw = self.ziel.signal().find("./MatrixEintrag/Ereignis[@Er='1']")
+        zielsignal_geschw = finde_ereignis_in_signal(self.ziel.signal(), EREIGNIS_SIGNALGESCHWINDIGKEIT)
         if zielsignal_geschw is not None:
             self.signalgeschwindigkeit = float(zielsignal_geschw.get("Wert", 0))
         else:
@@ -66,7 +66,7 @@ class Fahrstrasse:
             # Startsignal ansteuern
             if idx == 0:
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
-                    if self.ziel.signal().find("./MatrixEintrag/Ereignis[@Er='23']") is not None:
+                    if finde_ereignis_in_signal(self.ziel.signal(), EREIGNIS_HILFSHAUPTSIGNAL) is not None:
                         # Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
                         startsignal_zeile = get_hsig_ersatzsignal_zeile(self.start.signal(), self.rgl_ggl)
                         if startsignal_zeile is None:
