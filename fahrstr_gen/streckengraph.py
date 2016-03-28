@@ -5,7 +5,7 @@ from collections import namedtuple, defaultdict
 
 from . import strecke
 from .konstanten import *
-from .strecke import Element, ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, vorgaenger_elemente, gegenrichtung, element_laenge
+from .strecke import *
 
 import logging
 
@@ -46,6 +46,15 @@ class Fahrstrasse:
             startsignal = self.start.signal()
             self.name += "{} {}".format(startsignal.attrib.get("NameBetriebsstelle", ""), startsignal.attrib.get("Signalname", ""))
 
+        # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
+        zielsignal_geschw = self.ziel.signal().find("./MatrixEintrag/Ereignis[@Er='1']")
+        if zielsignal_geschw is not None:
+            self.signalgeschwindigkeit = float(zielsignal_geschw.get("Wert", 0))
+        else:
+            self.signalgeschwindigkeit = -1.0
+            for einzelfahrstrasse in einzelfahrstrassen:
+                self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, einzelfahrstrasse.signalgeschwindigkeit)
+
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             self.laenge += einzelfahrstrasse.laenge
 
@@ -53,7 +62,20 @@ class Fahrstrasse:
             zielsignal = zielkante.ziel.signal()
             self.name += " -> {} {}".format(zielsignal.attrib.get("NameBetriebsstelle", ""), zielsignal.attrib.get("Signalname", ""))
 
-            # TODO: Hauptsignale (richtig) ansteuern: Startsignal mit oder ohne Ersatzsignal, Kennlichtsignale, Zielsignal auf -999
+            # Startsignal ansteuern
+            if idx == 0:
+                if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
+                    if True:
+                        startsignal_zeile = get_hsig_zeile(self.start.signal(), self.fahrstr_typ, self.signalgeschwindigkeit)
+                        if startsignal_zeile is None:
+                            logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
+                        else:
+                            self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
+                    else:
+                        # TODO: Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
+                        pass
+
+            # TODO: Hauptsignale (richtig) ansteuern: Kennlichtsignale, Zielsignal auf -999
 
             for kante in einzelfahrstrasse.kantenliste():
                 # TODO: Vorsignale ansteuern

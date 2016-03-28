@@ -61,8 +61,46 @@ def geschw_kleiner(v1, v2):
         return False
     return v1 < v2
 
+str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v * 3.6)
+
+float_geschw = lambda v : float("Infinity") if v < 0 else v
+
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and any(float(h.attrib.get("HsigGeschw", 0)) == 0 and int(h.attrib.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal.findall("./HsigBegriff"))
+
+# Gibt die Matrixzeile zurueck, die im angegebenen Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
+# Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
+# Wenn solche eine Zeile nicht existiert, wird die Zeile mit der naechstgroesseren Geschwindigkeit genommen.
+# Richtungs- und Gegengleisanzeiger werden nicht betrachtet.
+def get_hsig_zeile(signal, fahrstr_typ, zielgeschwindigkeit):
+    assert(zielgeschwindigkeit != 0)
+    zeile_kleinergleich, geschw_kleinergleich = None, 0
+    zeile_groesser, geschw_groesser = None, -1
+
+    for zeile, hsig_begriff in enumerate(signal.iterfind("./HsigBegriff")):
+        if int(hsig_begriff.get("FahrstrTyp", 0)) & fahrstr_typ == 0:
+            continue
+        geschw = float(hsig_begriff.get("HsigGeschw", 0))
+
+        # Zeilen fuer Spezialgeschwindigkeiten werden nicht betrachtet.
+        if geschw == 0.0 or geschw == -2.0 or geschw == -999.0:
+            continue
+
+        if geschw_kleiner(geschw_kleinergleich, geschw) and not geschw_kleiner(zielgeschwindigkeit, geschw):
+            # geschw > geschw_kleinergleich und geschw <= zielgeschwindigkeit
+            zeile_kleinergleich = zeile
+            geschw_kleinergleich = geschw
+
+        elif geschw_kleiner(geschw, geschw_groesser) and geschw_kleiner(zielgeschwindigkeit, geschw):
+            # geschw < geschw_groesser und geschw > zielgeschwindigkeit
+            zeile_groesser = zeile
+            geschw_groesser = geschw
+
+    return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
+
+def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
+    # TODO
+    pass
 
 def element_laenge(element):
     p1 = [0, 0, 0]
