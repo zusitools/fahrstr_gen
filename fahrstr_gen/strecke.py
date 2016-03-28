@@ -1,11 +1,22 @@
 from collections import namedtuple
 from .konstanten import *
-from .modulverwaltung import get_modul_aus_dateiknoten
+from .modulverwaltung import get_modul_aus_dateiknoten, dieses_modul
 
 import math
 
-Element = namedtuple('ElementUndRichtung', ['modul', 'element'])
-ElementUndRichtung = namedtuple('ElementUndRichtung', ['modul', 'element', 'richtung'])
+class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
+    def __repr__(self):
+        if self.modul == modulverwaltung.dieses_modul:
+            return self.element.attrib.get("Nr", "0")
+        else:
+            return "{}[{}]".format(self.element.attrib.get("Nr", "0"), self.modul.name_kurz())
+
+class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', 'richtung'])):
+    def __repr__(self):
+        if self.modul == modulverwaltung.dieses_modul:
+            return self.element.attrib.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
+        else:
+            return "{}{}[{}]".format(self.element.attrib.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
 
 def geschw_min(v1, v2):
     if v1 < 0:

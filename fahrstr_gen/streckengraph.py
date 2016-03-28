@@ -222,6 +222,9 @@ class Knoten:
         self.vorgaenger_kanten = [None, None]
         self.einzelfahrstrassen = [None, None]
 
+    def __repr__(self):
+        return "Knoten<{}>".format(repr(self.element))
+
     def signal(self, richtung):
         return self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal")
 
@@ -233,7 +236,7 @@ class Knoten:
 
     # Gibt alle von diesem Knoten ausgehenden (kombinierten) Fahrstrassen in der angegebenen Richtung zurueck.
     def get_fahrstrassen(self, richtung):
-        logging.debug("Suche Fahrstrassen ab {} {}{}".format(self.modul.relpath, self.element.attrib["Nr"], 'n' if richtung == NORM else 'g'))
+        logging.debug("Suche Fahrstrassen ab {}{}".format(self, "b" if richtung == NORM else "g"))
         result = []
         for einzelfahrstrasse in self.get_einzelfahrstrassen(richtung):
             self._get_fahrstrassen_rek([einzelfahrstrasse], result)
@@ -244,7 +247,7 @@ class Knoten:
     def get_einzelfahrstrassen(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.einzelfahrstrassen[key] is None:
-            logging.debug("Suche Einzelfahrstrassen ab {} {}{}".format(self.modul.relpath, self.element.attrib["Nr"], 'n' if richtung == NORM else 'g'))
+            logging.debug("Suche Einzelfahrstrassen ab {}{}".format(self, "b" if richtung == NORM else "g"))
             self.einzelfahrstrassen[key] = self._get_einzelfahrstrassen(richtung)
         return self.einzelfahrstrassen[key]
 
@@ -252,7 +255,7 @@ class Knoten:
     def get_nachfolger_kanten(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.nachfolger_kanten[key] is None:
-            logging.debug("Suche Nachfolgerkanten ab {} {}{}".format(self.modul.relpath, self.element.attrib["Nr"], 'n' if richtung == NORM else 'g'))
+            logging.debug("Suche Nachfolgerkanten ab {}{}".format(self, "b" if richtung == NORM else "g"))
             self.nachfolger_kanten[key] = []
             nachfolger = nachfolger_elemente(ElementUndRichtung(self.modul, self.element, richtung))
 
