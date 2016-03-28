@@ -99,8 +99,11 @@ def get_hsig_zeile(signal, fahrstr_typ, zielgeschwindigkeit):
     return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
 
 def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
-    # TODO
-    pass
+    for zeile, begriff in enumerate(signal.iterfind("./Ersatzsignal")):
+        if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
+            return zeile
+
+    return None
 
 def element_laenge(element):
     p1 = [0, 0, 0]

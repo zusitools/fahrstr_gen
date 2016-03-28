@@ -28,6 +28,7 @@ class Fahrstrasse:
         self.aufloesepunkte = [] # [RefPunkt]
         self.signalhaltfallpunkte = [] # [RefPunkt]
         self.laenge = 0
+        self.rgl_ggl = GLEIS_BAHNHOF
 
         self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
         if self.start is None or not ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
@@ -65,15 +66,19 @@ class Fahrstrasse:
             # Startsignal ansteuern
             if idx == 0:
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
-                    if True:
+                    if self.ziel.signal().find("./MatrixEintrag/Ereignis[@Er='23']") is not None:
+                        # Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
+                        startsignal_zeile = get_hsig_ersatzsignal_zeile(self.start.signal(), self.rgl_ggl)
+                        if startsignal_zeile is None:
+                            logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}".format(self.name, self.rgl_ggl))
+                        else:
+                            self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, True))
+                    else:
                         startsignal_zeile = get_hsig_zeile(self.start.signal(), self.fahrstr_typ, self.signalgeschwindigkeit)
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
-                    else:
-                        # TODO: Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
-                        pass
 
             # TODO: Hauptsignale (richtig) ansteuern: Kennlichtsignale, Zielsignal auf -999
 
