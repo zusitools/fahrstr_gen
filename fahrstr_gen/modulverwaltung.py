@@ -145,6 +145,9 @@ class Modul:
 
         self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)
 
+    def name_kurz(self):
+        return os.path.basename(self.relpath.replace('\\', os.sep))
+
 # Sucht Knoten ./Datei und liefert Modul oder None zurueck (leerer String oder nicht vorhandener Knoten = Fallback)
 def get_modul_aus_dateiknoten(knoten, fallback):
     datei = knoten.find("./Datei")

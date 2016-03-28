@@ -2,7 +2,7 @@
 
 from fahrstr_gen import modulverwaltung, streckengraph, strecke
 from fahrstr_gen.konstanten import *
-from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ
+from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ, Element
 
 import xml.etree.ElementTree as ET
 import argparse
@@ -31,7 +31,7 @@ def finde_fahrstrassen(args):
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.richtung == richtung
                         ):
 
-                        fahrstrassen.extend([f for f in graph.get_knoten(modulverwaltung.dieses_modul, str_element).get_fahrstrassen(richtung)
+                        fahrstrassen.extend([f for f in graph.get_knoten(Element(modulverwaltung.dieses_modul, str_element)).get_fahrstrassen(richtung)
                             if f.name not in loeschfahrstrassen_namen])
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")

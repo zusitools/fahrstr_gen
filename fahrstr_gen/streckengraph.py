@@ -5,7 +5,7 @@ from collections import namedtuple, defaultdict
 
 from . import strecke
 from .konstanten import *
-from .strecke import ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, vorgaenger_elemente, element_laenge
+from .strecke import Element, ElementUndRichtung, geschw_min, ist_hsig_fuer_fahrstr_typ, nachfolger_elemente, vorgaenger_elemente, gegenrichtung, element_laenge
 
 import logging
 
@@ -29,11 +29,11 @@ class Fahrstrasse:
         self.signalhaltfallpunkte = [] # [RefPunkt]
         self.laenge = 0
 
-        self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL, einzelfahrstrassen[0].startrichtung)
+        self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
         if self.start is None:
-            self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT, einzelfahrstrassen[0].startrichtung)
+            self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
 
-        self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL, einzelfahrstrassen[-1].zielrichtung)
+        self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
 
         # TODO: Setze Regelgleis/Gegengleis
         # TODO: Setze Richtungsanzeiger
@@ -50,7 +50,7 @@ class Fahrstrasse:
             self.laenge += einzelfahrstrasse.laenge
 
             zielkante = einzelfahrstrasse.kanten.eintrag
-            zielsignal = zielkante.ziel.signal(zielkante.zielrichtung)
+            zielsignal = zielkante.ziel.signal()
             self.name += " -> {} {}".format(zielsignal.attrib.get("NameBetriebsstelle", ""), zielsignal.attrib.get("Signalname", ""))
 
             # TODO: Hauptsignale (richtig) ansteuern: Startsignal mit oder ohne Ersatzsignal, Kennlichtsignale, Zielsignal auf -999
@@ -112,11 +112,8 @@ class Fahrstrasse:
 # ohne dazwischenliegende Hauptsignale (etwa fuer Kennlichtschaltungen).
 class EinzelFahrstrasse:
     def __init__(self):
-        self.start = None
-        self.startrichtung = None
-
-        self.ziel = None
-        self.zielrichtung = None
+        self.start = None # KnotenUndRichtung
+        self.ziel = None  # KnotenUndRichtung
 
         self.kanten = None  # ListenEintrag
         self.laenge = 0  # Laenge in Metern
@@ -128,9 +125,7 @@ class EinzelFahrstrasse:
     def erweitere(self, kante):
         if self.start is None:
             self.start = kante.start
-            self.startrichtung = kante.startrichtung
         self.ziel = kante.ziel
-        self.zielrichtung = kante.zielrichtung
         self.kanten = ListenEintrag(kante, self.kanten)
         self.laenge = self.laenge + kante.laenge
         self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
@@ -143,7 +138,6 @@ class EinzelFahrstrasse:
     def erweiterte_kopie(self, kante):
         result = EinzelFahrstrasse()
         result.start = self.start
-        result.startrichtung = self.startrichtung
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
@@ -177,23 +171,20 @@ class Streckengraph:
             ist_hsig_fuer_fahrstr_typ(element.find("./InfoGegenRichtung/Signal"), self.fahrstr_typ)
         )
 
-    def get_knoten(self, modul, element):
+    def get_knoten(self, element):
         try:
             return self.knoten[element]
         except KeyError:
-            result = Knoten(self, modul, element)
+            result = Knoten(self, element)
             self.knoten[element] = result
             return result
 
 # Eine Kante zwischen zwei Knoten im Streckengraphen. Sie enthaelt alle fahrstrassenrelevanten Daten (Signale, Weichen, Aufloesepunkte etc.)
 # einer Folge von gerichteten Streckenelementen zwischen den beiden Knoten (exklusive Start, inklusive Ziel, inklusive Start-Weichenstellung).
 class Kante:
-    def __init__(self, start, startrichtung):
-        self.start = start
-        self.startrichtung = startrichtung
-
-        self.ziel = None  # Knoten
-        self.zielrichtung = None  # Richtung
+    def __init__(self, start):
+        self.start = start  # KnotenUndRichtung
+        self.ziel = None  # KnotenUndRichtung
 
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
@@ -210,10 +201,9 @@ class Kante:
 
 # Ein Knoten im Streckengraphen ist ein relevantes Streckenelement, also eines, das eine Weiche oder ein Hauptsignal enthaelt.
 class Knoten:
-    def __init__(self, graph, modul, element):
+    def __init__(self, graph, element):
         self.graph = graph  # Streckengraph
-        self.modul = modul  # Modul
-        self.element = element  # <StrElement>
+        self.element = element  # Instanz der Klasse Element (Tupel aus Modul und <StrElement>-Knoten)
 
         # Von den nachfolgenden Informationen existiert eine Liste pro Richtung.
         self.nachfolger_kanten = [None, None]
@@ -223,18 +213,18 @@ class Knoten:
     def __repr__(self):
         return "Knoten<{}>".format(repr(self.element))
 
-    def signal(self, richtung):
-        return self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal")
+    def richtung(self, richtung):
+        return KnotenUndRichtung(self, richtung)
 
-    def refpunkt(self, typ, richtung):
-        for refpunkt in self.modul.referenzpunkte[self.element]:
-            if refpunkt.richtung == richtung and refpunkt.reftyp == typ:
-                return refpunkt
-        return None
+    def signal(self, richtung):
+        return self.element.signal(richtung)
+
+    def refpunkt(self, richtung, typ):
+        return self.element.refpunkt(richtung, typ)
 
     # Gibt alle von diesem Knoten ausgehenden (kombinierten) Fahrstrassen in der angegebenen Richtung zurueck.
     def get_fahrstrassen(self, richtung):
-        logging.debug("Suche Fahrstrassen ab {}{}".format(self, "b" if richtung == NORM else "g"))
+        logging.debug("Suche Fahrstrassen ab {}".format(self.richtung(richtung)))
         result = []
         for einzelfahrstrasse in self.get_einzelfahrstrassen(richtung):
             self._get_fahrstrassen_rek([einzelfahrstrasse], result)
@@ -245,7 +235,7 @@ class Knoten:
     def get_einzelfahrstrassen(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.einzelfahrstrassen[key] is None:
-            logging.debug("Suche Einzelfahrstrassen ab {}{}".format(self, "b" if richtung == NORM else "g"))
+            logging.debug("Suche Einzelfahrstrassen ab {}".format(self.richtung(richtung)))
             self.einzelfahrstrassen[key] = self._get_einzelfahrstrassen(richtung)
         return self.einzelfahrstrassen[key]
 
@@ -255,22 +245,23 @@ class Knoten:
     def get_nachfolger_kanten(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.nachfolger_kanten[key] is None:
-            logging.debug("Suche Nachfolgerkanten ab {}{}".format(self, "b" if richtung == NORM else "g"))
+            logging.debug("Suche Nachfolgerkanten ab {}".format(self.richtung(richtung)))
             self.nachfolger_kanten[key] = []
-            nachfolger = nachfolger_elemente(ElementUndRichtung(self.modul, self.element, richtung))
+            nachfolger = nachfolger_elemente(self.element.richtung(richtung))
 
             weichen_refpunkt = None
             if len(nachfolger) > 1:
-                weichen_refpunkt = self.refpunkt(REFTYP_WEICHE, richtung)
+                # Weichenstellung am Startelement in die Kante mit aufnehmen
+                weichen_refpunkt = self.element.refpunkt(richtung, REFTYP_WEICHE)
                 if weichen_refpunkt is None:
                     logging.warn(("Element {} hat mehr als einen Nachfolger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                             "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
-                            self.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
+                            self.element.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
                     self.nachfolger_kanten[key] = [None] * len(nachfolger)
                     return
 
             for idx, n in enumerate(nachfolger):
-                kante = Kante(self, richtung)
+                kante = Kante(self.richtung(richtung))
                 if weichen_refpunkt is not None:
                     kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
                 kante = self._neue_nachfolger_kante(kante, n)
@@ -288,7 +279,7 @@ class Knoten:
             # TODO: Register am aktuellen Element in die Registerliste einfuegen
 
             # Ereignisse am aktuellen Element verarbeiten
-            for ereignis in element_richtung.element.findall("./Info" + ('Norm' if element_richtung.richtung == NORM else 'Gegen') + "Richtung/Ereignis"):
+            for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.attrib.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
                     kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.attrib.get("Wert", 0)))
@@ -363,7 +354,7 @@ class Knoten:
             nachfolger_vorgaenger = vorgaenger_elemente(element_richtung_neu)
             if nachfolger_vorgaenger is not None and len(nachfolger_vorgaenger) > 1:
                 # Stumpf befahrene Weiche stellen
-                weichen_refpunkt = self.graph.get_knoten(element_richtung_neu.modul, element_richtung_neu.element).refpunkt(REFTYP_WEICHE, NORM if element_richtung_neu.richtung == GEGEN else NORM)
+                weichen_refpunkt = self.graph.get_knoten(Element(element_richtung_neu.modul, element_richtung_neu.element)).refpunkt(gegenrichtung(element_richtung_neu.richtung), REFTYP_WEICHE)
                 if weichen_refpunkt is None:
                     logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                             "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
@@ -385,8 +376,7 @@ class Knoten:
             # Fahrweg endet im Nichts, hier ist keine sinnvolle Fahrstrasse zu erzeugen
             return None
         else:
-            kante.ziel = self.graph.get_knoten(element_richtung.modul, element_richtung.element)
-            kante.zielrichtung = element_richtung.richtung
+            kante.ziel = KnotenUndRichtung(self.graph.get_knoten(Element(element_richtung.modul, element_richtung.element)), element_richtung.richtung)
 
         return kante
 
@@ -414,13 +404,13 @@ class Knoten:
     # und fuegt die resultierenden Einzelfahrstrassen in das Ergebnis-Dict ein.
     def _get_einzelfahrstrassen_rek(self, fahrstrasse, ergebnis_dict):
         # Sind wir am Hauptsignal?
-        signal = fahrstrasse.ziel.signal(fahrstrasse.zielrichtung)
+        signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.graph.fahrstr_typ):
             logging.debug("Zielsignal gefunden: {} {}".format(signal.attrib.get("NameBetriebsstelle", "?"), signal.attrib.get("Signalname", "?")))
-            ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL, fahrstrasse.zielrichtung)].append(fahrstrasse)
+            ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
             return
 
-        folgekanten = fahrstrasse.ziel.get_nachfolger_kanten(fahrstrasse.zielrichtung)
+        folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
         if len(folgekanten) == 1:
             if folgekanten[0] is not None:
                 fahrstrasse.erweitere(folgekanten[0])
@@ -432,8 +422,8 @@ class Knoten:
 
     def _get_fahrstrassen_rek(self, einzelfahrstr_liste, ziel_liste):
         letzte_fahrstrasse = einzelfahrstr_liste[-1]
-        zielknoten = letzte_fahrstrasse.kanten.eintrag.ziel
-        zielrichtung = letzte_fahrstrasse.kanten.eintrag.zielrichtung
+        zielknoten = letzte_fahrstrasse.kanten.eintrag.ziel.knoten
+        zielrichtung = letzte_fahrstrasse.kanten.eintrag.ziel.richtung
         zielsignal = zielknoten.signal(zielrichtung)
         ziel_flags = int(zielsignal.attrib.get("SignalFlags", 0))
 
@@ -468,3 +458,13 @@ class Knoten:
         if fahrstr_weiterfuehren:
             for einzelfahrstrasse in zielknoten.get_einzelfahrstrassen(zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
+
+class KnotenUndRichtung(namedtuple('KnotenUndRichtung', ['knoten', 'richtung'])):
+    def __repr__(self):
+        return repr(self.knoten) + ("b" if self.richtung == NORM else "g")
+
+    def signal(self):
+        return self.knoten.element.signal(self.richtung)
+
+    def refpunkt(self, typ):
+        return self.knoten.element.refpunkt(self.richtung, typ)

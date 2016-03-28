@@ -1,6 +1,7 @@
 from collections import namedtuple
 from .konstanten import *
-from .modulverwaltung import get_modul_aus_dateiknoten, dieses_modul
+
+from . import modulverwaltung
 
 import math
 
@@ -9,7 +10,19 @@ class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
         if self.modul == modulverwaltung.dieses_modul:
             return self.element.attrib.get("Nr", "0")
         else:
-            return "{}[{}]".format(self.element.attrib.get("Nr", "0"), self.modul.name_kurz())
+            return "{}[{}] {} {}".format(self.element.attrib.get("Nr", "0"), self.modul.name_kurz(), self.modul, modulverwaltung.dieses_modul)
+
+    def richtung(self, richtung):
+        return ElementUndRichtung(self.modul, self.element, richtung)
+
+    def signal(self, richtung):
+        return self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal")
+
+    def refpunkt(self, richtung, typ):
+        for refpunkt in self.modul.referenzpunkte[self.element]:
+            if refpunkt.richtung == richtung and refpunkt.reftyp == typ:
+                return refpunkt
+        return None
 
 class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', 'richtung'])):
     def __repr__(self):
@@ -17,6 +30,22 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', '
             return self.element.attrib.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
         else:
             return "{}{}[{}]".format(self.element.attrib.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
+
+    def signal(self):
+        return self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal")
+
+    def refpunkt(self, typ):
+        for refpunkt in self.modul.referenzpunkte[self.element]:
+            if refpunkt.richtung == self.richtung and refpunkt.reftyp == typ:
+                return refpunkt
+        return None
+
+    def ereignisse(self):
+        # TODO: eventuell auch Ereignisse in Signalen beachten?
+        return self.element.iterfind("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Ereignis")
+
+    def gegenrichtung(self):
+        return ElementUndRichtung(self.modul, self.element, GEGEN if self.richtung == NORM else NORM)
 
 def geschw_min(v1, v2):
     if v1 < 0:
@@ -69,7 +98,7 @@ def nachfolger_elemente(element_richtung):
                 continue
             nach_richtung = NORM if (anschluss >> anschluss_shift) & 1 == 0 else GEGEN
         else:
-            nach_modul = get_modul_aus_dateiknoten(n, element_richtung.modul)
+            nach_modul = modulverwaltung.get_modul_aus_dateiknoten(n, element_richtung.modul)
             if nach_modul is None:
                 nachfolger.append(None)
                 continue
@@ -87,14 +116,14 @@ def nachfolger_elemente(element_richtung):
 
     return nachfolger
 
-def gegenrichtung(element_richtung):
-    return ElementUndRichtung(element_richtung.modul, element_richtung.element, NORM if element_richtung.richtung == GEGEN else GEGEN)
+def gegenrichtung(richtung):
+    return GEGEN if richtung == NORM else NORM
 
 def vorgaenger_elemente(element_richtung):
     if element_richtung is None:
         return None
 
-    return [gegenrichtung(e) for e in nachfolger_elemente(gegenrichtung(element_richtung))]
+    return [e.gegenrichtung() for e in nachfolger_elemente(element_richtung.gegenrichtung()) if e is not None]
 
 st3_attrib_order = {
     "AutorEintrag": ["AutorID", "AutorName", "AutorEmail", "AutorAufwand", "AutorLizenz", "AutorBeschreibung"],
