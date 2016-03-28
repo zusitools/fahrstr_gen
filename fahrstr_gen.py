@@ -70,6 +70,16 @@ def finde_fahrstrassen(args):
                 if abs(laenge_alt - fahrstr_neu.laenge) > 1:
                     print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
 
+                rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
+                if fahrstr_neu.rgl_ggl != rgl_ggl_alt:
+                    print("{}: unterschiedliche RglGgl-Spezifikation: {} vs {}".format(name, rgl_ggl_alt, fahrstr_neu.rgl_ggl))
+
+                streckenname_alt = fahrstr_alt.get("FahrstrStrecke", "")
+                if fahrstr_neu.streckenname != streckenname_alt:
+                    print("{}: unterschiedlicher Streckenname: {} vs {}".format(name, streckenname_alt, fahrstr_neu.streckenname))
+
+                # TODO: Zufallswert
+
                 start_alt = fahrstr_alt.find("./FahrstrStart")
                 start_alt_refnr = int(start_alt.get("Ref", 0))
                 start_alt_modul = start_alt.find("./Datei").get("Dateiname", "")

@@ -28,15 +28,26 @@ class Fahrstrasse:
         self.aufloesepunkte = [] # [RefPunkt]
         self.signalhaltfallpunkte = [] # [RefPunkt]
         self.laenge = 0
-        self.rgl_ggl = GLEIS_BAHNHOF
 
+        # Setze Start und Ziel
         self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
         if self.start is None or not ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
             self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
 
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
 
-        # TODO: Setze Regelgleis/Gegengleis
+        # Setze Regelgleis/Gegengleis/Streckenname
+        self.rgl_ggl = GLEIS_BAHNHOF
+        self.streckenname = ""
+        for einzelfahrstrasse in einzelfahrstrassen:
+            for kante in einzelfahrstrasse.kantenliste():
+                if kante.rgl_ggl != GLEIS_BAHNHOF:
+                    self.rgl_ggl = kante.rgl_ggl
+                    self.streckenname = kante.streckenname
+                    break
+            if self.rgl_ggl != GLEIS_BAHNHOF:
+                break
+
         # TODO: Setze Richtungsanzeiger
 
         self.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
@@ -92,7 +103,7 @@ class Fahrstrasse:
         # TODO: Aufloesepunkte suchen (= Teilaufloesepunkte der naechsten Einzelfahrstrassen am Zielknoten)
 
     def to_xml(self):
-        # TODO: FahrstrStrecke, RglGgl, Zufallswert
+        # TODO: Zufallswert
         result = ET.Element('Fahrstrasse', {
             "FahrstrName": self.name,
             "Laenge": "{:.1f}".format(self.laenge)
@@ -103,6 +114,11 @@ class Fahrstrasse:
             result.attrib["FahrstrTyp"] = "TypZug"
         elif self.fahrstr_typ == FAHRSTR_TYP_LZB:
             result.attrib["FahrstrTyp"] = "TypLZB"
+
+        if self.rgl_ggl != 0:
+            result.set("RglGgl", str(self.rgl_ggl))
+        if len(self.streckenname) > 0:
+            result.set("FahrstrStrecke", self.streckenname)
 
         self.start.to_xml(ET.SubElement(result, 'FahrstrStart'))
         self.ziel.to_xml(ET.SubElement(result, 'FahrstrZiel'))
@@ -146,9 +162,6 @@ class EinzelFahrstrasse:
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
 
-        self.rgl_ggl = GLEIS_BAHNHOF
-        self.richtungsanzeiger = ""
-
     def erweitere(self, kante):
         if self.start is None:
             self.start = kante.start
@@ -157,19 +170,12 @@ class EinzelFahrstrasse:
         self.laenge = self.laenge + kante.laenge
         self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
 
-        if self.rgl_ggl == GLEIS_BAHNHOF:
-            self.rgl_ggl = kante.rgl_ggl
-        if self.richtungsanzeiger == "":
-            self.richtungsanzeiger = kante.richtungsanzeiger
-
     def erweiterte_kopie(self, kante):
         result = EinzelFahrstrasse()
         result.start = self.start
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
-        result.rgl_ggl = self.rgl_ggl
-        result.richtungsanzeiger = self.richtungsanzeiger
         result.erweitere(kante)
         return result
 
@@ -224,6 +230,7 @@ class Kante:
         self.signalhaltfallpunkte = []  # [RefPunkt]
 
         self.rgl_ggl = GLEIS_BAHNHOF  # Regelgleis-/Gegengleiskennzeichnung dieses Abschnitts
+        self.streckenname = ""  # Streckenname (Teil der Regelgleis-/Gegengleiskennzeichnung)
         self.richtungsanzeiger = ""  # Richtungsanzeiger-Ziel dieses Abschnitts
 
 # Ein Knoten im Streckengraphen ist ein relevantes Streckenelement, also eines, das eine Weiche oder ein Hauptsignal enthaelt.
@@ -327,6 +334,7 @@ class Knoten:
                 elif ereignis_nr == EREIGNIS_GEGENGLEIS:
                     if kante.rgl_ggl == GLEIS_BAHNHOF:
                         kante.rgl_ggl = GLEIS_GEGENGLEIS
+                        kante.streckenname = ereignis.get("Beschr", "")
                     else:
                         # TODO: Warnmeldung
                         pass
@@ -334,6 +342,7 @@ class Knoten:
                 elif ereignis_nr == EREIGNIS_REGELGLEIS:
                     if kante.rgl_ggl == GLEIS_BAHNHOF:
                         kante.rgl_ggl = GLEIS_REGELGLEIS
+                        kante.streckenname = ereignis.get("Beschr", "")
                     else:
                         # TODO: Warnmeldung
                         pass
@@ -341,6 +350,7 @@ class Knoten:
                 elif ereignis_nr == EREIGNIS_EINGLEISIG:
                     if kante.rgl_ggl == GLEIS_BAHNHOF:
                         kante.rgl_ggl = GLEIS_EINGLEISIG
+                        kante.streckenname = ereignis.get("Beschr", "")
                     else:
                         # TODO: Warnmeldung
                         pass
