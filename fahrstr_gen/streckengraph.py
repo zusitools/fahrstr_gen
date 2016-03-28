@@ -190,11 +190,11 @@ class Kante:
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
 
         self.register = []  # [RefPunkt]
-        self.weichen = []  # [(RefPunkt, Weichenstellung)]
-        self.signale = []  # [(RefPunkt, Signalzeile)] -- alle Signale, die nicht eine Fahrstrasse beenden, also z.B. Rangiersignale, sowie "Signal in Fahrstrasse verknuepfen"
-        self.vorsignale = []  # [(RefPunkt, Signalspalte)]
+        self.weichen = []  # [FahrstrWeichenstellung]
+        self.signale = []  # [FahrstrHauptsignal] -- alle Signale, die nicht eine Fahrstrasse beenden, also z.B. Rangiersignale, sowie "Signal in Fahrstrasse verknuepfen". Wenn die Signalzeile den Wert -1 hat, ist die zu waehlende Zeile fahrstrassenabhaengig.
+        self.vorsignale = []  # [FahrstrVorsignal] -- nur Vorsignale, die mit "Vorsignal in Fahrstrasse verknuepfen" in einem Streckenelement dieser Kante verknuepft sind
         self.aufloesepunkte = []  # [RefPunkt]
-        self.signalhaltfallpunkte = []  # RefPunkt
+        self.signalhaltfallpunkte = []  # [RefPunkt]
 
         self.rgl_ggl = GLEIS_BAHNHOF  # Regelgleis-/Gegengleiskennzeichnung dieses Abschnitts
         self.richtungsanzeiger = ""  # Richtungsanzeiger-Ziel dieses Abschnitts
@@ -268,7 +268,7 @@ class Knoten:
                 self.nachfolger_kanten[key].append(kante)
         return self.nachfolger_kanten[key]
 
-    # Erweitert die angegebene Kante, die am Nachfolger 'el_r' (Nachfolgerelement Nummer 'idx') dieses Knotens beginnt.
+    # Erweitert die angegebene Kante, die am Nachfolger 'element_richtung' dieses Knotens beginnt.
     # Gibt None zurueck, wenn keine fahrstrassenrelevante Kante existiert.
     def _neue_nachfolger_kante(self, kante, element_richtung):
         if element_richtung is None:
