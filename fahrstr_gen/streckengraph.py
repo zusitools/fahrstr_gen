@@ -44,9 +44,6 @@ class Fahrstrasse:
                 if kante.rgl_ggl != GLEIS_BAHNHOF:
                     self.rgl_ggl = kante.rgl_ggl
                     self.streckenname = kante.streckenname
-                    break
-            if self.rgl_ggl != GLEIS_BAHNHOF:
-                break
 
         # TODO: Setze Richtungsanzeiger
 
