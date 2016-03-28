@@ -329,8 +329,16 @@ class Knoten:
                     # TODO: in Liste von Registern einfuegen
                     pass
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
-                    # TODO: in Liste von Weichen einfuegen
-                    pass
+                    try:
+                        refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                    except (KeyError, ValueError):
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Weichenverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        continue
+
+                    try:
+                        kante.weichen.append(FahrstrWeichenstellung(refpunkt, int(ereignis.get("Beschr", ""))))
+                    except ValueError:
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Beschr", "")))
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
                     # TODO: in Liste von Signalen einfuegen
                     pass
