@@ -120,7 +120,6 @@ dieses_modul = None
 
 class Modul:
     def __init__(self, relpath, root):
-        logging.debug("Lade Modul {}".format(relpath))
         self.relpath = relpath
         self.root = root
         self.streckenelemente = dict(
@@ -152,11 +151,14 @@ class Modul:
 def get_modul_aus_dateiknoten(knoten, fallback):
     datei = knoten.find("./Datei")
     if datei is not None and "Dateiname" in datei.attrib:
-        try:
-            modul_relpath = normalize_zusi_relpath(datei.attrib["Dateiname"])
-            if modul_relpath not in module:
-                module[modul_relpath] = Modul(datei.attrib["Dateiname"], ET.parse(get_abspath(datei.attrib["Dateiname"])))
-            return module[modul_relpath]
-        except FileNotFoundError:
-            return None
+        modul_relpath = normalize_zusi_relpath(datei.attrib["Dateiname"])
+        if modul_relpath not in module:
+            dateiname = get_abspath(datei.attrib["Dateiname"])
+            try:
+                logging.debug("Lade Modul {}".format(datei.attrib["Dateiname"]))
+                module[modul_relpath] = Modul(datei.attrib["Dateiname"], ET.parse(dateiname))
+            except FileNotFoundError:
+                logging.warn("Moduldatei {} nicht gefunden".format(dateiname))
+                module[modul_relpath] = None
+        return module[modul_relpath]
     return fallback
