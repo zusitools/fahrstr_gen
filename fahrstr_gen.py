@@ -96,6 +96,20 @@ def finde_fahrstrassen(args):
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
                         print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, weichen_refpunkt, weichenstellungen["alt"], weichenstellungen["neu"]))
 
+                hsig_alt_vs_neu = defaultdict(dict)
+                for hsig_alt in fahrstr_alt.findall("./FahrstrSignal"):
+                    hsig_alt_vs_neu[(int(hsig_alt.attrib.get("Ref", 0)), hsig_alt.find("./Datei").attrib.get("Dateiname", "").upper())]["alt"] = (int(hsig_alt.attrib.get("FahrstrSignalZeile", 0)), int(hsig_alt.attrib.get("FahrstrSignalErsatzsignal", 0)) == 1)
+                for hsig_neu in fahrstr_neu.signale:
+                    hsig_alt_vs_neu[(hsig_neu.refpunkt.refnr, hsig_neu.refpunkt.modul.relpath.upper())]["neu"] = (hsig_neu.zeile, hsig_neu.ist_ersatzsignal)
+
+                for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                    if "alt" not in hsig:
+                        print("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, hsig_refpunkt))
+                    elif "neu" not in hsig:
+                        print("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, hsig_refpunkt))
+                    elif hsig["alt"] != hsig["neu"]:
+                        print("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, hsig_refpunkt, hsig["alt"], hsig["neu"]))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
     parser.add_argument('dateiname')
