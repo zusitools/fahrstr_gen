@@ -161,6 +161,9 @@ class EinzelFahrstrasse:
 
         self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
 
+    def __repr__(self):
+        return "EinzelFahrstrasse<{}, {}>".format(self.start, self.ziel)
+
     def erweitere(self, kante):
         if self.start is None:
             self.start = kante.start
