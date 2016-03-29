@@ -70,7 +70,7 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
-    return signal is not None and any(float(h.get("HsigGeschw", 0)) == 0 and int(h.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal.iterfind("./HsigBegriff"))
+    return signal is not None and any(float(h.get("HsigGeschw", 0)) == 0 and int(h.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal if h.tag == "HsigBegriff")
 
 # Gibt die Matrixzeile zurueck, die im angegebenen Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
 # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
