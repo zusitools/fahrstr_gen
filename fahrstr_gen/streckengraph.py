@@ -309,6 +309,15 @@ class Knoten:
             # TODO: Signal am aktuellen Element in die Signalliste einfuegen
             # TODO: Register am aktuellen Element in die Registerliste einfuegen
 
+            # Register am aktuellen Element in die Registerliste einfuegen
+            regnr = element_richtung.registernr()
+            if regnr != 0:
+                refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
+                if refpunkt is None:
+                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichetet.".format(element_richtung))
+                else:
+                    kante.register.append(refpunkt)
+
             # Ereignisse am aktuellen Element verarbeiten
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
@@ -360,8 +369,12 @@ class Knoten:
                         pass
 
                 elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
-                    # TODO: in Liste von Registern einfuegen
-                    pass
+                    try:
+                        kante.register.append(element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))])
+                    except (KeyError, ValueError):
+                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Registerverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        continue
+
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
                         refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]

@@ -40,6 +40,10 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', '
                 return refpunkt
         return None
 
+    def registernr(self):
+        richtungsinfo = self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung")
+        return 0 if richtungsinfo is None else int(richtungsinfo.get("Reg", 0))
+
     def ereignisse(self):
         # TODO: eventuell auch Ereignisse in Signalen beachten?
         return self.element.iterfind("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Ereignis")
