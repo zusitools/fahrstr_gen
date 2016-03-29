@@ -92,6 +92,16 @@ def finde_fahrstrassen(args):
                 if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.modul.relpath.upper():
                     print("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.modul.relpath))
 
+                # Register
+                register_alt = set((int(register_alt.get("Ref", 0)), register_alt.find("./Datei").get("Dateiname", "").upper()) for register_alt in fahrstr_alt.iterfind("./FahrstrRegister"))
+                register_neu = set((register_neu.refnr, register_neu.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
+
+                for refpunkt in register_alt - register_neu:
+                    print("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                for refpunkt in register_neu - register_alt:
+                    print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+
+                # Weichen
                 weichenstellungen_alt_vs_neu = defaultdict(dict)
                 for weiche_alt in fahrstr_alt.findall("./FahrstrWeiche"):
                     weichenstellungen_alt_vs_neu[(int(weiche_alt.get("Ref", 0)), weiche_alt.find("./Datei").get("Dateiname", "").upper())]["alt"] = int(weiche_alt.get("FahrstrWeichenlage", 0))
@@ -106,6 +116,7 @@ def finde_fahrstrassen(args):
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
                         print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, weichen_refpunkt, weichenstellungen["alt"], weichenstellungen["neu"]))
 
+                # Hauptsignale
                 hsig_alt_vs_neu = defaultdict(dict)
                 for hsig_alt in fahrstr_alt.findall("./FahrstrSignal"):
                     hsig_alt_vs_neu[(int(hsig_alt.get("Ref", 0)), hsig_alt.find("./Datei").get("Dateiname", "").upper())]["alt"] = (int(hsig_alt.get("FahrstrSignalZeile", 0)), int(hsig_alt.get("FahrstrSignalErsatzsignal", 0)) == 1)
