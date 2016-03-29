@@ -437,8 +437,6 @@ class Knoten:
 
     # Gibt alle Einzelfahrstrassen zurueck, die an diesem Knoten in der angegebenen Richtung beginnen.
     # Pro Zielsignal wird nur eine Einzelfahrstrasse behalten, auch wenn alternative Fahrwege existieren.
-    # Es wird moeglichst die Fahrstrasse mit der hoechsten Signalgeschwindigkeit behalten, als zweites Kriterium
-    # wird die Fahrstrasse mit der kuerzesten Gesamtlaenge behalten.
     def _get_einzelfahrstrassen(self, richtung):
         # Zielsignal-Refpunkt -> [EinzelFahrstrasse]
         einzelfahrstrassen_by_zielsignal = defaultdict(list)
@@ -450,7 +448,13 @@ class Knoten:
 
         result = []
         for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
-            # TODO: sortieren nach a) Signalgeschwindigkeit, b) Laenge
+            if len(einzelfahrstrassen) > 1:
+                logging.debug("{} Einzelfahrstrassen zu {} {} gefunden: {}".format(
+                    len(einzelfahrstrassen),
+                    ziel_refpunkt.signal().get("NameBetriebsstelle", "?"),
+                    ziel_refpunkt.signal().get("Signalname", "?"),
+                    " / ".join("{} km/h, {:.2f} m".format(strecke.str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse in einzelfahrstrassen)))
+            # result.append(min(einzelfahrstrassen, key = lambda fstr: (float_geschw(fstr.signalgeschwindigkeit), fstr.laenge)))
             result.append(einzelfahrstrassen[0])
 
         return result
