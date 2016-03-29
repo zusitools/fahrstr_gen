@@ -159,13 +159,17 @@ class EinzelFahrstrasse:
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
 
+        self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
+
     def erweitere(self, kante):
         if self.start is None:
             self.start = kante.start
         self.ziel = kante.ziel
         self.kanten = ListenEintrag(kante, self.kanten)
         self.laenge = self.laenge + kante.laenge
-        self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
+        if not self.hat_ende_weichenbereich:
+            self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
+        self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
 
     def erweiterte_kopie(self, kante):
         result = EinzelFahrstrasse()
@@ -173,6 +177,7 @@ class EinzelFahrstrasse:
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
+        result.hat_ende_weichenbereich = result.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
         result.erweitere(kante)
         return result
 
@@ -229,6 +234,8 @@ class Kante:
         self.rgl_ggl = GLEIS_BAHNHOF  # Regelgleis-/Gegengleiskennzeichnung dieses Abschnitts
         self.streckenname = ""  # Streckenname (Teil der Regelgleis-/Gegengleiskennzeichnung)
         self.richtungsanzeiger = ""  # Richtungsanzeiger-Ziel dieses Abschnitts
+
+        self.hat_ende_weichenbereich = False  # Liegt im Verlauf dieser Kante ein Ereignis "Ende Weichenbereich"?
 
 # Ein Knoten im Streckengraphen ist ein relevantes Streckenelement, also eines, das eine Weiche oder ein Hauptsignal enthaelt.
 class Knoten:
@@ -293,6 +300,8 @@ class Knoten:
 
             for idx, n in enumerate(nachfolger):
                 kante = Kante(self.richtung(richtung))
+                # Ende Weichenbereich wirkt schon im Startelement
+                kante.hat_ende_weichenbereich = self.element.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis[@Er='1000002']") is not None
                 if weichen_refpunkt is not None:
                     kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
                 kante = self._neue_nachfolger_kante(kante, n)
@@ -319,10 +328,12 @@ class Knoten:
                     kante.register.append(refpunkt)
 
             # Ereignisse am aktuellen Element verarbeiten
+            hat_ende_weichenbereich = False
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
-                    kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.get("Wert", 0)))
+                    if not kante.hat_ende_weichenbereich:
+                        kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.get("Wert", 0)))
                 elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
                     pass
                 elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
@@ -333,6 +344,8 @@ class Knoten:
                     return None
                 elif ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
                     return None
+                elif ereignis_nr == EREIGNIS_ENDE_WEICHENBEREICH:
+                    hat_ende_weichenbereich = True # wird erst am Element danach wirksam
                 elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
                     # TODO: in Liste von Aufloesepunkten einfuegen
                     pass
@@ -393,6 +406,7 @@ class Knoten:
                     # TODO: in Liste von Vorsignalen einfuegen
                     pass
 
+            kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
             kante.laenge += element_laenge(element_richtung.element)
 
             if self.graph.ist_knoten(element_richtung.element):
