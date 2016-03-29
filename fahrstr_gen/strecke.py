@@ -10,7 +10,7 @@ class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
         if self.modul == modulverwaltung.dieses_modul:
             return self.element.get("Nr", "0")
         else:
-            return "{}[{}] {} {}".format(self.element.get("Nr", "0"), self.modul.name_kurz(), self.modul, modulverwaltung.dieses_modul)
+            return "{}[{}]".format(self.element.get("Nr", "0"), self.modul.name_kurz())
 
     def richtung(self, richtung):
         return ElementUndRichtung(self.modul, self.element, richtung)
