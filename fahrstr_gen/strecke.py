@@ -16,7 +16,7 @@ class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
         return ElementUndRichtung(self.modul, self.element, richtung)
 
     def signal(self, richtung):
-        return self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal")
+        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal"))
 
     def refpunkt(self, richtung, typ):
         for refpunkt in self.modul.referenzpunkte[self.element]:
@@ -32,7 +32,7 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', '
             return "{}{}[{}]".format(self.element.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
 
     def signal(self):
-        return self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal")
+        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal"))
 
     def refpunkt(self, typ):
         for refpunkt in self.modul.referenzpunkte[self.element]:
@@ -69,8 +69,28 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
+SignalZeile = namedtuple('SignalZeile', ['fahrstr_typ', 'hsig_geschw'])
+
+class Signal:
+    def __init__(self, xml_knoten):
+        self.xml_knoten = xml_knoten
+        self.zeilen = [SignalZeile(int(h.get("FahrstrTyp", 0)), float(h.attrib.get("HsigGeschw", 0))) for h in self.xml_knoten if h.tag == "HsigBegriff"]
+        self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
+
+    def __repr__(self):
+        return self.signalbeschreibung()
+
+    def signalbeschreibung(self):
+        return "{} {}".format(self.xml_knoten.get("NameBetriebsstelle", ""), self.xml_knoten.get("Signalname"))
+
+    def hat_zeile_fuer_fahrstr_typ(self, fahrstr_typ):
+        return any(z.fahrstr_typ & fahrstr_typ != 0 for z in self.zeilen)
+
+    def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
+        return any(z.hsig_geschw == 0 and (z.fahrstr_typ & fahrstr_typ != 0) for z in self.zeilen)
+
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
-    return signal is not None and any(float(h.get("HsigGeschw", 0)) == 0 and int(h.get("FahrstrTyp", 0)) & fahrstr_typ != 0 for h in signal if h.tag == "HsigBegriff")
+    return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
 
 # Gibt die Matrixzeile zurueck, die im angegebenen Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
 # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
@@ -81,36 +101,35 @@ def get_hsig_zeile(signal, fahrstr_typ, zielgeschwindigkeit):
     zeile_kleinergleich, geschw_kleinergleich = None, 0
     zeile_groesser, geschw_groesser = None, -1
 
-    for zeile, hsig_begriff in enumerate(signal.iterfind("./HsigBegriff")):
-        if int(hsig_begriff.get("FahrstrTyp", 0)) & fahrstr_typ == 0:
+    for idx, zeile in enumerate(signal.zeilen):
+        if zeile.fahrstr_typ & fahrstr_typ == 0:
             continue
-        geschw = float(hsig_begriff.get("HsigGeschw", 0))
 
         # Zeilen fuer Spezialgeschwindigkeiten werden nicht betrachtet.
-        if geschw == 0.0 or geschw == -2.0 or geschw == -999.0:
+        if zeile.hsig_geschw == 0.0 or zeile.hsig_geschw == -2.0 or zeile.hsig_geschw == -999.0:
             continue
 
-        if geschw_kleiner(geschw_kleinergleich, geschw) and not geschw_kleiner(zielgeschwindigkeit, geschw):
+        if geschw_kleiner(geschw_kleinergleich, zeile.hsig_geschw) and not geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
             # geschw > geschw_kleinergleich und geschw <= zielgeschwindigkeit
-            zeile_kleinergleich = zeile
-            geschw_kleinergleich = geschw
+            zeile_kleinergleich = idx
+            geschw_kleinergleich = zeile.hsig_geschw
 
-        elif (zeile_groesser is None or geschw_kleiner(geschw, geschw_groesser)) and geschw_kleiner(zielgeschwindigkeit, geschw):
+        elif (zeile_groesser is None or geschw_kleiner(zeile.hsig_geschw, geschw_groesser)) and geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
             # geschw < geschw_groesser und geschw > zielgeschwindigkeit
-            zeile_groesser = zeile
-            geschw_groesser = geschw
+            zeile_groesser = idx
+            geschw_groesser = zeile.hsig_geschw
 
     return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
 
 def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
-    for zeile, begriff in enumerate(signal.iterfind("./Ersatzsignal")):
+    for zeile, begriff in enumerate(signal.xml_knoten.iterfind("./Ersatzsignal")):
         if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
             return zeile
 
     return None
 
 def finde_ereignis_in_signal(signal, ereignis_nr):
-    for matrixeintrag in signal:
+    for matrixeintrag in signal.xml_knoten:
         if matrixeintrag.tag != "MatrixEintrag":
             continue
         for ereignis in matrixeintrag:

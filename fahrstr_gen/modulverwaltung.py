@@ -92,7 +92,7 @@ class RefPunkt(object):
         return (self.modul, self.element, self.richtung)
 
     def signal(self):
-        return self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal")
+        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal"))
 
     def to_xml(self, node):
         node.attrib["Ref"] = str(self.refnr)
@@ -143,6 +143,19 @@ class Modul:
                 pass
 
         self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)
+        self.signale = dict()
+
+    def get_signal(self, xml_knoten):
+        if xml_knoten is None:
+            return None
+
+        try:
+            return self.signale[xml_knoten]
+        except KeyError:
+            from .strecke import Signal  # get around circular dependency by deferring the import to here
+            result = Signal(xml_knoten)
+            self.signale[xml_knoten] = result
+            return result
 
     def name_kurz(self):
         return os.path.basename(self.relpath.replace('\\', os.sep))

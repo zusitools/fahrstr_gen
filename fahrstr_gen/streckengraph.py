@@ -52,8 +52,7 @@ class Fahrstrasse:
         if self.start.reftyp == REFTYP_AUFGLEISPUNKT:
             self.name += "Aufgleispunkt"
         else:
-            startsignal = self.start.signal()
-            self.name += "{} {}".format(startsignal.get("NameBetriebsstelle", ""), startsignal.get("Signalname", ""))
+            self.name += self.start.signal().signalbeschreibung()
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         zielsignal_geschw = finde_ereignis_in_signal(self.ziel.signal(), EREIGNIS_SIGNALGESCHWINDIGKEIT)
@@ -69,7 +68,7 @@ class Fahrstrasse:
 
             zielkante = einzelfahrstrasse.kanten.eintrag
             zielsignal = zielkante.ziel.signal()
-            self.name += " -> {} {}".format(zielsignal.get("NameBetriebsstelle", ""), zielsignal.get("Signalname", ""))
+            self.name += " -> {}".format(zielsignal.signalbeschreibung())
 
             # Startsignal ansteuern
             if idx == 0:
@@ -203,10 +202,10 @@ class Streckengraph:
 
     def ist_knoten(self, element):
         return (
-            len([n for n in element if n.tag == "NachNorm" or n.tag == "NachNormModul"]) > 1 or
-            len([n for n in element if n.tag == "NachGegen" or n.tag == "NachGegenModul"]) > 1 or
-            ist_hsig_fuer_fahrstr_typ(element.find("./InfoNormRichtung/Signal"), self.fahrstr_typ) or
-            ist_hsig_fuer_fahrstr_typ(element.find("./InfoGegenRichtung/Signal"), self.fahrstr_typ)
+            len([n for n in element.element if n.tag == "NachNorm" or n.tag == "NachNormModul"]) > 1 or
+            len([n for n in element.element if n.tag == "NachGegen" or n.tag == "NachGegenModul"]) > 1 or
+            ist_hsig_fuer_fahrstr_typ(element.signal(NORM), self.fahrstr_typ) or
+            ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), self.fahrstr_typ)
         )
 
     def get_knoten(self, element):
@@ -412,7 +411,7 @@ class Knoten:
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
             kante.laenge += element_laenge(element_richtung.element)
 
-            if self.graph.ist_knoten(element_richtung.element):
+            if self.graph.ist_knoten(Element(element_richtung.modul, element_richtung.element)):
                 break
 
             nachfolger = nachfolger_elemente(element_richtung)
@@ -466,10 +465,8 @@ class Knoten:
         result = []
         for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
             if len(einzelfahrstrassen) > 1:
-                logging.debug("{} Einzelfahrstrassen zu {} {} gefunden: {}".format(
-                    len(einzelfahrstrassen),
-                    ziel_refpunkt.signal().get("NameBetriebsstelle", "?"),
-                    ziel_refpunkt.signal().get("Signalname", "?"),
+                logging.debug("{} Einzelfahrstrassen zu {} gefunden: {}".format(
+                    len(einzelfahrstrassen), ziel_refpunkt.signal(),
                     " / ".join("{} km/h, {:.2f} m".format(strecke.str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse in einzelfahrstrassen)))
             # result.append(min(einzelfahrstrassen, key = lambda fstr: (float_geschw(fstr.signalgeschwindigkeit), fstr.laenge)))
             result.append(einzelfahrstrassen[0])
@@ -482,7 +479,7 @@ class Knoten:
         # Sind wir am Hauptsignal?
         signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.graph.fahrstr_typ):
-            logging.debug("Zielsignal gefunden: {} {}".format(signal.get("NameBetriebsstelle", "?"), signal.get("Signalname", "?")))
+            logging.debug("Zielsignal gefunden: {}".format(signal))
             ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
             return
 
@@ -501,12 +498,11 @@ class Knoten:
         zielknoten = letzte_fahrstrasse.kanten.eintrag.ziel.knoten
         zielrichtung = letzte_fahrstrasse.kanten.eintrag.ziel.richtung
         zielsignal = zielknoten.signal(zielrichtung)
-        ziel_flags = int(zielsignal.get("SignalFlags", 0))
 
         fahrstr_abschliessen = True
         fahrstr_weiterfuehren = False
 
-        if ziel_flags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0:
+        if zielsignal.sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0:
             # Fahrstrasse nur abschliessen, wenn schon ein Signal mit "Kennlichtschaltung Nachfolgersignal" aufgenommen wurde.
             # Ansonsten Fahrstrasse weiterfuehren.
 
@@ -521,12 +517,12 @@ class Knoten:
                 # startsignal = startknoten.signal(startrichtung)
                 # if startsignal is None or int(startsignal.get("SignalFlags", 0)) & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
 
-        if ziel_flags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
+        if zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
             fahrstr_weiterfuehren = True
 
-        logging.debug("Fahrstrassensuche: an {} {}, Kennlicht Vorgaenger={}, Kennlicht Nachfolger={}, abschl={}, weiter={}".format(
-            zielsignal.get("NameBetriebsstelle", ""), zielsignal.get("Signalname", ""),
-            ziel_flags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0, ziel_flags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0,
+        logging.debug("Fahrstrassensuche: an {}, Kennlicht Vorgaenger={}, Kennlicht Nachfolger={}, abschl={}, weiter={}".format(
+            zielsignal,
+            zielsignal.sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0, zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0,
             fahrstr_abschliessen, fahrstr_weiterfuehren))
 
         if fahrstr_abschliessen:
