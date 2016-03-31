@@ -431,8 +431,6 @@ class Knoten:
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
                     if not kante.hat_ende_weichenbereich:
                         kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.get("Wert", 0)))
-                elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
-                    pass
                 elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
                     return None
                 elif ereignis_nr == EREIGNIS_LZB_ENDE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
@@ -479,6 +477,13 @@ class Knoten:
                     refpunkt = element_richtung.refpunkt(REFTYP_AUFLOESEPUNKT)
                     if refpunkt is None:
                         logging.warn("Element {} enthaelt ein Ereignis \"Fahrstrasse aufloesen\", aber es existiert kein passender Referenzpunkt. Die Aufloese-Verknuepfung wird nicht eingerichetet.".format(element_richtung))
+                    else:
+                        kante.aufloesepunkte.append(refpunkt)
+
+                elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
+                    refpunkt = element_richtung.refpunkt(REFTYP_SIGNALHALTFALL)
+                    if refpunkt is None:
+                        logging.warn("Element {} enthaelt ein Ereignis \"Signalhaltfall\", aber es existiert kein passender Referenzpunkt. Die Signalhaltfall-Verknuepfung wird nicht eingerichetet.".format(element_richtung))
                     else:
                         kante.aufloesepunkte.append(refpunkt)
 
