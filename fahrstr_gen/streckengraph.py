@@ -93,7 +93,7 @@ class Fahrstrasse:
                     if zeile.hsig_geschw == -2.0:
                         refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
                         if refpunkt is None:
-                            logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(einzelfahrstrasse.start))
+                            logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(einzelfahrstrasse.start))
                         else:
                             # TODO: Richtungsanzeiger
                             self.signale.append(FahrstrHauptsignal(refpunkt, idx, False))
