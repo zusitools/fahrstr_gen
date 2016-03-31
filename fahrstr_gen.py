@@ -102,6 +102,15 @@ def finde_fahrstrassen(args):
                 for refpunkt in register_neu - register_alt:
                     print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
 
+                # Teilaufloesepunkte
+                teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
+                teilaufloesepunkte_neu = set((aufl.refnr, aufl.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
+
+                for refpunkt in teilaufloesepunkte_alt - teilaufloesepunkte_neu:
+                    print("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                for refpunkt in teilaufloesepunkte_neu - teilaufloesepunkte_alt:
+                    print("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+
                 # Weichen
                 weichenstellungen_alt_vs_neu = defaultdict(dict)
                 for weiche_alt in fahrstr_alt.findall("./FahrstrWeiche"):
