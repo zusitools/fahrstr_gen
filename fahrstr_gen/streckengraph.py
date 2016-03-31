@@ -35,6 +35,7 @@ class Fahrstrasse:
             self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
 
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
+        self.zufallswert = float(self.ziel.signal().xml_knoten.get("Zufallswert", 0))
 
         # Setze Regelgleis/Gegengleis/Streckenname
         self.rgl_ggl = GLEIS_BAHNHOF
@@ -134,7 +135,6 @@ class Fahrstrasse:
                     self.aufloesepunkte.append(aufl)
 
     def to_xml(self):
-        # TODO: Zufallswert
         result = ET.Element('Fahrstrasse', {
             "FahrstrName": self.name,
             "Laenge": "{:.1f}".format(self.laenge)
@@ -146,6 +146,8 @@ class Fahrstrasse:
         elif self.fahrstr_typ == FAHRSTR_TYP_LZB:
             result.attrib["FahrstrTyp"] = "TypLZB"
 
+        if self.zufallswert != 0:
+            result.set("Zufallwert", str(self.zufallswert))
         if self.rgl_ggl != 0:
             result.set("RglGgl", str(self.rgl_ggl))
         if len(self.streckenname) > 0:

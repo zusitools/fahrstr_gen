@@ -79,7 +79,9 @@ def finde_fahrstrassen(args):
                 if fahrstr_neu.streckenname != streckenname_alt:
                     print("{}: unterschiedlicher Streckenname: {} vs {}".format(name, streckenname_alt, fahrstr_neu.streckenname))
 
-                # TODO: Zufallswert
+                zufallswert_alt = float(fahrstr_alt.get("Zufallswert", 0))
+                if fahrstr_neu.zufallswert != zufallswert_alt:
+                    print("{}: unterschiedlicher Zufallswert: {} vs {}".format(name, zufallswert_alt, fahrstr_neu.zufallswert))
 
                 start_alt = fahrstr_alt.find("./FahrstrStart")
                 start_alt_refnr = int(start_alt.get("Ref", 0))
