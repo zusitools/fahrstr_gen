@@ -1,8 +1,11 @@
 from collections import namedtuple, defaultdict
-from .konstanten import *
+from copy import deepcopy
+import xml.etree.ElementTree as ET
 
+from .konstanten import *
 from . import modulverwaltung
 
+import logging
 import math
 
 class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
@@ -76,6 +79,7 @@ class Signal:
     def __init__(self, xml_knoten):
         self.xml_knoten = xml_knoten
         self.zeilen = []
+        self.spalten = []
         self.signalgeschwindigkeit = None
         self.ist_hilfshauptsignal = False
 
@@ -88,6 +92,8 @@ class Signal:
         for n in self.xml_knoten:
             if n.tag == "HsigBegriff":
                 self.zeilen.append(SignalZeile(int(n.get("FahrstrTyp", 0)), float(n.attrib.get("HsigGeschw", 0))))
+            elif n.tag == "VsigBegriff":
+                self.spalten.append(float(n.attrib.get("VsigGeschw", 0)))
             elif n.tag == "MatrixEintrag":
                 for ereignis in n:
                     if ereignis.tag == "Ereignis":
@@ -144,6 +150,64 @@ class Signal:
                 geschw_groesser = zeile.hsig_geschw
 
         return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
+
+    # Gibt die Zeile zurueck, die die Zeile Nummer `zeilenidx_original` gemaess dem angegebenen Richtungsanzeiger
+    # und der angegebenen Gleisangabe erweitert.
+    def get_richtungsanzeiger_zeile(self, zeilenidx_original, rgl_ggl, richtungsanzeiger_ziel):
+        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
+            return zeilenidx_original
+        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsanzeiger:
+            return zeilenidx_original
+        if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
+            return zeilenidx_original
+
+        matrix = self.xml_knoten.findall("./MatrixEintrag")
+
+        # Erweitere Signalbild der ersten Spalte der Originalzeile um Richtungs- und Gegengleisanzeiger.
+        zielsignalbild = int(matrix[zeilenidx_original * len(self.spalten)].get("Signalbild", 0))
+        neue_signalframes = 0
+        if rgl_ggl == GLEIS_GEGENGLEIS:
+            neue_signalframes |= self.gegengleisanzeiger
+        if richtungsanzeiger_ziel != '' and richtungsanzeiger_ziel in self.richtungsanzeiger:
+            neue_signalframes |= self.richtungsanzeiger[richtungsanzeiger_ziel]
+        zielsignalbild |= neue_signalframes
+
+        # Suche existierende Zeile mit dem neuen Signalbild.
+        zeile_original = self.zeilen[zeilenidx_original]
+        for idx, zeile in enumerate(self.zeilen):
+            if zeile.fahrstr_typ == zeile_original.fahrstr_typ and zeile.hsig_geschw == zeile_original.hsig_geschw and int(matrix[idx * len(self.spalten)].get("Signalbild", 0)) == zielsignalbild:
+                return idx
+
+        # Nicht gefunden, Matrix erweitern.
+        # TODO: Warnen, wenn nicht im aktuellen Modul.
+
+        # Neuer <HsigBegriff>-Knoten
+        einfuegeindex_hsigbegriff = 1
+        for idx, n in enumerate(self.xml_knoten):
+            if n.tag == "HsigBegriff":
+                einfuegeindex_hsigbegriff = idx + 1
+
+        self.zeilen.append(self.zeilen[zeilenidx_original])
+        hsig_begriff_knoten = ET.Element("HsigBegriff")
+        if self.zeilen[zeilenidx_original].fahrstr_typ != 0:
+            hsig_begriff_knoten.set("FahrstrTyp", str(self.zeilen[zeilenidx_original].fahrstr_typ))
+        if self.zeilen[zeilenidx_original].hsig_geschw != 0:
+            hsig_begriff_knoten.set("HsigGeschw", str(self.zeilen[zeilenidx_original].hsig_geschw))
+        self.xml_knoten.insert(einfuegeindex_hsigbegriff, hsig_begriff_knoten)
+
+        # Neue <MatrixEintrag>-Knoten
+        einfuegeindex_matrixeintrag = 1
+        for idx, n in enumerate(self.xml_knoten):
+            if n.tag == "MatrixEintrag":
+                einfuegeindex_matrixeintrag = idx + 1
+
+        for eintrag in matrix[zeilenidx_original * len(self.spalten) : (zeilenidx_original+1) * len(self.spalten)]:
+            neuer_eintrag = deepcopy(eintrag)
+            neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
+            self.xml_knoten.insert(einfuegeindex_matrixeintrag, neuer_eintrag)
+            einfuegeindex_matrixeintrag += 1
+
+        return len(self.zeilen) - 1
 
     def get_hsig_ersatzsignal_zeile(self, rgl_ggl):
         for zeile, begriff in enumerate(self.xml_knoten.iterfind("./Ersatzsignal")):

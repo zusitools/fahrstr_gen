@@ -85,7 +85,7 @@ class Fahrstrasse:
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
-                            # TODO: Richtungsanzeiger
+                            startsignal_zeile = self.start.signal().get_richtungsanzeiger_zeile(startsignal_zeile, self.rgl_ggl, einzelfahrstrasse.richtungsanzeiger)
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
             else:
                 gefunden = False
@@ -95,8 +95,8 @@ class Fahrstrasse:
                         if refpunkt is None:
                             logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(einzelfahrstrasse.start))
                         else:
-                            # TODO: Richtungsanzeiger
-                            self.signale.append(FahrstrHauptsignal(refpunkt, idx, False))
+                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, self.rgl_ggl, einzelfahrstrasse.richtungsanzeiger)
+                            self.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
                         break
 
@@ -192,6 +192,7 @@ class EinzelFahrstrasse:
         self.kanten = None  # ListenEintrag
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
+        self.richtungsanzeiger = ''
 
         self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
 
@@ -207,6 +208,8 @@ class EinzelFahrstrasse:
         if not self.hat_ende_weichenbereich:
             self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
         self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
+        if self.richtungsanzeiger == '':
+            self.richtungsanzeiger = kante.richtungsanzeiger
 
     def erweiterte_kopie(self, kante):
         result = EinzelFahrstrasse()
