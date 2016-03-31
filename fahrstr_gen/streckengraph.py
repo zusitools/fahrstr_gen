@@ -74,14 +74,14 @@ class Fahrstrasse:
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
                     if self.ziel.signal().ist_hilfshauptsignal:
                         # Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
-                        startsignal_zeile = get_hsig_ersatzsignal_zeile(self.start.signal(), self.rgl_ggl)
+                        startsignal_zeile = self.start.signal().get_hsig_ersatzsignal_zeile(self.rgl_ggl)
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}".format(self.name, self.rgl_ggl))
                         else:
                             # TODO: Richtungsanzeiger
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, True))
                     else:
-                        startsignal_zeile = get_hsig_zeile(self.start.signal(), self.fahrstr_typ, self.signalgeschwindigkeit)
+                        startsignal_zeile = self.start.signal().get_hsig_zeile(self.fahrstr_typ, self.signalgeschwindigkeit)
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
@@ -382,17 +382,26 @@ class Knoten:
                 verkn = False
                 zeile = -1
                 if self.graph.fahrstr_typ == FAHRSTR_TYP_LZB and signal.hat_zeile_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
-                    verkn = True
-                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_LZB, -1)
+                    zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
+                    if zeile is None:
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1.".format(element_richtung))
+                    else:
+                        verkn = True
                 elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & FAHRSTR_TYP_ZUG != 0)) >= 2:
                     verkn = True
                     # Zeile muss ermittelt werden
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
-                    verkn = True
-                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_RANGIER, -1)
+                    zeile = signal.get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1)
+                    if zeile is None:
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1.".format(element_richtung))
+                    else:
+                        verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) and signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
-                    verkn = True
-                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_FAHRWEG, -1)
+                    zeile = signal.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
+                    if zeile is None:
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1.".format(element_richtung))
+                    else:
+                        verkn = True
                 elif signal.gegengleisanzeiger != 0 or len(signal.richtungsanzeiger) > 0:
                     verkn = True
                     # Zeile muss ermittelt werden

@@ -116,44 +116,44 @@ class Signal:
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return any(z.hsig_geschw == 0 and (z.fahrstr_typ & fahrstr_typ != 0) for z in self.zeilen)
 
+    # Gibt die Matrixzeile zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
+    # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
+    # Wenn solche eine Zeile nicht existiert, wird die Zeile mit der naechstgroesseren Geschwindigkeit genommen.
+    # Richtungs- und Gegengleisanzeiger werden nicht betrachtet.
+    def get_hsig_zeile(self, fahrstr_typ, zielgeschwindigkeit):
+        assert(zielgeschwindigkeit != 0)
+        zeile_kleinergleich, geschw_kleinergleich = None, 0
+        zeile_groesser, geschw_groesser = None, -1
+
+        for idx, zeile in enumerate(self.zeilen):
+            if zeile.fahrstr_typ & fahrstr_typ == 0:
+                continue
+
+            # Zeilen fuer Spezialgeschwindigkeiten werden nicht betrachtet.
+            if zeile.hsig_geschw == 0.0 or zeile.hsig_geschw == -2.0 or zeile.hsig_geschw == -999.0:
+                continue
+
+            if geschw_kleiner(geschw_kleinergleich, zeile.hsig_geschw) and not geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
+                # geschw > geschw_kleinergleich und geschw <= zielgeschwindigkeit
+                zeile_kleinergleich = idx
+                geschw_kleinergleich = zeile.hsig_geschw
+
+            elif (zeile_groesser is None or geschw_kleiner(zeile.hsig_geschw, geschw_groesser)) and geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
+                # geschw < geschw_groesser und geschw > zielgeschwindigkeit
+                zeile_groesser = idx
+                geschw_groesser = zeile.hsig_geschw
+
+        return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
+
+    def get_hsig_ersatzsignal_zeile(self, rgl_ggl):
+        for zeile, begriff in enumerate(self.xml_knoten.iterfind("./Ersatzsignal")):
+            if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
+                return zeile
+
+        return None
+
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
-
-# Gibt die Matrixzeile zurueck, die im angegebenen Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
-# Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
-# Wenn solche eine Zeile nicht existiert, wird die Zeile mit der naechstgroesseren Geschwindigkeit genommen.
-# Richtungs- und Gegengleisanzeiger werden nicht betrachtet.
-def get_hsig_zeile(signal, fahrstr_typ, zielgeschwindigkeit):
-    assert(zielgeschwindigkeit != 0)
-    zeile_kleinergleich, geschw_kleinergleich = None, 0
-    zeile_groesser, geschw_groesser = None, -1
-
-    for idx, zeile in enumerate(signal.zeilen):
-        if zeile.fahrstr_typ & fahrstr_typ == 0:
-            continue
-
-        # Zeilen fuer Spezialgeschwindigkeiten werden nicht betrachtet.
-        if zeile.hsig_geschw == 0.0 or zeile.hsig_geschw == -2.0 or zeile.hsig_geschw == -999.0:
-            continue
-
-        if geschw_kleiner(geschw_kleinergleich, zeile.hsig_geschw) and not geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
-            # geschw > geschw_kleinergleich und geschw <= zielgeschwindigkeit
-            zeile_kleinergleich = idx
-            geschw_kleinergleich = zeile.hsig_geschw
-
-        elif (zeile_groesser is None or geschw_kleiner(zeile.hsig_geschw, geschw_groesser)) and geschw_kleiner(zielgeschwindigkeit, zeile.hsig_geschw):
-            # geschw < geschw_groesser und geschw > zielgeschwindigkeit
-            zeile_groesser = idx
-            geschw_groesser = zeile.hsig_geschw
-
-    return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
-
-def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
-    for zeile, begriff in enumerate(signal.xml_knoten.iterfind("./Ersatzsignal")):
-        if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
-            return zeile
-
-    return None
 
 def element_laenge(element):
     p1 = [0, 0, 0]
