@@ -114,8 +114,8 @@ class Fahrstrasse:
                 # TODO: Vorsignale ansteuern
                 self.register.extend(kante.register)
                 self.weichen.extend(kante.weichen)
-                self.teilaufloesepunkte.extend(kante.aufloesepunkte)
-                self.signalhaltfallpunkte.extend(kante.signalhaltfallpunkte)
+                self.teilaufloesepunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_AUFLOESEPUNKT])
+                self.signalhaltfallpunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_SIGNALHALTFALL])
                 self.signale.extend(kante.signale)  # TODO ansteuern
 
         # TODO: Aufloesepunkte suchen (= Teilaufloesepunkte der naechsten Einzelfahrstrassen am Zielknoten)
@@ -252,8 +252,7 @@ class Kante:
         self.weichen = []  # [FahrstrWeichenstellung]
         self.signale = []  # [FahrstrHauptsignal] -- alle Signale, die nicht eine Fahrstrasse beenden, also z.B. Rangiersignale, sowie "Signal in Fahrstrasse verknuepfen". Wenn die Signalzeile den Wert -1 hat, ist die zu waehlende Zeile fahrstrassenabhaengig.
         self.vorsignale = []  # [FahrstrVorsignal] -- nur Vorsignale, die mit "Vorsignal in Fahrstrasse verknuepfen" in einem Streckenelement dieser Kante verknuepft sind
-        self.aufloesepunkte = []  # [RefPunkt]
-        self.signalhaltfallpunkte = []  # [RefPunkt]
+        self.aufloesepunkte = []  # [RefPunkt] -- Signalhaltfall- und Aufloesepunkte. Reihenfolge ist wichtig!
 
         self.rgl_ggl = GLEIS_BAHNHOF  # Regelgleis-/Gegengleiskennzeichnung dieses Abschnitts
         self.streckenname = ""  # Streckenname (Teil der Regelgleis-/Gegengleiskennzeichnung)
@@ -406,9 +405,6 @@ class Knoten:
                     return None
                 elif ereignis_nr == EREIGNIS_ENDE_WEICHENBEREICH:
                     hat_ende_weichenbereich = True # wird erst am Element danach wirksam
-                elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
-                    # TODO: in Liste von Aufloesepunkten einfuegen
-                    pass
 
                 elif ereignis_nr == EREIGNIS_GEGENGLEIS:
                     if kante.rgl_ggl == GLEIS_BAHNHOF:
@@ -440,6 +436,13 @@ class Knoten:
                     else:
                         # TODO: Warnmeldung
                         pass
+
+                elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
+                    refpunkt = element_richtung.refpunkt(REFTYP_AUFLOESEPUNKT)
+                    if refpunkt is None:
+                        logging.warn("Element {} enthaelt ein Ereignis \"Fahrstrasse aufloesen\", aber es existiert kein passender Referenzpunkt. Die Aufloese-Verknuepfung wird nicht eingerichetet.".format(element_richtung))
+                    else:
+                        kante.aufloesepunkte.append(refpunkt)
 
                 elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
                     try:
