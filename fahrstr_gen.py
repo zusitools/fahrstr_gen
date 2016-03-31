@@ -102,6 +102,24 @@ def finde_fahrstrassen(args):
                 for refpunkt in register_neu - register_alt:
                     print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
 
+                # Aufloesepunkte
+                aufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrAufloesung"))
+                aufloesepunkte_neu = set((aufl.refnr, aufl.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
+
+                for refpunkt in aufloesepunkte_alt - aufloesepunkte_neu:
+                    print("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                for refpunkt in aufloesepunkte_neu - aufloesepunkte_alt:
+                    print("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+
+                # Signalhaltfallpunkte
+                sighaltfallpunkte_alt = set((int(haltfall.get("Ref", 0)), haltfall.find("./Datei").get("Dateiname", "").upper()) for haltfall in fahrstr_alt.iterfind("./FahrstrSigHaltfall"))
+                sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
+
+                for refpunkt in sighaltfallpunkte_alt - sighaltfallpunkte_neu:
+                    print("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                for refpunkt in sighaltfallpunkte_neu - sighaltfallpunkte_alt:
+                    print("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+
                 # Teilaufloesepunkte
                 teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
