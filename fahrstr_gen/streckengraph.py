@@ -55,9 +55,8 @@ class Fahrstrasse:
             self.name += self.start.signal().signalbeschreibung()
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
-        zielsignal_geschw = finde_ereignis_in_signal(self.ziel.signal(), EREIGNIS_SIGNALGESCHWINDIGKEIT)
-        if zielsignal_geschw is not None:
-            self.signalgeschwindigkeit = float(zielsignal_geschw.get("Wert", 0))
+        if self.ziel.signal().signalgeschwindigkeit is not None:
+            self.signalgeschwindigkeit = self.ziel.signal().signalgeschwindigkeit
         else:
             self.signalgeschwindigkeit = -1.0
             for einzelfahrstrasse in einzelfahrstrassen:
@@ -70,10 +69,10 @@ class Fahrstrasse:
             zielsignal = zielkante.ziel.signal()
             self.name += " -> {}".format(zielsignal.signalbeschreibung())
 
-            # Startsignal ansteuern
+            # Startsignal bzw. Kennlichtsignal ansteuern
             if idx == 0:
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
-                    if finde_ereignis_in_signal(self.ziel.signal(), EREIGNIS_HILFSHAUPTSIGNAL) is not None:
+                    if self.ziel.signal().ist_hilfshauptsignal:
                         # Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
                         startsignal_zeile = get_hsig_ersatzsignal_zeile(self.start.signal(), self.rgl_ggl)
                         if startsignal_zeile is None:
@@ -86,8 +85,27 @@ class Fahrstrasse:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
+            else:
+                gefunden = False
+                for idx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
+                    if zeile.hsig_geschw == -2.0:
+                        refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
+                        if refpunkt is None:
+                            logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(einzelfahrstrasse.start))
+                        else:
+                            self.signale.append(FahrstrHauptsignal(refpunkt, idx, False))
+                        gefunden = True
+                        break
 
-            # TODO: Hauptsignale (richtig) ansteuern: Kennlichtsignale, Zielsignal auf -999
+                if not gefunden:
+                    logging.warn("{}: An Signal {} wurde keine Kennlichtzeile (Geschwindigkeit -2) gefunden".format(self.name, einzelfahrstrasse.start.signal()))
+
+            # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
+            if idx == len(einzelfahrstrassen) - 1:
+                for idx, zeile in enumerate(self.ziel.signal().zeilen):
+                    if zeile.hsig_geschw == -999.0:
+                        self.signale.append(FahrstrHauptsignal(self.ziel, idx, False))
+                        break
 
             for kante in einzelfahrstrasse.kantenliste():
                 # TODO: Vorsignale ansteuern
@@ -95,6 +113,7 @@ class Fahrstrasse:
                 self.weichen.extend(kante.weichen)
                 self.teilaufloesepunkte.extend(kante.aufloesepunkte)
                 self.signalhaltfallpunkte.extend(kante.signalhaltfallpunkte)
+                self.signale.extend(kante.signale)  # TODO ansteuern
 
         # TODO: Aufloesepunkte suchen (= Teilaufloesepunkte der naechsten Einzelfahrstrassen am Zielknoten)
 
@@ -317,8 +336,44 @@ class Knoten:
             return None
 
         while element_richtung is not None:
-            # TODO: Signal am aktuellen Element in die Signalliste einfuegen
-            # TODO: Register am aktuellen Element in die Registerliste einfuegen
+            # Signal am aktuellen Element in die Signalliste einfuegen
+            signal = element_richtung.signal()
+            if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
+                verkn = False
+                zeile = -1
+                if self.graph.fahrstr_typ == FAHRSTR_TYP_LZB and signal.hat_zeile_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
+                    verkn = True
+                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_LZB, -1)
+                elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & FAHRSTR_TYP_ZUG != 0)) >= 2:
+                    verkn = True
+                    # Zeile muss ermittelt werden
+                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
+                    verkn = True
+                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_RANGIER, -1)
+                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) and signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
+                    verkn = True
+                    zeile = get_hsig_zeile(signal, FAHRSTR_TYP_FAHRWEG, -1)
+                elif signal.hat_richtungsanzeiger:
+                    verkn = True
+                    # Zeile muss ermittelt werden
+
+                if verkn:
+                    refpunkt = element_richtung.refpunkt(REFTYP_SIGNAL)
+                    if refpunkt is None:
+                        logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung))
+                    else:
+                        kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
+
+            # Signal am aktuellen Element (Gegenrichtung) in die Signalliste einfuegen
+            element_richtung_gegenrichtung = element_richtung.gegenrichtung()
+            signal_gegenrichtung = element_richtung_gegenrichtung.signal()
+            if signal_gegenrichtung is not None and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_BEIDE_FAHRTRICHTUNGEN != 0 and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
+                refpunkt = element_richtung_gegenrichtung.refpunkt(REFTYP_SIGNAL)
+                if refpunkt is None:
+                    logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung_gegenrichtung))
+                else:
+                    # TODO
+                    kante.signale.append(FahrstrHauptsignal(refpunkt, 0, False))
 
             # Register am aktuellen Element in die Registerliste einfuegen
             regnr = element_richtung.registernr()
@@ -401,9 +456,19 @@ class Knoten:
                         kante.weichen.append(FahrstrWeichenstellung(refpunkt, int(ereignis.get("Beschr", ""))))
                     except ValueError:
                         logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Beschr", "")))
+
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
-                    # TODO: in Liste von Signalen einfuegen
-                    pass
+                    try:
+                        refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                    except (KeyError, ValueError):
+                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        continue
+
+                    try:
+                        kante.signale.append(FahrstrHauptsignal(refpunkt, int(ereignis.get("Beschr", "")), False))
+                    except ValueError:
+                        logging.warn("Ereignis \"Signale in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Beschr", "")))
+
                 elif ereignis_nr == EREIGNIS_VORSIGNAL_VERKNUEPFEN:
                     # TODO: in Liste von Vorsignalen einfuegen
                     pass

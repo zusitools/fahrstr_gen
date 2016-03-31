@@ -70,12 +70,35 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
 SignalZeile = namedtuple('SignalZeile', ['fahrstr_typ', 'hsig_geschw'])
+Ereignis = namedtuple('Ereignis', ['nr', 'wert', 'beschr'])
 
 class Signal:
     def __init__(self, xml_knoten):
         self.xml_knoten = xml_knoten
-        self.zeilen = [SignalZeile(int(h.get("FahrstrTyp", 0)), float(h.attrib.get("HsigGeschw", 0))) for h in self.xml_knoten if h.tag == "HsigBegriff"]
+        self.zeilen = []
+        self.signalgeschwindigkeit = None
+        self.ist_hilfshauptsignal = False
+        self.hat_richtungsanzeiger = False
+        self.hat_richtungsvoranzeiger = False
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
+
+        for n in self.xml_knoten:
+            if n.tag == "HsigBegriff":
+                self.zeilen.append(SignalZeile(int(n.get("FahrstrTyp", 0)), float(n.attrib.get("HsigGeschw", 0))))
+            elif n.tag == "MatrixEintrag":
+                for ereignis in n:
+                    if ereignis.tag == "Ereignis":
+                        ereignisnr = int(ereignis.get("Er", 0))
+                        if ereignisnr == EREIGNIS_HILFSHAUPTSIGNAL:
+                            self.ist_hilfshauptsignal = True
+                        elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None:
+                            self.signalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                        elif ereignisnr == EREIGNIS_GEGENGLEIS:
+                            self.hat_richtungsanzeiger = True
+                        elif ereignisnr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
+                            self.hat_richtungsanzeiger = True
+                        elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
+                            self.hat_richtungsvoranzeiger = True
 
     def __repr__(self):
         return self.signalbeschreibung()
@@ -125,16 +148,6 @@ def get_hsig_ersatzsignal_zeile(signal, rgl_ggl):
     for zeile, begriff in enumerate(signal.xml_knoten.iterfind("./Ersatzsignal")):
         if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
             return zeile
-
-    return None
-
-def finde_ereignis_in_signal(signal, ereignis_nr):
-    for matrixeintrag in signal.xml_knoten:
-        if matrixeintrag.tag != "MatrixEintrag":
-            continue
-        for ereignis in matrixeintrag:
-            if ereignis.tag == "Ereignis" and int(ereignis.get("Er", 0)) == ereignis_nr:
-                return ereignis
 
     return None
 
