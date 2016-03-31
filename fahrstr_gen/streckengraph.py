@@ -157,7 +157,7 @@ class Fahrstrasse:
             rp.to_xml(ET.SubElement(result, 'FahrstrRegister'))
         for rp in self.aufloesepunkte:
             rp.to_xml(ET.SubElement(result, 'FahrstrAufloesung'))
-        for rp in self.aufloesepunkte:
+        for rp in self.teilaufloesepunkte:
             rp.to_xml(ET.SubElement(result, 'FahrstrTeilaufloesung'))
         for rp in self.signalhaltfallpunkte:
             rp.to_xml(ET.SubElement(result, 'FahrstrSigHaltfall'))
