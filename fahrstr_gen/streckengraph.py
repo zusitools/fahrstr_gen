@@ -78,12 +78,14 @@ class Fahrstrasse:
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}".format(self.name, self.rgl_ggl))
                         else:
+                            # TODO: Richtungsanzeiger
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, True))
                     else:
                         startsignal_zeile = get_hsig_zeile(self.start.signal(), self.fahrstr_typ, self.signalgeschwindigkeit)
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
+                            # TODO: Richtungsanzeiger
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
             else:
                 gefunden = False
@@ -93,6 +95,7 @@ class Fahrstrasse:
                         if refpunkt is None:
                             logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(einzelfahrstrasse.start))
                         else:
+                            # TODO: Richtungsanzeiger
                             self.signale.append(FahrstrHauptsignal(refpunkt, idx, False))
                         gefunden = True
                         break
@@ -353,7 +356,7 @@ class Knoten:
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) and signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
                     verkn = True
                     zeile = get_hsig_zeile(signal, FAHRSTR_TYP_FAHRWEG, -1)
-                elif signal.hat_richtungsanzeiger:
+                elif signal.gegengleisanzeiger != 0 or len(signal.richtungsanzeiger) > 0:
                     verkn = True
                     # Zeile muss ermittelt werden
 

@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from .konstanten import *
 
 from . import modulverwaltung
@@ -78,8 +78,11 @@ class Signal:
         self.zeilen = []
         self.signalgeschwindigkeit = None
         self.ist_hilfshauptsignal = False
-        self.hat_richtungsanzeiger = False
+
+        self.gegengleisanzeiger = 0 # Signalbild-ID
+        self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
         self.hat_richtungsvoranzeiger = False
+
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
 
         for n in self.xml_knoten:
@@ -94,9 +97,10 @@ class Signal:
                         elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None:
                             self.signalgeschwindigkeit = float(ereignis.get("Wert", 0))
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
-                            self.hat_richtungsanzeiger = True
+                            self.gegengleisanzeiger |= 1 << int(float(ereignis.get("Wert", 0)))
                         elif ereignisnr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
-                            self.hat_richtungsanzeiger = True
+                            if ereignis.get("Beschr") is not None:
+                                self.richtungsanzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
                         elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
                             self.hat_richtungsvoranzeiger = True
 
