@@ -114,11 +114,24 @@ class Fahrstrasse:
                 # TODO: Vorsignale ansteuern
                 self.register.extend(kante.register)
                 self.weichen.extend(kante.weichen)
-                self.teilaufloesepunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_AUFLOESEPUNKT])
+                for refpunkt in kante.aufloesepunkte:
+                    if refpunkt.reftyp == REFTYP_AUFLOESEPUNKT:
+                        # Aufloesepunkte im Zielelement zaehlen als Aufloesung der gesamten Fahrstrasse, nicht als Teilaufloesung.
+                        if refpunkt.element == self.ziel.element and refpunkt.richtung == self.ziel.richtung:
+                            self.aufloesepunkte.append(refpunkt)
+                        else:
+                            self.teilaufloesepunkte.append(refpunkt)
                 self.signalhaltfallpunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_SIGNALHALTFALL])
                 self.signale.extend(kante.signale)  # TODO ansteuern
 
-        # TODO: Aufloesepunkte suchen (= Teilaufloesepunkte der naechsten Einzelfahrstrassen am Zielknoten)
+        # Aufloesepunkte suchen. Wenn wir vorher schon einen Aufloesepunkt gefunden haben, lag er im Zielelement der Fahrstrasse,
+        # und es muss nicht weiter gesucht werden.
+        if len(self.aufloesepunkte) == 0:
+            for aufl in einzelfahrstrassen[-1].ziel.knoten.get_aufloesepunkte(einzelfahrstrassen[-1].ziel.richtung):
+                if aufl.reftyp == REFTYP_SIGNALHALTFALL:
+                    self.signalhaltfallpunkte.append(aufl)
+                else:
+                    self.aufloesepunkte.append(aufl)
 
     def to_xml(self):
         # TODO: Zufallswert
@@ -221,6 +234,10 @@ class Streckengraph:
     def __init__(self, fahrstr_typ):
         self.fahrstr_typ = fahrstr_typ
         self.knoten = {}  # <StrElement> -> Knoten
+        self._besuchszaehler = 1  # Ein Knoten gilt als besucht, wenn sein Besuchszaehler gleich dem Besuchszaehler des Graphen ist. Alle Knoten koennen durch Inkrementieren des Besuchszaehlers als unbesucht markiert werden.
+
+    def markiere_unbesucht(self):
+        self._besuchszaehler += 1
 
     def ist_knoten(self, element):
         return (
@@ -270,9 +287,21 @@ class Knoten:
         self.nachfolger_kanten = [None, None]
         self.vorgaenger_kanten = [None, None]
         self.einzelfahrstrassen = [None, None]
+        self.aufloesepunkte = [None, None]  # Aufloesepunkte bis zum naechsten Zugfahrt-Hauptsignal.
+
+        self._besuchszaehler = self.graph._besuchszaehler - 1  # Dokumentation siehe Streckengraph._besuchszaehler
 
     def __repr__(self):
         return "Knoten<{}>".format(repr(self.element))
+
+    def __str__(self):
+        return str(self.element)
+
+    def ist_besucht(self):
+        return self._besuchszaehler >= self.graph._besuchszaehler
+
+    def markiere_besucht(self):
+        self._besuchszaehler = self.graph._besuchszaehler
 
     def richtung(self, richtung):
         return KnotenUndRichtung(self, richtung)
@@ -299,6 +328,15 @@ class Knoten:
             logging.debug("Suche Einzelfahrstrassen ab {}".format(self.richtung(richtung)))
             self.einzelfahrstrassen[key] = self._get_einzelfahrstrassen(richtung)
         return self.einzelfahrstrassen[key]
+
+    # Gibt alle von diesem Knoten in der angegebenen Richtung erreichbaren Signalhaltfall- und Aufloesepunkte bis zum naechsten Hauptsignal.
+    # Die Suche stoppt jeweils nach dem ersten gefundenen Aufloesepunkt.
+    def get_aufloesepunkte(self, richtung):
+        key = 0 if richtung == NORM else 1
+        if self.aufloesepunkte[key] is None:
+            logging.debug("Suche Aufloesepunkte ab {}".format(self.richtung(richtung)))
+            self.aufloesepunkte[key] = self._get_aufloesepunkte(richtung)
+        return self.aufloesepunkte[key]
 
     # Gibt alle von diesem Knoten ausgehenden Nachfolgerkanten in der angegebenen Richtung zurueck.
     # Eine Kante wird nur erzeugt, wenn sie fuer die Fahrstrasse relevant ist, also an einem
@@ -602,9 +640,45 @@ class Knoten:
             for einzelfahrstrasse in zielknoten.get_einzelfahrstrassen(zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
 
+    def _get_aufloesepunkte(self, richtung):
+        self.graph.markiere_unbesucht()
+        result = []
+        for kante in self.get_nachfolger_kanten(richtung):
+            if kante is not None:
+                self._get_aufloesepunkte_rek(richtung, kante, result)
+        return result
+
+    def _get_aufloesepunkte_rek(self, startrichtung, kante, result_liste):
+        aufloesepunkt_gefunden = False
+        for aufl in kante.aufloesepunkte:
+            # Aufloeseelement im Zielknoten nur einfuegen, wenn dieser noch nicht besucht wurde,
+            # sonst wird es mehrmals eingefuegt.
+            if aufl.element != kante.ziel.knoten.element or not kante.ziel.knoten.ist_besucht():
+                logging.debug("Aufloesepunkt an {}".format(aufl))
+                result_liste.append(aufl)
+            if aufl.reftyp == REFTYP_AUFLOESEPUNKT:
+                aufloesepunkt_gefunden = True
+                break
+
+        if aufloesepunkt_gefunden:
+            return
+
+        if not kante.ziel.knoten.ist_besucht():
+            kante.ziel.knoten.markiere_besucht()
+            if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG):
+                if not aufloesepunkt_gefunden:
+                    logging.warn("Es gibt einen Fahrweg zwischen den Signalen {} ({}) und {} ({}), der keinen Aufloesepunkt enthaelt.".format(self.signal(startrichtung), self.richtung(startrichtung), kante.ziel.signal(), kante.ziel))
+            else:
+                for kante in kante.ziel.knoten.get_nachfolger_kanten(kante.ziel.richtung):
+                    if kante is not None:
+                        self._get_aufloesepunkte_rek(startrichtung, kante, result_liste)
+
 class KnotenUndRichtung(namedtuple('KnotenUndRichtung', ['knoten', 'richtung'])):
     def __repr__(self):
         return repr(self.knoten) + ("b" if self.richtung == NORM else "g")
+
+    def __str__(self):
+        return str(self.knoten) + ("b" if self.richtung == NORM else "g")
 
     def signal(self):
         return self.knoten.element.signal(self.richtung)
