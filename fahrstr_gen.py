@@ -7,6 +7,9 @@ from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ, Element
 import xml.etree.ElementTree as ET
 import argparse
 import operator
+import tempfile
+import shutil
+import os
 from collections import defaultdict
 
 import logging
@@ -42,10 +45,13 @@ def finde_fahrstrassen(args):
             for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
                 logging.info(fahrstrasse_neu.name)
                 strecke.append(fahrstrasse_neu.to_xml())
-            with open(args.dateiname, 'wb') as fp:
+            fp = tempfile.NamedTemporaryFile('wb', delete = False)
+            with fp:
                 fp.write(b"\xef\xbb\xbf")
                 fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
                 writeuglyxml(fp, modulverwaltung.dieses_modul.root)
+            shutil.copyfile(fp.name, args.dateiname)
+            os.remove(fp.name)
 
         elif args.modus == 'vergleiche':
             alt_vs_neu = defaultdict(dict)
