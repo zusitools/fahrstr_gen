@@ -185,7 +185,7 @@ def finde_fahrstrassen(args):
                     elif "neu" not in vsig:
                         print("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, vsig_refpunkt))
                     elif vsig["alt"] != vsig["neu"]:
-                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, vsig_refpunkt, vsig["alt"], vsig["neu"]))
+                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, vsig_refpunkt, vsig["alt"], vsig["neu"]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
