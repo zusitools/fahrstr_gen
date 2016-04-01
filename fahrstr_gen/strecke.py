@@ -122,6 +122,11 @@ class Signal:
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return any(z.hsig_geschw == 0 and (z.fahrstr_typ & fahrstr_typ != 0) for z in self.zeilen)
 
+    def ist_vsig(self):
+        return any(spalten_geschw == 0 for spalten_geschw in self.spalten) and \
+                any(spalten_geschw != 0 for spalten_geschw in self.spalten) and \
+                any(z.fahrstr_typ & FAHRSTR_TYP_ZUG != 0 and z.hsig_geschw == -1 for z in self.zeilen)
+
     # Gibt die Matrixzeile zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
     # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
     # Wenn solche eine Zeile nicht existiert, wird die Zeile mit der naechstgroesseren Geschwindigkeit genommen.
@@ -225,6 +230,9 @@ class Signal:
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
+
+def ist_vsig(signal):
+    return signal is not None and signal.ist_vsig()
 
 def element_laenge(element):
     p1 = [0, 0, 0]

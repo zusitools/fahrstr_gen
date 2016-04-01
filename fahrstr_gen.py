@@ -22,8 +22,13 @@ def finde_fahrstrassen(args):
 
     loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
     fahrstrassen = []
+    vorsignal_graph = streckengraph.Streckengraph(FAHRSTR_TYP_VORSIGNALE)
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
-        graph = streckengraph.Streckengraph(fahrstr_typ)
+        logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
+        if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
+            graph = streckengraph.Streckengraph(fahrstr_typ, vorsignal_graph)
+        else:
+            graph = streckengraph.Streckengraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
             if str_element in modulverwaltung.dieses_modul.referenzpunkte:
