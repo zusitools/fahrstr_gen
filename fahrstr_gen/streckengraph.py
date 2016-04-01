@@ -527,35 +527,19 @@ class Knoten:
                     hat_ende_weichenbereich = True # wird erst am Element danach wirksam
 
                 elif ereignis_nr == EREIGNIS_GEGENGLEIS:
-                    if kante.rgl_ggl == GLEIS_BAHNHOF:
-                        kante.rgl_ggl = GLEIS_GEGENGLEIS
-                        kante.streckenname = ereignis.get("Beschr", "")
-                    else:
-                        # TODO: Warnmeldung
-                        pass
+                    kante.rgl_ggl = GLEIS_GEGENGLEIS
+                    kante.streckenname = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_REGELGLEIS:
-                    if kante.rgl_ggl == GLEIS_BAHNHOF:
-                        kante.rgl_ggl = GLEIS_REGELGLEIS
-                        kante.streckenname = ereignis.get("Beschr", "")
-                    else:
-                        # TODO: Warnmeldung
-                        pass
+                    kante.rgl_ggl = GLEIS_REGELGLEIS
+                    kante.streckenname = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_EINGLEISIG:
-                    if kante.rgl_ggl == GLEIS_BAHNHOF:
-                        kante.rgl_ggl = GLEIS_EINGLEISIG
-                        kante.streckenname = ereignis.get("Beschr", "")
-                    else:
-                        # TODO: Warnmeldung
-                        pass
+                    kante.rgl_ggl = GLEIS_EINGLEISIG
+                    kante.streckenname = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
-                    if kante.richtungsanzeiger == "":
-                        kante.richtungsanzeiger = ereignis.get("Beschr", "")
-                    else:
-                        # TODO: Warnmeldung
-                        pass
+                    kante.richtungsanzeiger = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
                     refpunkt = element_richtung.refpunkt(REFTYP_AUFLOESEPUNKT)
