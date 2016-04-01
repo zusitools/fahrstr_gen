@@ -391,19 +391,19 @@ class Knoten:
                 if signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
                     if zeile is None:
-                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1.".format(element_richtung))
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1)
                     if zeile is None:
-                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1.".format(element_richtung))
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) and signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
                     if zeile is None:
-                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1.".format(element_richtung))
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         verkn = True
 
@@ -420,7 +420,7 @@ class Knoten:
                 if verkn:
                     refpunkt = element_richtung.refpunkt(REFTYP_SIGNAL)
                     if refpunkt is None:
-                        logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung))
+                        logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
 
@@ -433,7 +433,7 @@ class Knoten:
                     and signal_gegenrichtung.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG):
                 refpunkt = element_richtung_gegenrichtung.refpunkt(REFTYP_SIGNAL)
                 if refpunkt is None:
-                    logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung_gegenrichtung))
+                    logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung_gegenrichtung))
                 else:
                     zeile = signal_gegenrichtung.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
                     if zeile is None:
@@ -446,7 +446,7 @@ class Knoten:
             if regnr != 0:
                 refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
                 if refpunkt is None:
-                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichetet.".format(element_richtung))
+                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung))
                 else:
                     kante.register.append(refpunkt)
 
@@ -502,14 +502,14 @@ class Knoten:
                 elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
                     refpunkt = element_richtung.refpunkt(REFTYP_AUFLOESEPUNKT)
                     if refpunkt is None:
-                        logging.warn("Element {} enthaelt ein Ereignis \"Fahrstrasse aufloesen\", aber es existiert kein passender Referenzpunkt. Die Aufloese-Verknuepfung wird nicht eingerichetet.".format(element_richtung))
+                        logging.warn("Element {} enthaelt ein Ereignis \"Fahrstrasse aufloesen\", aber es existiert kein passender Referenzpunkt. Die Aufloese-Verknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         kante.aufloesepunkte.append(refpunkt)
 
                 elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
                     refpunkt = element_richtung.refpunkt(REFTYP_SIGNALHALTFALL)
                     if refpunkt is None:
-                        logging.warn("Element {} enthaelt ein Ereignis \"Signalhaltfall\", aber es existiert kein passender Referenzpunkt. Die Signalhaltfall-Verknuepfung wird nicht eingerichetet.".format(element_richtung))
+                        logging.warn("Element {} enthaelt ein Ereignis \"Signalhaltfall\", aber es existiert kein passender Referenzpunkt. Die Signalhaltfall-Verknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         kante.aufloesepunkte.append(refpunkt)
 
@@ -517,32 +517,32 @@ class Knoten:
                     try:
                         kante.register.append(element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))])
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Registerverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
                         refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Weichenverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
 
                     try:
                         kante.weichen.append(FahrstrWeichenstellung(refpunkt, int(ereignis.get("Beschr", ""))))
                     except ValueError:
-                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Beschr", "")))
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
                     try:
                         refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
 
                     try:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, int(ereignis.get("Beschr", "")), False))
                     except ValueError:
-                        logging.warn("Ereignis \"Signale in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung, ereignis.get("Beschr", "")))
+                        logging.warn("Ereignis \"Signale in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_VORSIGNAL_VERKNUEPFEN:
                     # TODO: in Liste von Vorsignalen einfuegen
