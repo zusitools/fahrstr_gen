@@ -37,16 +37,17 @@ class Fahrstrasse:
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
         self.zufallswert = float(self.ziel.signal().xml_knoten.get("Zufallswert", 0))
 
-        # Setze Regelgleis/Gegengleis/Streckenname
+        # Setze Regelgleis/Gegengleis/Streckenname/Richtungsanzeiger
         self.rgl_ggl = GLEIS_BAHNHOF
         self.streckenname = ""
+        self.richtungsanzeiger = ""
         for einzelfahrstrasse in einzelfahrstrassen:
             for kante in einzelfahrstrasse.kantenliste():
                 if kante.rgl_ggl != GLEIS_BAHNHOF:
                     self.rgl_ggl = kante.rgl_ggl
                     self.streckenname = kante.streckenname
-
-        # TODO: Setze Richtungsanzeiger
+            if einzelfahrstrasse.richtungsanzeiger != "":
+                self.richtungsanzeiger = einzelfahrstrasse.richtungsanzeiger
 
         self.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
 
@@ -86,7 +87,7 @@ class Fahrstrasse:
                         if startsignal_zeile is None:
                             logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
-                            startsignal_zeile = self.start.signal().get_richtungsanzeiger_zeile(startsignal_zeile, self.rgl_ggl, einzelfahrstrasse.richtungsanzeiger)
+                            startsignal_zeile = self.start.signal().get_richtungsanzeiger_zeile(startsignal_zeile, self.rgl_ggl, self.richtungsanzeiger)
                             self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
             else:
                 gefunden = False
@@ -96,7 +97,7 @@ class Fahrstrasse:
                         if refpunkt is None:
                             logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(einzelfahrstrasse.start))
                         else:
-                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, self.rgl_ggl, einzelfahrstrasse.richtungsanzeiger)
+                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, self.rgl_ggl, self.richtungsanzeiger)
                             self.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
                         break
