@@ -167,6 +167,21 @@ def finde_fahrstrassen(args):
                     elif hsig["alt"] != hsig["neu"]:
                         print("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, hsig_refpunkt, hsig["alt"], hsig["neu"]))
 
+                # Vorsignale
+                vsig_alt_vs_neu = defaultdict(dict)
+                for vsig_alt in fahrstr_alt.findall("./FahrstrVSignal"):
+                    vsig_alt_vs_neu[(int(vsig_alt.get("Ref", 0)), vsig_alt.find("./Datei").get("Dateiname", "").upper())]["alt"] = int(vsig_alt.get("FahrstrSignalSpalte", 0))
+                for vsig_neu in fahrstr_neu.vorsignale:
+                    vsig_alt_vs_neu[(vsig_neu.refpunkt.refnr, vsig_neu.refpunkt.modul.relpath.upper())]["neu"] = vsig_neu.spalte
+
+                for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                    if "alt" not in vsig:
+                        print("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, vsig_refpunkt))
+                    elif "neu" not in vsig:
+                        print("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, vsig_refpunkt))
+                    elif vsig["alt"] != vsig["neu"]:
+                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, vsig_refpunkt, vsig["alt"], vsig["neu"]))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
     parser.add_argument('dateiname')
