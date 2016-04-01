@@ -149,6 +149,13 @@ class Signal:
                 zeile_groesser = idx
                 geschw_groesser = zeile.hsig_geschw
 
+        if zeile_kleinergleich is None and zeile_groesser is None:
+            # WORKAROUND zur Kompatibilitaet mit Zusi: Zusi akzeptiert auch Zeile -2 als Hsig-Geschwindigkeit.
+            for idx, zeile in enumerate(self.zeilen):
+                if zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw == -2.0:
+                    logging.warn("{}: Nutze Kennlichtzeile (Geschwindigkeit -2) als regulaere Fahrstrassenzeile (Geschwindigkeit {})".format(self, str_geschw(zielgeschwindigkeit)))
+                    return idx
+
         return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
 
     # Gibt die Zeile zurueck, die die Zeile Nummer `zeilenidx_original` gemaess dem angegebenen Richtungsanzeiger
