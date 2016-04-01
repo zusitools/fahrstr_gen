@@ -140,7 +140,12 @@ class Fahrstrasse:
             for vsig in einzelfahrstrassen[0].start.knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
                 logging.debug("{} {}".format(self.name, vsig))
                 if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in self.vorsignale):
-                    self.vorsignale.append(FahrstrVorsignal(vsig, 0)) # TODO: ansteuern, Richtungsvoranzeiger
+                    # TODO: Vorsignale an LZB-Fahrstrassen mit v=-2 ansteuern
+                    spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
+                    if spalte is None:
+                        logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig, str_geschw(self.signalgeschwindigkeit)))
+                    else:
+                        self.vorsignale.append(FahrstrVorsignal(vsig, spalte)) # TODO: Richtungsvoranzeiger
 
     def to_xml(self):
         result = ET.Element('Fahrstrasse', {

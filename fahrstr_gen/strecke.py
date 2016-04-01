@@ -228,6 +228,25 @@ class Signal:
 
         return None
 
+    # Gibt die Matrixspalte zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
+    # Das ist die Zeile mit der passenden oder naechstkleineren Geschwindigkeit.
+    def get_vsig_spalte(self, zielgeschwindigkeit):
+        assert(zielgeschwindigkeit != 0)
+        spalte_kleinergleich, geschw_kleinergleich = None, 0
+
+        for idx, vsig_geschw in enumerate(self.spalten):
+            # Spalten fuer Spezialgeschwindigkeiten werden nicht betrachtet.
+            if vsig_geschw == -2.0:
+                continue
+
+            if (geschw_kleiner(geschw_kleinergleich, vsig_geschw) and not geschw_kleiner(zielgeschwindigkeit, vsig_geschw)) or \
+                    (spalte_kleinergleich is None and vsig_geschw == 0):
+                # geschw > geschw_kleinergleich und geschw <= zielgeschwindigkeit
+                spalte_kleinergleich = idx
+                geschw_kleinergleich = vsig_geschw
+
+        return spalte_kleinergleich
+
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
 
