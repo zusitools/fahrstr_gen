@@ -386,15 +386,14 @@ class Knoten:
             if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
                 verkn = False
                 zeile = -1
-                if self.graph.fahrstr_typ == FAHRSTR_TYP_LZB and signal.hat_zeile_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
+
+                # Hauptsignale, die nicht dem aktuellen Fahrstrassentyp entsprechen, auf -1 stellen:
+                if signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
                     if zeile is None:
                         logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1.".format(element_richtung))
                     else:
                         verkn = True
-                elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & FAHRSTR_TYP_ZUG != 0)) >= 2:
-                    verkn = True
-                    # Zeile muss ermittelt werden
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1)
                     if zeile is None:
@@ -407,6 +406,13 @@ class Knoten:
                         logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1.".format(element_richtung))
                     else:
                         verkn = True
+
+                # Signale, die mehr als eine Auswahl fuer den aktuellen Fahrstrassentyp haben
+                elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & self.graph.fahrstr_typ != 0)) >= 2:
+                    verkn = True
+                    # Zeile muss ermittelt werden
+
+                # Signale, die einen Richtungs- oder Gegengleisanzeiger haben
                 elif signal.gegengleisanzeiger != 0 or len(signal.richtungsanzeiger) > 0:
                     verkn = True
                     # Zeile muss ermittelt werden
