@@ -427,13 +427,19 @@ class Knoten:
             # Signal am aktuellen Element (Gegenrichtung) in die Signalliste einfuegen
             element_richtung_gegenrichtung = element_richtung.gegenrichtung()
             signal_gegenrichtung = element_richtung_gegenrichtung.signal()
-            if signal_gegenrichtung is not None and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_BEIDE_FAHRTRICHTUNGEN != 0 and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
+            if signal_gegenrichtung is not None \
+                    and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_BEIDE_FAHRTRICHTUNGEN != 0 \
+                    and signal_gegenrichtung.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0 \
+                    and signal_gegenrichtung.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG):
                 refpunkt = element_richtung_gegenrichtung.refpunkt(REFTYP_SIGNAL)
                 if refpunkt is None:
                     logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichetet.".format(element_richtung_gegenrichtung))
                 else:
-                    # TODO
-                    kante.signale.append(FahrstrHauptsignal(refpunkt, 0, False))
+                    zeile = signal_gegenrichtung.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
+                    if zeile is None:
+                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung_gegenrichtung))
+                    else:
+                        kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
 
             # Register am aktuellen Element in die Registerliste einfuegen
             regnr = element_richtung.registernr()
