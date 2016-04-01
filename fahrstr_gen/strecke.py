@@ -8,51 +8,125 @@ from . import modulverwaltung
 import logging
 import math
 
-class Element(namedtuple('ElementUndRichtung', ['modul', 'element'])):
+class Element:
+    def __init__(self, modul, xml_knoten):
+        self.modul = modul
+        self.xml_knoten = xml_knoten
+
+        self._signal_gesucht = [False, False]
+        self._signal = [None, None]
+        self._nachfolger = [None, None]
+        self._laenge = None
+
     def __repr__(self):
         if self.modul == modulverwaltung.dieses_modul:
-            return self.element.get("Nr", "0")
+            return self.xml_knoten.get("Nr", "0")
         else:
-            return "{}[{}]".format(self.element.get("Nr", "0"), self.modul.name_kurz())
+            return "{}[{}]".format(self.xml_knoten.get("Nr", "0"), self.modul.name_kurz())
+
+    def laenge(self):
+        if self._laenge is None:
+            p1 = [0, 0, 0]
+            p2 = [0, 0, 0]
+
+            for n in self.xml_knoten:
+                if n.tag == "b":
+                    p1[0] = float(n.get("X", 0))
+                    p1[1] = float(n.get("Y", 0))
+                    p1[2] = float(n.get("Z", 0))
+                elif n.tag == "g":
+                    p2[0] = float(n.get("X", 0))
+                    p2[1] = float(n.get("Y", 0))
+                    p2[2] = float(n.get("Z", 0))
+
+            self._laenge = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
+        return self._laenge
 
     def richtung(self, richtung):
-        return ElementUndRichtung(self.modul, self.element, richtung)
+        return ElementUndRichtung(self, richtung)
 
     def signal(self, richtung):
-        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal"))
+        key = 1 if richtung == NORM else 0
+        if not self._signal_gesucht[key]:
+            self._signal[key] = self.modul.get_signal(self.xml_knoten.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal"))
+            self._signal_gesucht[key] = True
+        return self._signal[key]
 
     def refpunkt(self, richtung, typ):
-        for refpunkt in self.modul.referenzpunkte[self.element]:
-            if refpunkt.richtung == richtung and refpunkt.reftyp == typ:
+        for refpunkt in self.modul.referenzpunkte[self]:
+            if refpunkt.element_richtung.richtung == richtung and refpunkt.reftyp == typ:
                 return refpunkt
         return None
 
-class ElementUndRichtung(namedtuple('ElementUndRichtung', ['modul', 'element', 'richtung'])):
+    def nachfolger(self, richtung):
+        key = 1 if richtung == NORM else 0
+        if self._nachfolger[key] is None:
+            anschluss = int(self.xml_knoten.get("Anschluss", 0))
+
+            nachfolger_knoten = [n for n in self.xml_knoten if
+                (richtung == NORM and (n.tag == "NachNorm" or n.tag == "NachNormModul")) or
+                (richtung == GEGEN and (n.tag == "NachGegen" or n.tag == "NachGegenModul"))]
+            self._nachfolger[key] = []
+
+            for idx, n in enumerate(nachfolger_knoten):
+                anschluss_shift = idx + (8 if richtung == GEGEN else 0)
+                if "Modul" not in n.tag:
+                    nach_modul = self.modul
+                    try:
+                        nach_el = nach_modul.streckenelemente[int(n.get("Nr", 0))]
+                    except KeyError:
+                        self._nachfolger[key].append(None)
+                        continue
+                    nach_richtung = NORM if (anschluss >> anschluss_shift) & 1 == 0 else GEGEN
+                    self._nachfolger[key].append(ElementUndRichtung(nach_el, nach_richtung))
+                else:
+                    nach_modul = modulverwaltung.get_modul_aus_dateiknoten(n, self.modul)
+                    if nach_modul is None:
+                        self._nachfolger[key].append(None)
+                        continue
+
+                    try:
+                        nach_ref = nach_modul.referenzpunkte_by_nr[int(n.get("Nr", 0))]
+                    except KeyError:
+                        self._nachfolger[key].append(None)
+                        continue
+
+                    self._nachfolger[key].append(nach_ref.element_richtung.gegenrichtung())  # Referenzpunkt zeigt zur Modulschnittstelle hin
+
+        return self._nachfolger[key]
+
+    def vorgaenger(self, richtung):
+        return [(e.gegenrichtung() if e is not None else None) for e in self.nachfolger(GEGEN if richtung == NORM else NORM)]
+
+class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'])):
     def __repr__(self):
-        if self.modul == modulverwaltung.dieses_modul:
-            return self.element.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
+        if self.element.modul == modulverwaltung.dieses_modul:
+            return self.element.xml_knoten.get("Nr", "0") + ("b" if self.richtung == NORM else "g")
         else:
-            return "{}{}[{}]".format(self.element.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.modul.name_kurz())
+            return "{}{}[{}]".format(self.element.xml_knoten.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.element.modul.name_kurz())
 
     def signal(self):
-        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal"))
+        return self.element.signal(self.richtung)
 
     def refpunkt(self, typ):
-        for refpunkt in self.modul.referenzpunkte[self.element]:
-            if refpunkt.richtung == self.richtung and refpunkt.reftyp == typ:
-                return refpunkt
-        return None
+        return self.element.refpunkt(self.richtung, typ)
 
     def registernr(self):
-        richtungsinfo = self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung")
+        richtungsinfo = self.element.xml_knoten.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung")
         return 0 if richtungsinfo is None else int(richtungsinfo.get("Reg", 0))
 
     def ereignisse(self):
         # TODO: eventuell auch Ereignisse in Signalen beachten?
-        return self.element.iterfind("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Ereignis")
+        return self.element.xml_knoten.iterfind("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Ereignis")
 
     def gegenrichtung(self):
-        return ElementUndRichtung(self.modul, self.element, GEGEN if self.richtung == NORM else NORM)
+        return ElementUndRichtung(self.element, GEGEN if self.richtung == NORM else NORM)
+
+    def nachfolger(self):
+        return self.element.nachfolger(self.richtung)
+
+    def vorgaenger(self):
+        return self.element.vorgaenger(self.richtung)
 
 def geschw_min(v1, v2):
     if v1 < 0:
@@ -253,70 +327,8 @@ def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
 def ist_vsig(signal):
     return signal is not None and signal.ist_vsig()
 
-def element_laenge(element):
-    p1 = [0, 0, 0]
-    p2 = [0, 0, 0]
-
-    for n in element:
-        if n.tag == "b":
-            p1[0] = float(n.get("X", 0))
-            p1[1] = float(n.get("Y", 0))
-            p1[2] = float(n.get("Z", 0))
-        elif n.tag == "g":
-            p2[0] = float(n.get("X", 0))
-            p2[1] = float(n.get("Y", 0))
-            p2[2] = float(n.get("Z", 0))
-
-    return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
-
-def nachfolger_elemente(element_richtung):
-    if element_richtung is None:
-        return None
-
-    anschluss = int(element_richtung.element.get("Anschluss", 0))
-
-    nachfolger_knoten = [n for n in element_richtung.element if
-        (element_richtung.richtung == NORM and (n.tag == "NachNorm" or n.tag == "NachNormModul")) or
-        (element_richtung.richtung == GEGEN and (n.tag == "NachGegen" or n.tag == "NachGegenModul"))]
-    nachfolger = []
-
-    for idx, n in enumerate(nachfolger_knoten):
-        anschluss_shift = idx + (8 if element_richtung.richtung == GEGEN else 0)
-        if "Modul" not in n.tag:
-            nach_modul = element_richtung.modul
-            try:
-                nach_el = nach_modul.streckenelemente[int(n.get("Nr", 0))]
-            except KeyError:
-                nachfolger.append(None)
-                continue
-            nach_richtung = NORM if (anschluss >> anschluss_shift) & 1 == 0 else GEGEN
-        else:
-            nach_modul = modulverwaltung.get_modul_aus_dateiknoten(n, element_richtung.modul)
-            if nach_modul is None:
-                nachfolger.append(None)
-                continue
-
-            try:
-                nach_ref = nach_modul.referenzpunkte_by_nr[int(n.get("Nr", 0))]
-            except KeyError:
-                nachfolger.append(None)
-                continue
-
-            nach_el = nach_ref.element
-            nach_richtung = GEGEN if nach_ref.richtung == NORM else NORM # Richtung zeigt zur Modulschnittstelle -> umkehren
-
-        nachfolger.append(ElementUndRichtung(nach_modul, nach_el, nach_richtung))
-
-    return nachfolger
-
 def gegenrichtung(richtung):
     return GEGEN if richtung == NORM else NORM
-
-def vorgaenger_elemente(element_richtung):
-    if element_richtung is None:
-        return None
-
-    return [e.gegenrichtung() for e in nachfolger_elemente(element_richtung.gegenrichtung()) if e is not None]
 
 st3_attrib_order = {
     "AutorEintrag": ["AutorID", "AutorName", "AutorEmail", "AutorAufwand", "AutorLizenz", "AutorBeschreibung"],

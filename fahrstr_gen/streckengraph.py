@@ -118,7 +118,7 @@ class Fahrstrasse:
                 for refpunkt in kante.aufloesepunkte:
                     if refpunkt.reftyp == REFTYP_AUFLOESEPUNKT:
                         # Aufloesepunkte im Zielelement zaehlen als Aufloesung der gesamten Fahrstrasse, nicht als Teilaufloesung.
-                        if refpunkt.element == self.ziel.element and refpunkt.richtung == self.ziel.richtung:
+                        if refpunkt.element_richtung == self.ziel.element_richtung:
                             self.aufloesepunkte.append(refpunkt)
                         else:
                             self.teilaufloesepunkte.append(refpunkt)
@@ -259,8 +259,8 @@ class Streckengraph:
         self._besuchszaehler += 1
 
     def ist_knoten(self, element):
-        if len([n for n in element.element if n.tag == "NachNorm" or n.tag == "NachNormModul"]) > 1 or \
-                len([n for n in element.element if n.tag == "NachGegen" or n.tag == "NachGegenModul"]) > 1:
+        if len([n for n in element.xml_knoten if n.tag == "NachNorm" or n.tag == "NachNormModul"]) > 1 or \
+                len([n for n in element.xml_knoten if n.tag == "NachGegen" or n.tag == "NachGegenModul"]) > 1:
             return True
 
         if self.fahrstr_typ == FAHRSTR_TYP_VORSIGNALE:
@@ -398,7 +398,7 @@ class Knoten:
         if self.nachfolger_kanten[key] is None:
             logging.debug("Suche Nachfolgerkanten ab {}".format(self.richtung(richtung)))
             self.nachfolger_kanten[key] = []
-            nachfolger = nachfolger_elemente(self.element.richtung(richtung))
+            nachfolger = self.element.richtung(richtung).nachfolger()
 
             weichen_refpunkt = None
             if len(nachfolger) > 1:
@@ -414,7 +414,7 @@ class Knoten:
             for idx, n in enumerate(nachfolger):
                 kante = Kante(self.richtung(richtung))
                 # Ende Weichenbereich wirkt schon im Startelement
-                kante.hat_ende_weichenbereich = self.element.element.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis[@Er='1000002']") is not None
+                kante.hat_ende_weichenbereich = self.element.xml_knoten.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis[@Er='1000002']") is not None
                 if weichen_refpunkt is not None:
                     kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
                 kante = self._neue_nachfolger_kante(kante, n)
@@ -428,7 +428,7 @@ class Knoten:
             # TODO: Vorher keine Vsig-Verknuepfung im Element selbst?
             logging.debug("Suche Vorsignal-Kanten ab {}".format(self.richtung(richtung)))
             self.vorsignal_kanten[key] = []
-            for v in vorgaenger_elemente(self.element.richtung(richtung)):
+            for v in self.element.richtung(richtung).vorgaenger():
                 if v is not None:
                     kante = VorsignalKante()
                     self.vorsignal_kanten[key].append(self._neue_vorsignal_kante(kante, v))
@@ -573,14 +573,14 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
                     try:
-                        kante.register.append(element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))])
+                        kante.register.append(element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))])
                     except (KeyError, ValueError):
                         logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
-                        refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
                     except (KeyError, ValueError):
                         logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
@@ -592,7 +592,7 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
                     try:
-                        refpunkt = element_richtung.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
                     except (KeyError, ValueError):
                         logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
                         continue
@@ -607,12 +607,12 @@ class Knoten:
                     pass
 
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
-            kante.laenge += element_laenge(element_richtung.element)
+            kante.laenge += element_richtung.element.laenge()
 
-            if self.graph.ist_knoten(Element(element_richtung.modul, element_richtung.element)):
+            if self.graph.ist_knoten(element_richtung.element):
                 break
 
-            nachfolger = nachfolger_elemente(element_richtung)
+            nachfolger = element_richtung.nachfolger()
             if len(nachfolger) == 0:
                 element_richtung = None
                 break
@@ -620,10 +620,14 @@ class Knoten:
             assert(len(nachfolger) == 1)  # sonst waere es ein Knoten
             element_richtung_neu = nachfolger[0]
 
-            nachfolger_vorgaenger = vorgaenger_elemente(element_richtung_neu)
+            if element_richtung_neu is None:
+                element_richtung = None
+                break
+
+            nachfolger_vorgaenger = element_richtung_neu.vorgaenger()
             if nachfolger_vorgaenger is not None and len(nachfolger_vorgaenger) > 1:
                 # Stumpf befahrene Weiche stellen
-                weichen_refpunkt = self.graph.get_knoten(Element(element_richtung_neu.modul, element_richtung_neu.element)).refpunkt(gegenrichtung(element_richtung_neu.richtung), REFTYP_WEICHE)
+                weichen_refpunkt = self.graph.get_knoten(element_richtung_neu.element).refpunkt(gegenrichtung(element_richtung_neu.richtung), REFTYP_WEICHE)
                 if weichen_refpunkt is None:
                     logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                             "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
@@ -645,7 +649,7 @@ class Knoten:
             # Fahrweg endet im Nichts, hier ist keine sinnvolle Fahrstrasse zu erzeugen
             return None
         else:
-            kante.ziel = KnotenUndRichtung(self.graph.get_knoten(Element(element_richtung.modul, element_richtung.element)), element_richtung.richtung)
+            kante.ziel = KnotenUndRichtung(self.graph.get_knoten(element_richtung.element), element_richtung.richtung)
 
         return kante
 
@@ -666,8 +670,8 @@ class Knoten:
                     kante.vorher_keine_vsig_verknuepfung = True
                     break
 
-            if self.graph.ist_knoten(Element(element_richtung.modul, element_richtung.element)):
-                kante.ziel = KnotenUndRichtung(self.graph.get_knoten(Element(element_richtung.modul, element_richtung.element)), element_richtung.richtung)
+            if self.graph.ist_knoten(element_richtung.element):
+                kante.ziel = KnotenUndRichtung(self.graph.get_knoten(element_richtung.element), element_richtung.richtung)
                 if ist_hsig_fuer_fahrstr_typ(element_richtung.signal(), FAHRSTR_TYP_ZUG) and \
                         element_richtung.signal().sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0 and \
                         element_richtung.signal().sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL == 0:
@@ -677,7 +681,7 @@ class Knoten:
             if kante.vorher_keine_vsig_verknuepfung:
                 break
 
-            vorgaenger = vorgaenger_elemente(element_richtung)
+            vorgaenger = element_richtung.vorgaenger()
             if len(vorgaenger) == 0:
                 element_richtung = None
                 break
@@ -781,7 +785,7 @@ class Knoten:
         for aufl in kante.aufloesepunkte:
             # Aufloeseelement im Zielknoten nur einfuegen, wenn dieser noch nicht besucht wurde,
             # sonst wird es mehrmals eingefuegt.
-            if aufl.element != kante.ziel.knoten.element or not kante.ziel.knoten.ist_besucht():
+            if aufl.element_richtung.element != kante.ziel.knoten.element or not kante.ziel.knoten.ist_besucht():
                 logging.debug("Aufloesepunkt an {}".format(aufl))
                 result_liste.append(aufl)
             if aufl.reftyp == REFTYP_AUFLOESEPUNKT:

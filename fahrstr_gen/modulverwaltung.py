@@ -69,34 +69,28 @@ def _path_insensitive(path):
         return
 
 class RefPunkt(object):
-    def __init__(self, modul, refnr, info, reftyp, element, richtung):
-        self.modul = modul
+    def __init__(self, refnr, reftyp, element_richtung):
         self.refnr = refnr
-        self.info = info
         self.reftyp = reftyp
-        self.element = element
-        self.richtung = richtung
+        self.element_richtung = element_richtung
 
     def __repr__(self):
         global dieses_modul
         return "Element {}{}{}".format(
-            self.element.get("Nr", "0"),
-            'n' if self.richtung == NORM else 'g',
-            "" if self.modul == dieses_modul else "[{}]".format(self.modul_kurz())
+            self.element_richtung.element.xml_knoten.get("Nr", "0"),
+            'n' if self.element_richtung.richtung == NORM else 'g',
+            "" if self.element_richtung.element.modul == dieses_modul else "[{}]".format(self.modul_kurz())
         )
 
     def modul_kurz(self):
-        return os.path.basename(self.modul.relpath.replace('\\', os.sep))
-
-    def el_r(self):
-        return (self.modul, self.element, self.richtung)
+        return os.path.basename(self.element_richtung.element.modul.relpath.replace('\\', os.sep))
 
     def signal(self):
-        return self.modul.get_signal(self.element.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Signal"))
+        return self.element_richtung.signal()
 
     def to_xml(self, node):
         node.attrib["Ref"] = str(self.refnr)
-        ET.SubElement(node, 'Datei', { "Dateiname": self.modul.relpath, "NurInfo": "1" })
+        ET.SubElement(node, 'Datei', { "Dateiname": self.element_richtung.element.modul.relpath, "NurInfo": "1" })
 
 def normalize_zusi_relpath(relpath):
     return relpath.upper().replace('/', '\\')
@@ -120,10 +114,12 @@ dieses_modul = None
 
 class Modul:
     def __init__(self, relpath, root):
+        from .strecke import Element, ElementUndRichtung  # get around circular dependency by deferring the import to here
+
         self.relpath = relpath
         self.root = root
         self.streckenelemente = dict(
-            (int(s.get("Nr", 0)), s)
+            (int(s.get("Nr", 0)), Element(self, s))
             for s in root.findall("./Strecke/StrElement")
         )
 
@@ -132,15 +128,12 @@ class Modul:
             try:
                 element = self.streckenelemente[int(r.get("StrElement", 0))]
                 self.referenzpunkte[element].append(RefPunkt(
-                    self,
                     int(r.get("ReferenzNr", 0)),
-                    r.get("Info", ""),
                     int(r.get("RefTyp", 0)),
-                    element,
-                    NORM if int(r.get("StrNorm", 0)) == 1 else GEGEN
+                    ElementUndRichtung(element, NORM if int(r.get("StrNorm", 0)) == 1 else GEGEN)
                 ))
             except KeyError:
-                pass
+                logging.debug("Referenzpunkt {} in Modul {} verweist auf ungueltiges Streckenelement {}".format(int(r.get("ReferenzNr", 0)), self.relpath, int(r.get("StrElement", 0))))
 
         self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)
         self.signale = dict()
