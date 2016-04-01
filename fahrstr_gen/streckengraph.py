@@ -123,7 +123,16 @@ class Fahrstrasse:
                         else:
                             self.teilaufloesepunkte.append(refpunkt)
                 self.signalhaltfallpunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_SIGNALHALTFALL])
-                self.signale.extend(kante.signale)  # TODO ansteuern
+                for signal_verkn in kante.signale:
+                    if signal_verkn.zeile != -1:
+                        self.signale.append(signal_verkn)
+                    else:
+                        zeile = signal_verkn.refpunkt.signal().get_hsig_zeile(self.fahrstr_typ, self.signalgeschwindigkeit)
+                        if zeile is None:
+                            logging.warn("{}: Signal {} ({}) hat keine Zeile fuer Geschwindigkeit {}".format(self.name, signal_verkn.refpunkt.signal(), signal_verkn.refpunkt, str_geschw(self.signalgeschwindigkeit)))
+                        else:
+                            zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, self.rgl_ggl, self.richtungsanzeiger)
+                            self.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))
                 self.vorsignale.extend(kante.vorsignale)
 
         # Aufloesepunkte suchen. Wenn wir vorher schon einen Aufloesepunkt gefunden haben, lag er im Zielelement der Fahrstrasse,
