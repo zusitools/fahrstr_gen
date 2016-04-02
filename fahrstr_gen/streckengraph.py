@@ -657,7 +657,11 @@ class Knoten:
                     kante.vorsignale.append(refpunkt)
 
             for ereignis in element_richtung.ereignisse():
-                if int(ereignis.get("Er", 0)) == EREIGNIS_VORHER_KEINE_VSIG_VERKNUEPFUNG:
+                ereignis_nr = int(ereignis.get("Er", 0))
+                if ereignis_nr == EREIGNIS_VORHER_KEINE_VSIG_VERKNUEPFUNG:
+                    kante.vorher_keine_vsig_verknuepfung = True
+                    break
+                elif ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE:
                     kante.vorher_keine_vsig_verknuepfung = True
                     break
 
