@@ -95,9 +95,70 @@ class RefPunkt(object):
 def normalize_zusi_relpath(relpath):
     return relpath.upper().replace('/', '\\')
 
+# aus zusicommon
+# From the first key in "keys" that contains a value, returns a dictionary
+# with the values indexed by "valuenames"
+def read_registry_strings(keys, valuenames):
+    result = {}
+
+    try:
+        import winreg
+        for (root, path) in keys:
+            try:
+                key = winreg.OpenKey(root, path)
+            except WindowsError:
+                continue
+
+            # We have to enumerate all key-value pairs in the open key
+            try:
+                index = 0
+                while True:
+                    # The loop will be ended by a WindowsError being thrown when there
+                    # are no more key-value pairs
+                    value = winreg.EnumValue(key, index)
+                    if value[0] in valuenames and value[1] != "":
+                        result[value[0]] = value[1]
+                    index += 1
+            except WindowsError:
+                pass
+
+            if len(result):
+                break
+
+    except ImportError:
+        # we're not on Windows
+        return None
+    except WindowsError:
+        return None
+
+    return result if len(result) else None
+
+# aus zusicommon, angepasst
 def get_zusi_datapath():
-    # TODO: aus der Registry auslesen
-    return os.environ['ZUSI3_DATAPATH']
+    result = os.environ['ZUSI3_DATAPATH']
+
+    if result is not None:
+        return result
+
+    try:
+        import winreg
+        registry_values = read_registry_strings([
+            (winreg.HKEY_LOCAL_MACHINE, "Software\\Zusi3"),
+            (winreg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Zusi3"),
+            (winreg.HKEY_CURRENT_USER, "Software\\Zusi3"),
+            (winreg.HKEY_CURRENT_USER, "Software\\Wow6432Node\\Zusi3"),
+        ], set(["DatenVerzeichnis", "DatenDir", "DatenVerzeichnisDemo", "DatenDirDemo"]))
+        if registry_values is not None:
+            if "DatenVerzeichnis" in registry_values:
+                return registry_values["DatenVerzeichnis"]
+            elif "DatenDir" in registry_values:
+                return registry_values["DatenDir"]
+            elif "DatenVerzeichnisDemo" in registry_values:
+                return registry_values["DatenVerzeichnisDemo"]
+            elif "DatenDirDemo" in registry_values:
+                return registry_values["DatenDirDemo"]
+    except ImportError:
+        return ""
 
 def get_zusi_relpath(realpath):
     if not os.path.isabs(realpath):
