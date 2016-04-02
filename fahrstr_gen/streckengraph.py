@@ -147,7 +147,6 @@ class Fahrstrasse:
         # Vorsignale ansteuern
         if self.start.reftyp == REFTYP_SIGNAL and not self.ziel.signal().ist_hilfshauptsignal:
             for vsig in einzelfahrstrassen[0].start.knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
-                logging.debug("{} {}".format(self.name, vsig))
                 if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in self.vorsignale):
                     # TODO: Vorsignale an LZB-Fahrstrassen mit v=-2 ansteuern
                     spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
@@ -396,7 +395,6 @@ class Knoten:
         if self.vorsignale[key] is None:
             logging.debug("Suche Vorsignale ab {}".format(self.richtung(richtung)))
             self.vorsignale[key] = self._get_vorsignale(richtung)
-            logging.debug("Vorsignale ab {} sind {}".format(self.richtung(richtung), self.vorsignale[key]))
         return self.vorsignale[key]
 
     # Gibt alle von diesem Knoten ausgehenden Nachfolgerkanten in der angegebenen Richtung zurueck.
@@ -682,7 +680,6 @@ class Knoten:
             assert(len(vorgaenger) == 1)  # sonst waere es ein Knoten
             element_richtung = vorgaenger[0]
 
-        logging.debug("Suche endete an {}, vorher_keine_vsig_verknuepfung = {}".format(kante.ziel, kante.vorher_keine_vsig_verknuepfung))
         return kante
 
     # Gibt alle Einzelfahrstrassen zurueck, die an diesem Knoten in der angegebenen Richtung beginnen.
@@ -811,13 +808,9 @@ class Knoten:
 
         result_liste.extend(kante.vorsignale)
 
-        logging.debug("vorher_keine_vsig_verknuepfung = {}, ziel = {}, result_liste = {}".format(kante.vorher_keine_vsig_verknuepfung, kante.ziel, result_liste))
-
         if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
             kante.ziel.knoten.markiere_besucht()
-            logging.debug("Jetzt an {}, {} Vorsignalkanten".format(kante.ziel, len(kante.ziel.knoten.get_vorsignal_kanten(kante.ziel.richtung))))
             for kante2 in kante.ziel.knoten.get_vorsignal_kanten(kante.ziel.richtung):
-                logging.debug("An {}, Kante nach {} mit Vorsignalen {}".format(kante.ziel, kante2.ziel, kante2.vorsignale))
                 self._get_vorsignale_rek(kante2, result_liste)
 
 class KnotenUndRichtung(namedtuple('KnotenUndRichtung', ['knoten', 'richtung'])):
