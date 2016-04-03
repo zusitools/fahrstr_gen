@@ -160,10 +160,12 @@ class Fahrstrasse:
                             logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden".format(self.name, vsig.signal(), vsig.element_richtung))
                     else:
                         spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
+                        if len(vsig.signal().richtungsvoranzeiger) > 0:
+                            spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, self.rgl_ggl, self.richtungsanzeiger)
                         if spalte is None:
                             logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig.element_richtung, str_geschw(self.signalgeschwindigkeit)))
                         else:
-                            self.vorsignale.append(FahrstrVorsignal(vsig, spalte)) # TODO: Richtungsvoranzeiger
+                            self.vorsignale.append(FahrstrVorsignal(vsig, spalte))
 
     def to_xml(self):
         result = ET.Element('Fahrstrasse', {
@@ -700,7 +702,7 @@ class Knoten:
     def _neue_vorsignal_kante(self, kante, element_richtung):
         while element_richtung is not None:
             signal = element_richtung.signal()
-            if ist_vsig(signal):
+            if signal is not None and (signal.ist_vsig() or len(signal.richtungsvoranzeiger) > 0):
                 refpunkt = element_richtung.refpunkt(REFTYP_SIGNAL)
                 if refpunkt is None:
                     logging.warn("Element {} enthaelt ein Vorsignal, aber es existiert kein passender Referenzpunkt. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung))

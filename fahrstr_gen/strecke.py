@@ -186,7 +186,7 @@ class Signal:
 
         self.gegengleisanzeiger = 0 # Signalbild-ID
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
-        self.hat_richtungsvoranzeiger = False
+        self.richtungsvoranzeiger = defaultdict(int) # Ziel -> Signalbild-ID
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
 
@@ -209,7 +209,8 @@ class Signal:
                             if ereignis.get("Beschr") is not None:
                                 self.richtungsanzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
                         elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
-                            self.hat_richtungsvoranzeiger = True
+                            if ereignis.get("Beschr") is not None:
+                                self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
 
     def __repr__(self):
         return self.signalbeschreibung()
@@ -348,6 +349,35 @@ class Signal:
                 geschw_kleinergleich = vsig_geschw
 
         return spalte_kleinergleich
+
+    # Gibt die Spalte zurueck, die die Spalte Nummer `spaltenidx_original` gemaess dem angegebenen Richtungsanzeiger-Ziel
+    # und der angegebenen Gleisangabe erweitert.
+    def get_richtungsvoranzeiger_spalte(self, spaltenidx_original, rgl_ggl, richtungsanzeiger_ziel):
+        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
+            return spaltenidx_original
+        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsvoranzeiger:
+            return spaltenidx_original
+        if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
+            return spaltenidx_original
+
+        matrix = self.xml_knoten.findall("./MatrixEintrag")
+
+        # Erweitere Signalbild der ersten Zeile der Originalspalte um Richtungs- und Gegengleisanzeiger.
+        zielsignalbild = int(matrix[spaltenidx_original].get("Signalbild", 0))
+        neue_signalframes = 0
+        if rgl_ggl == GLEIS_GEGENGLEIS:
+            neue_signalframes |= self.gegengleisanzeiger
+        if richtungsanzeiger_ziel != '' and richtungsanzeiger_ziel in self.richtungsvoranzeiger:
+            neue_signalframes |= self.richtungsvoranzeiger[richtungsanzeiger_ziel]
+        zielsignalbild |= neue_signalframes
+
+        # Suche existierende Spalte mit dem neuen Signalbild.
+        for idx, vsig_geschw in enumerate(self.spalten):
+            if vsig_geschw == self.spalten[spaltenidx_original] and int(matrix[idx].get("Signalbild", 0)) == zielsignalbild:
+                return idx
+
+        # Nicht gefunden. TODO: Matrix erweitern.
+        return None
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
