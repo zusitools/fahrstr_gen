@@ -248,6 +248,7 @@ class EinzelFahrstrasse:
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
+        result.richtungsanzeiger = self.richtungsanzeiger
         result.hat_ende_weichenbereich = self.hat_ende_weichenbereich
         result.erweitere(kante)
         return result
