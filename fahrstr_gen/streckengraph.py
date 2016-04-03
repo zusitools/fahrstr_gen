@@ -507,7 +507,7 @@ class Knoten:
                         verkn = True
 
                 # Signale, die mehr als eine Auswahl fuer den aktuellen Fahrstrassentyp haben
-                elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & self.graph.fahrstr_typ != 0)) >= 2:
+                elif len(set(zeile.hsig_geschw for zeile in signal.zeilen if zeile.fahrstr_typ & self.graph.fahrstr_typ != 0 and zeile.hsig_geschw != -2 and zeile.hsig_geschw != -999)) >= 2:
                     verkn = True
                     logging.debug("Signal an Element {}: hat mehr als eine Zeile fuer den aktuellen Fahrstrassentyp (Zeile noch unbekannt)".format(element_richtung))
                     # Zeile muss ermittelt werden
