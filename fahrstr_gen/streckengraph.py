@@ -609,9 +609,14 @@ class Knoten:
                         continue
 
                     try:
-                        kante.weichen.append(FahrstrWeichenstellung(refpunkt, int(ereignis.get("Beschr", ""))))
+                        weichenstellung = int(ereignis.get("Beschr", 0))
                     except ValueError:
-                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung \"{}\". Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
+
+                    if weichenstellung <= 0:
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Weichenstellung {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, weichenstellung))
+                    else:
+                        kante.weichen.append(FahrstrWeichenstellung(refpunkt, int(ereignis.get("Beschr", ""))))
 
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
                     try:
