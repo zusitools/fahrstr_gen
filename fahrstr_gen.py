@@ -82,6 +82,14 @@ def finde_fahrstrassen(args):
                     # print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
                     pass
 
+                fahrstr_typ = fahrstr_alt.get("FahrstrTyp", "")
+                if fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_RANGIER and fahrstr_typ != "TypRangier":
+                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypRangier".format(name, fahrstr_typ))
+                elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_ZUG and fahrstr_typ != "TypZug":
+                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypZug".format(name, fahrstr_typ))
+                elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_LZB and fahrstr_typ != "TypLZB":
+                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypLZB".format(name, fahrstr_typ))
+
                 rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
                 if fahrstr_neu.rgl_ggl != rgl_ggl_alt:
                     print("{}: unterschiedliche RglGgl-Spezifikation: {} vs {}".format(name, rgl_ggl_alt, fahrstr_neu.rgl_ggl))
