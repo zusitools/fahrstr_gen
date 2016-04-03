@@ -13,7 +13,6 @@ import os
 from collections import defaultdict
 
 import logging
-logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=logging.INFO)
 
 def finde_fahrstrassen(args):
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
@@ -200,7 +199,10 @@ if __name__ == '__main__':
     parser.add_argument('dateiname')
     parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help=argparse.SUPPRESS)
     parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
+    parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
     args = parser.parse_args()
+
+    logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
 
     if args.profile == 'profile':
         import profile, pstats
