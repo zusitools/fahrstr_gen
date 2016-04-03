@@ -596,16 +596,16 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
                     try:
-                        kante.register.append(element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))])
+                        kante.register.append(element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))])
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
                         continue
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
-                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))]
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Weiche in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Weichenverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
                         continue
 
                     try:
@@ -620,9 +620,9 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_SIGNAL_VERKNUEPFEN:
                     try:
-                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))]
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
                         continue
 
                     try:
@@ -633,9 +633,9 @@ class Knoten:
 
                 elif ereignis_nr == EREIGNIS_VORSIGNAL_VERKNUEPFEN:
                     try:
-                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))]
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
+                        logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
                         continue
 
                     try:
