@@ -623,7 +623,7 @@ class Knoten:
                     try:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, int(ereignis.get("Beschr", "")), False))
                     except ValueError:
-                        logging.warn("Ereignis \"Signale in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
+                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_VORSIGNAL_VERKNUEPFEN:
                     try:
