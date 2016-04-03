@@ -149,23 +149,23 @@ class Fahrstrasse:
         if self.start.reftyp == REFTYP_SIGNAL and not self.ziel.signal().ist_hilfshauptsignal:
             for vsig in einzelfahrstrassen[0].start.knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
                 if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in self.vorsignale):
+                    spalte = None
                     if self.fahrstr_typ == FAHRSTR_TYP_LZB:
-                        gefunden = False
                         for idx, spalten_geschw in enumerate(vsig.signal().spalten):
                             if spalten_geschw == -2.0:
-                                self.vorsignale.append(FahrstrVorsignal(vsig, idx)) # TODO: Richtungsvoranzeiger
-                                gefunden = True
+                                spalte = idx
                                 break
-                        if not gefunden:
-                            logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden".format(self.name, vsig.signal(), vsig.element_richtung))
-                    else:
-                        spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
-                        if len(vsig.signal().richtungsvoranzeiger) > 0:
-                            spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, self.rgl_ggl, self.richtungsanzeiger)
                         if spalte is None:
-                            logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig.element_richtung, str_geschw(self.signalgeschwindigkeit)))
-                        else:
-                            self.vorsignale.append(FahrstrVorsignal(vsig, spalte))
+                            logging.debug("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(self.name, vsig.signal(), vsig.element_richtung, self.signalgeschwindigkeit))
+                    if spalte is None:
+                        spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
+
+                    if len(vsig.signal().richtungsvoranzeiger) > 0:
+                        spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, self.rgl_ggl, self.richtungsanzeiger)
+                    if spalte is None:
+                        logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig.element_richtung, str_geschw(self.signalgeschwindigkeit)))
+                    else:
+                        self.vorsignale.append(FahrstrVorsignal(vsig, spalte))
 
     def to_xml(self):
         result = ET.Element('Fahrstrasse', {
