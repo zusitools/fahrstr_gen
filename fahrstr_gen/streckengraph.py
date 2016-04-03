@@ -37,24 +37,29 @@ class Fahrstrasse:
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
         self.zufallswert = float(self.ziel.signal().xml_knoten.get("Zufallswert", 0))
 
-        # Setze Regelgleis/Gegengleis/Streckenname/Richtungsanzeiger
-        self.rgl_ggl = GLEIS_BAHNHOF
-        self.streckenname = ""
-        self.richtungsanzeiger = ""
-        for einzelfahrstrasse in einzelfahrstrassen:
-            for kante in einzelfahrstrasse.kantenliste():
-                if kante.rgl_ggl != GLEIS_BAHNHOF:
-                    self.rgl_ggl = kante.rgl_ggl
-                    self.streckenname = kante.streckenname
-            if einzelfahrstrasse.richtungsanzeiger != "":
-                self.richtungsanzeiger = einzelfahrstrasse.richtungsanzeiger
-
         self.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
 
         if self.start.reftyp == REFTYP_AUFGLEISPUNKT:
             self.name += "Aufgleispunkt"
         else:
             self.name += self.start.signal().signalbeschreibung()
+
+        # Setze Name, Laenge, Regelgleis/Gegengleis/Streckenname/Richtungsanzeiger
+        self.rgl_ggl = GLEIS_BAHNHOF
+        self.streckenname = ""
+        self.richtungsanzeiger = ""
+        for einzelfahrstrasse in einzelfahrstrassen:
+            self.laenge += einzelfahrstrasse.laenge
+
+            zielkante = einzelfahrstrasse.kanten.eintrag
+            self.name += " -> {}".format(zielkante.ziel.signal().signalbeschreibung())
+
+            for kante in einzelfahrstrasse.kantenliste():
+                if kante.rgl_ggl != GLEIS_BAHNHOF:
+                    self.rgl_ggl = kante.rgl_ggl
+                    self.streckenname = kante.streckenname
+            if einzelfahrstrasse.richtungsanzeiger != "":
+                self.richtungsanzeiger = einzelfahrstrasse.richtungsanzeiger
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         if self.ziel.signal().signalgeschwindigkeit is not None:
@@ -64,13 +69,9 @@ class Fahrstrasse:
             for einzelfahrstrasse in einzelfahrstrassen:
                 self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, einzelfahrstrasse.signalgeschwindigkeit)
 
+        logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\"".format(self.name, str_geschw(self.signalgeschwindigkeit), self.richtungsanzeiger))
+
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
-            self.laenge += einzelfahrstrasse.laenge
-
-            zielkante = einzelfahrstrasse.kanten.eintrag
-            zielsignal = zielkante.ziel.signal()
-            self.name += " -> {}".format(zielsignal.signalbeschreibung())
-
             # Startsignal bzw. Kennlichtsignal ansteuern
             if idx == 0:
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
