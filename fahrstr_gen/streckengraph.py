@@ -660,7 +660,7 @@ class Knoten:
                 try:
                     kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, nachfolger_vorgaenger.index(element_richtung) + 1))
                 except ValueError:
-                    logging.warn(("Stellung der stumpf befahrene Weiche an Element {} {} von Element {} {} kommend konnte nicht ermittelt werden. " +
+                    logging.warn(("Stellung der stumpf befahrenen Weiche an Element {} {} von Element {} {} kommend konnte nicht ermittelt werden. " +
                             "Es werden keine Fahrstrassen ueber das letztere Element erzeugt.").format(
                             element_richtung_neu.element.attrib["Nr"], "blau" if element_richtung_neu.richtung == NORM else "gruen",
                             element_richtung.element.attrib["Nr"], "blau" if element_richtung.richtung == NORM else "gruen"))
