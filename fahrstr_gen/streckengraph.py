@@ -231,6 +231,7 @@ class EinzelFahrstrasse:
         return "EinzelFahrstrasse<{}>".format(weg)
 
     def erweitere(self, kante):
+        assert(kante.ziel is not None)
         if self.start is None:
             self.start = kante.start
         self.ziel = kante.ziel
@@ -410,8 +411,9 @@ class Knoten:
         return self.vorsignale[key]
 
     # Gibt alle von diesem Knoten ausgehenden Nachfolgerkanten in der angegebenen Richtung zurueck.
-    # Eine Kante wird nur erzeugt, wenn sie fuer die Fahrstrasse relevant ist, also an einem
+    # Eine Kante wird nur komplett erzeugt, wenn sie fuer die Fahrstrasse relevant ist, also an einem
     # Streckenelement mit Signal oder Weiche endet und kein Ereignis "Keine X-Fahrstrasse einrichten" enthaelt.
+    # Andernfalls wird sie zwar erzeugt (zwecks Signalhaltfall-/Aufloeseelementen), aber ihr Zielknoten ist dann None.
     def get_nachfolger_kanten(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.nachfolger_kanten[key] is None:
@@ -433,11 +435,12 @@ class Knoten:
             for idx, n in enumerate(nachfolger):
                 kante = Kante(self.richtung(richtung))
                 # Ende Weichenbereich wirkt schon im Startelement
-                kante.hat_ende_weichenbereich = self.element.xml_knoten.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis[@Er='1000002']") is not None
+                kante.hat_ende_weichenbereich = any(int(ereignis.get("Er", 0)) == 1000002 for ereignis in self.element.ereignisse(richtung))
                 if weichen_refpunkt is not None:
                     kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
                 kante = self._neue_nachfolger_kante(kante, n)
-                self.nachfolger_kanten[key].append(kante)
+                if kante is not None:
+                    self.nachfolger_kanten[key].append(kante)
         return self.nachfolger_kanten[key]
 
     # Gibt alle von diesem Knoten ausgehenden Vorsignalkanten in der angegebenen Richtung zurueck (gesucht wird also in der Gegenrichtung).
@@ -458,6 +461,21 @@ class Knoten:
     # Gibt None zurueck, wenn keine fahrstrassenrelevante Kante existiert.
     def _neue_nachfolger_kante(self, kante, element_richtung):
         while element_richtung is not None:
+            # Bei Ereignis "Keine Fahrstrasse einrichten" sofort abbrechen (keine weiteren Ereignisse/Signale an diesem Element betrachten)
+            keine_fahrstr_einrichten = False
+            for ereignis in element_richtung.ereignisse():
+                ereignis_nr = int(ereignis.get("Er", 0))
+                if ereignis_nr in [EREIGNIS_KEINE_LZB_FAHRSTRASSE, EREIGNIS_LZB_ENDE] and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB \
+                        or ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] \
+                        or ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
+                    keine_fahrstr_einrichten = True
+                    break
+
+            if keine_fahrstr_einrichten:
+                logging.debug("{}: Keine Fahrstrasse einrichten".format(element_richtung))
+                element_richtung = None
+                break
+
             # Signal am aktuellen Element in die Signalliste einfuegen
             signal = element_richtung.signal()
             if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
@@ -542,14 +560,7 @@ class Knoten:
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
                     if not kante.hat_ende_weichenbereich:
                         kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, float(ereignis.get("Wert", 0)))
-                elif ereignis_nr == EREIGNIS_KEINE_LZB_FAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
-                    return None
-                elif ereignis_nr == EREIGNIS_LZB_ENDE and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB:
-                    return None
-                elif ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
-                    return None
-                elif ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
-                    return None
+
                 elif ereignis_nr == EREIGNIS_ENDE_WEICHENBEREICH:
                     hat_ende_weichenbereich = True # wird erst am Element danach wirksam
 
@@ -656,10 +667,7 @@ class Knoten:
 
             element_richtung = element_richtung_neu
 
-        if element_richtung is None:
-            # Fahrweg endet im Nichts, hier ist keine sinnvolle Fahrstrasse zu erzeugen
-            return None
-        else:
+        if element_richtung is not None:
             kante.ziel = KnotenUndRichtung(self.graph.get_knoten(element_richtung.element), element_richtung.richtung)
 
         return kante
@@ -712,7 +720,7 @@ class Knoten:
         # Zielsignal-Refpunkt -> [EinzelFahrstrasse]
         einzelfahrstrassen_by_zielsignal = defaultdict(list)
         for kante in self.get_nachfolger_kanten(richtung):
-            if kante is not None:
+            if kante.ziel is not None:
                 f = EinzelFahrstrasse()
                 f.erweitere(kante)
                 self._get_einzelfahrstrassen_rek(f, einzelfahrstrassen_by_zielsignal)
@@ -740,7 +748,7 @@ class Knoten:
 
         folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
         for idx, kante in enumerate(folgekanten):
-            if kante is None:
+            if kante.ziel is None:
                 continue
 
             if idx == len(folgekanten) - 1:
@@ -791,8 +799,7 @@ class Knoten:
         self.graph.markiere_unbesucht()
         result = []
         for kante in self.get_nachfolger_kanten(richtung):
-            if kante is not None:
-                self._get_aufloesepunkte_rek(richtung, kante, result)
+            self._get_aufloesepunkte_rek(richtung, kante, result)
         return result
 
     def _get_aufloesepunkte_rek(self, startrichtung, kante, result_liste):
@@ -800,7 +807,7 @@ class Knoten:
         for aufl in kante.aufloesepunkte:
             # Aufloeseelement im Zielknoten nur einfuegen, wenn dieser noch nicht besucht wurde,
             # sonst wird es mehrmals eingefuegt.
-            if aufl.element_richtung.element != kante.ziel.knoten.element or not kante.ziel.knoten.ist_besucht():
+            if kante.ziel is None or aufl.element_richtung.element != kante.ziel.knoten.element or not kante.ziel.knoten.ist_besucht():
                 logging.debug("Aufloesepunkt an {}".format(aufl))
                 result_liste.append(aufl)
             if aufl.reftyp == REFTYP_AUFLOESEPUNKT:
@@ -810,15 +817,14 @@ class Knoten:
         if aufloesepunkt_gefunden:
             return
 
-        if not kante.ziel.knoten.ist_besucht():
+        if kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
             kante.ziel.knoten.markiere_besucht()
             if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG):
                 if not aufloesepunkt_gefunden:
-                    logging.warn("Es gibt einen Fahrweg zwischen den Signalen {} ({}) und {} ({}), der keinen Aufloesepunkt enthaelt.".format(self.signal(startrichtung), self.richtung(startrichtung), kante.ziel.signal(), kante.ziel))
+                    logging.warn("Es gibt einen Fahrweg zwischen den Signalen {} ({}) und {} ({}), der keinen Aufloesepunkt (fuer am ersten Signal endende Fahrstrassen) enthaelt.".format(self.signal(startrichtung), self.richtung(startrichtung), kante.ziel.signal(), kante.ziel))
             else:
                 for kante in kante.ziel.knoten.get_nachfolger_kanten(kante.ziel.richtung):
-                    if kante is not None:
-                        self._get_aufloesepunkte_rek(startrichtung, kante, result_liste)
+                    self._get_aufloesepunkte_rek(startrichtung, kante, result_liste)
 
     def _get_vorsignale(self, richtung):
         self.graph.markiere_unbesucht()
@@ -828,9 +834,6 @@ class Knoten:
         return result
 
     def _get_vorsignale_rek(self, kante, result_liste):
-        if kante is None:
-            return
-
         result_liste.extend(kante.vorsignale)
 
         if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():

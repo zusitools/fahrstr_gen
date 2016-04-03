@@ -16,6 +16,7 @@ class Element:
         self._signal_gesucht = [False, False]
         self._signal = [None, None]
         self._nachfolger = [None, None]
+        self._ereignisse = [None, None]
         self._laenge = None
 
     def __repr__(self):
@@ -44,6 +45,13 @@ class Element:
 
     def richtung(self, richtung):
         return ElementUndRichtung(self, richtung)
+
+    def ereignisse(self, richtung):
+        key = 1 if richtung == NORM else 0
+        if self._ereignisse[key] is None:
+            # TODO: eventuell auch Ereignisse in Signalen beachten?
+            self._ereignisse[key] = self.xml_knoten.findall("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis")
+        return self._ereignisse[key]
 
     def signal(self, richtung):
         key = 1 if richtung == NORM else 0
@@ -116,8 +124,7 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'
         return 0 if richtungsinfo is None else int(richtungsinfo.get("Reg", 0))
 
     def ereignisse(self):
-        # TODO: eventuell auch Ereignisse in Signalen beachten?
-        return self.element.xml_knoten.iterfind("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung/Ereignis")
+        return self.element.ereignisse(self.richtung)
 
     def gegenrichtung(self):
         return ElementUndRichtung(self.element, GEGEN if self.richtung == NORM else NORM)
