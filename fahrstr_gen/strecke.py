@@ -8,6 +8,22 @@ from . import modulverwaltung
 import logging
 import math
 
+# Schnelle Implementierung von node.find("./tag1/tag2"), wenn tag1 nur einmal vorkommen kann.
+def find_2(node, tag1, tag2):
+    for n in node:
+        if n.tag == tag1:
+            for n2 in n:
+                if n2.tag == tag2:
+                    return n2
+            break
+
+# Schnelle Implementierung von node.findall("./tag1/tag2"), wenn tag1 nur einmal vorkommen kann.
+def findall_2(node, tag1, tag2):
+    for n in node:
+        if n.tag == tag1:
+            return [n2 for n2 in n if n2.tag == tag2]
+    return []
+
 class Element:
     def __init__(self, modul, xml_knoten):
         self.modul = modul
@@ -50,14 +66,14 @@ class Element:
         key = 1 if richtung == NORM else 0
         if self._ereignisse[key] is None:
             # TODO: eventuell auch Ereignisse in Signalen beachten?
-            self._ereignisse[key] = self.xml_knoten.findall("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Ereignis")
+            self._ereignisse[key] = findall_2(self.xml_knoten, "InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung", "Ereignis")
         return self._ereignisse[key]
 
     def signal(self, richtung):
         key = 1 if richtung == NORM else 0
         if not self._signal_gesucht[key]:
-            self._signal[key] = self.modul.get_signal(self.xml_knoten.find("./Info" + ("Norm" if richtung == NORM else "Gegen") + "Richtung/Signal"))
             self._signal_gesucht[key] = True
+            self._signal[key] = self.modul.get_signal(find_2(self.xml_knoten, "InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung", "Signal"))
         return self._signal[key]
 
     def refpunkt(self, richtung, typ):
@@ -120,8 +136,10 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'
         return self.element.refpunkt(self.richtung, typ)
 
     def registernr(self):
-        richtungsinfo = self.element.xml_knoten.find("./Info" + ("Norm" if self.richtung == NORM else "Gegen") + "Richtung")
-        return 0 if richtungsinfo is None else int(richtungsinfo.get("Reg", 0))
+        for n in self.element.xml_knoten:
+            if n.tag == ("InfoNormRichtung" if self.richtung == NORM else "InfoGegenRichtung"):
+                return int(n.get("Reg", 0))
+        return 0
 
     def ereignisse(self):
         return self.element.ereignisse(self.richtung)
