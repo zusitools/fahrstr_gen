@@ -326,7 +326,8 @@ class Kante:
         return "Kante<{} -> {}>".format(self.start, self.ziel)
 
 # Eine Kante zwischen zwei Knoten im Streckengraphen, die alle Vorsignale auf dem Weg zwischen zwei Knoten (rueckwaerts) enthaelt.
-# Der Zielknoten kann auch None sein, wenn die Kante an einem Element ohne Vorgaenger oder mit Ereignis "Vorher keine Vsig-Verknuepfung" endet.
+# Der Zielknoten ist also ein *Vorgaenger* des Startknotens.
+# Der Zielknoten ist None, wenn die Kante an einem Element ohne Vorgaenger oder mit Ereignis "Vorher keine Vsig-Verknuepfung" endet.
 class VorsignalKante:
     def __init__(self):
         self.ziel = None  # KnotenUndRichtung
