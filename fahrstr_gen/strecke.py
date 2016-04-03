@@ -224,9 +224,10 @@ class Signal:
         return any(z.hsig_geschw == 0 and (z.fahrstr_typ & fahrstr_typ != 0) for z in self.zeilen)
 
     def ist_vsig(self):
-        return any(spalten_geschw == 0 for spalten_geschw in self.spalten) and \
-                any(spalten_geschw != 0 for spalten_geschw in self.spalten) and \
-                any(z.fahrstr_typ & FAHRSTR_TYP_ZUG != 0 and z.hsig_geschw == -1 for z in self.zeilen)
+        # Anders als in der Doku angegeben, ist fuer Zusi anscheinend nur relevant, ob das Signal eine
+        # Spalte fuer Geschwindigkeit != -1 hat, also auf die Geschwindigkeit des naechsten Hauptsignals
+        # in irgendeiner Weise reagiert. Die Zeilen, insbesondere deren Fahrstrassentypen, werden nicht beachtet.
+        return any(spalten_geschw != -1 for spalten_geschw in self.spalten) and len(self.zeilen) > 0
 
     # Gibt die Matrixzeile zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
     # Das ist normalerweise die Zeile mit der passenden oder naechstkleineren Geschwindigkeit, die groesser als 0 ist.
