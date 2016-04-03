@@ -149,12 +149,21 @@ class Fahrstrasse:
         if self.start.reftyp == REFTYP_SIGNAL and not self.ziel.signal().ist_hilfshauptsignal:
             for vsig in einzelfahrstrassen[0].start.knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
                 if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in self.vorsignale):
-                    # TODO: Vorsignale an LZB-Fahrstrassen mit v=-2 ansteuern
-                    spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
-                    if spalte is None:
-                        logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig, str_geschw(self.signalgeschwindigkeit)))
+                    if self.fahrstr_typ == FAHRSTR_TYP_LZB:
+                        gefunden = False
+                        for idx, spalten_geschw in enumerate(vsig.signal().spalten):
+                            if spalten_geschw == -2.0:
+                                self.vorsignale.append(FahrstrVorsignal(vsig, idx)) # TODO: Richtungsvoranzeiger
+                                gefunden = True
+                                break
+                        if not gefunden:
+                            logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden".format(self.name, vsig.signal(), vsig.element_richtung))
                     else:
-                        self.vorsignale.append(FahrstrVorsignal(vsig, spalte)) # TODO: Richtungsvoranzeiger
+                        spalte = vsig.signal().get_vsig_spalte(self.signalgeschwindigkeit)
+                        if spalte is None:
+                            logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(self.name, vsig.signal(), vsig.element_richtung, str_geschw(self.signalgeschwindigkeit)))
+                        else:
+                            self.vorsignale.append(FahrstrVorsignal(vsig, spalte)) # TODO: Richtungsvoranzeiger
 
     def to_xml(self):
         result = ET.Element('Fahrstrasse', {
