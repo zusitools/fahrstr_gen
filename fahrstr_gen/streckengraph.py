@@ -626,8 +626,16 @@ class Knoten:
                         logging.warn("Ereignis \"Signale in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_VORSIGNAL_VERKNUEPFEN:
-                    # TODO: in Liste von Vorsignalen einfuegen
-                    pass
+                    try:
+                        refpunkt = element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", "")))]
+                    except (KeyError, ValueError):
+                        logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", "")))
+                        continue
+
+                    try:
+                        kante.vorsignale.append(FahrstrVorsignal(refpunkt, int(ereignis.get("Beschr", ""))))
+                    except ValueError:
+                        logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Spaltennummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
             kante.laenge += element_richtung.element.laenge()
