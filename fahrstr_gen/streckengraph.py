@@ -58,8 +58,8 @@ class Fahrstrasse:
                 if kante.rgl_ggl != GLEIS_BAHNHOF:
                     self.rgl_ggl = kante.rgl_ggl
                     self.streckenname = kante.streckenname
-            if einzelfahrstrasse.richtungsanzeiger != "":
-                self.richtungsanzeiger = einzelfahrstrasse.richtungsanzeiger
+                if kante.richtungsanzeiger != "":
+                    self.richtungsanzeiger = kante.richtungsanzeiger
 
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         if self.ziel.signal().signalgeschwindigkeit is not None:
@@ -227,8 +227,6 @@ class EinzelFahrstrasse:
         self.kanten = None  # ListenEintrag
         self.laenge = 0  # Laenge in Metern
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
-        self.richtungsanzeiger = ''
-
         self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
 
     def __repr__(self):
@@ -251,8 +249,6 @@ class EinzelFahrstrasse:
         if not self.hat_ende_weichenbereich:
             self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
         self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
-        if self.richtungsanzeiger == '':
-            self.richtungsanzeiger = kante.richtungsanzeiger
 
     def erweiterte_kopie(self, kante):
         result = EinzelFahrstrasse()
@@ -260,7 +256,6 @@ class EinzelFahrstrasse:
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
-        result.richtungsanzeiger = self.richtungsanzeiger
         result.hat_ende_weichenbereich = self.hat_ende_weichenbereich
         result.erweitere(kante)
         return result
