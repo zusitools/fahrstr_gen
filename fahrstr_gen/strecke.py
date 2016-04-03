@@ -348,6 +348,9 @@ class Signal:
                 spalte_kleinergleich = idx
                 geschw_kleinergleich = vsig_geschw
 
+        if geschw_kleinergleich == 0 and spalte_kleinergleich != 0:
+            logging.warn("{}: Spalte mit Geschwindigkeit 0 ist nicht erste Spalte, dies fuehrt in Zusi aktuell zu einer falschen Vorsignalverknuepfung.".format(self))
+
         return spalte_kleinergleich
 
     # Gibt die Spalte zurueck, die die Spalte Nummer `spaltenidx_original` gemaess dem angegebenen Richtungsanzeiger-Ziel
