@@ -739,14 +739,15 @@ class Knoten:
             return
 
         folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
-        if len(folgekanten) == 1:
-            if folgekanten[0] is not None:
-                fahrstrasse.erweitere(folgekanten[0])
+        for idx, kante in enumerate(folgekanten):
+            if kante is None:
+                continue
+
+            if idx == len(folgekanten) - 1:
+                fahrstrasse.erweitere(kante)
                 self._get_einzelfahrstrassen_rek(fahrstrasse, ergebnis_dict)
-        else:
-            for kante in folgekanten:
-                if kante is not None:
-                    self._get_einzelfahrstrassen_rek(fahrstrasse.erweiterte_kopie(kante), ergebnis_dict)
+            else:
+                self._get_einzelfahrstrassen_rek(fahrstrasse.erweiterte_kopie(kante), ergebnis_dict)
 
     def _get_fahrstrassen_rek(self, einzelfahrstr_liste, ziel_liste):
         letzte_fahrstrasse = einzelfahrstr_liste[-1]
