@@ -792,7 +792,7 @@ class Knoten:
                 logging.debug("{} Einzelfahrstrassen zu {} gefunden: {}".format(
                     len(einzelfahrstrassen), ziel_refpunkt.signal(),
                     " / ".join("{} km/h, {:.2f} m".format(strecke.str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse in einzelfahrstrassen)))
-            # result.append(min(einzelfahrstrassen, key = lambda fstr: (float_geschw(fstr.signalgeschwindigkeit), fstr.laenge)))
+            # result.append(sorted(einzelfahrstrassen, key = lambda fstr: float_geschw(fstr.signalgeschwindigkeit), reverse = True)[0])  # anders als min wird bei sorted Stabilitaet garantiert
             result.append(einzelfahrstrassen[0])
 
         return result
