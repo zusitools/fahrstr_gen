@@ -72,25 +72,34 @@ class Fahrstrasse:
         logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\"".format(self.name, str_geschw(self.signalgeschwindigkeit), self.richtungsanzeiger))
 
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
-            # Startsignal bzw. Kennlichtsignal ansteuern
             if idx == 0:
+                # Startsignal ansteuern
                 if ist_hsig_fuer_fahrstr_typ(self.start.signal(), self.fahrstr_typ):
-                    if self.ziel.signal().ist_hilfshauptsignal:
-                        # Wenn Zielsignal Hilfshauptsignal ist, Ersatzsignalzeile ansteuern
-                        startsignal_zeile = self.start.signal().get_hsig_ersatzsignal_zeile(self.rgl_ggl)
-                        if startsignal_zeile is None:
-                            logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}".format(self.name, self.rgl_ggl))
+                    zeile_ersatzsignal = self.start.signal().get_hsig_ersatzsignal_zeile(self.rgl_ggl)
+                    zeile_regulaer = self.start.signal().get_hsig_zeile(self.fahrstr_typ, self.signalgeschwindigkeit)
+                    nutze_ersatzsignal = self.ziel.signal().ist_hilfshauptsignal
+
+                    if nutze_ersatzsignal and zeile_ersatzsignal is None:
+                        logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Zwecks Kompatibilitaet mit Zusi wird die regulaere Matrix angesteuert.".format(self.name, self.rgl_ggl))
+                        nutze_ersatzsignal = False
+                    elif not nutze_ersatzsignal and zeile_regulaer is None:
+                        logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Zwecks Kompatibilitaet mit Zusi wird die Ersatzsignal-Matrix angesteuert.".format(self.name, str_geschw(self.signalgeschwindigkeit)))
+                        nutze_ersatzsignal = True
+
+                    if nutze_ersatzsignal:
+                        if zeile_ersatzsignal is None:
+                            logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Die Signalverknuepfung wird nicht eingerichtet.".format(self.name, self.rgl_ggl))
                         else:
-                            # TODO: Richtungsanzeiger
-                            self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, True))
+                            # TODO Richtungsanzeiger
+                            self.signale.append(FahrstrHauptsignal(self.start, zeile_ersatzsignal, True))
                     else:
-                        startsignal_zeile = self.start.signal().get_hsig_zeile(self.fahrstr_typ, self.signalgeschwindigkeit)
-                        if startsignal_zeile is None:
-                            logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}".format(self.name, str_geschw(self.signalgeschwindigkeit)))
+                        if zeile_regulaer is None:
+                            logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Die Signalverknuepfung wird nicht eingerichtet.".format(self.name, str_geschw(self.signalgeschwindigkeit)))
                         else:
-                            startsignal_zeile = self.start.signal().get_richtungsanzeiger_zeile(startsignal_zeile, self.rgl_ggl, self.richtungsanzeiger)
-                            self.signale.append(FahrstrHauptsignal(self.start, startsignal_zeile, False))
+                            zeile_regulaer = self.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, self.rgl_ggl, self.richtungsanzeiger)
+                            self.signale.append(FahrstrHauptsignal(self.start, zeile_regulaer, False))
             else:
+                # Kennlichtsignal ansteuern
                 gefunden = False
                 for idx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
                     if zeile.hsig_geschw == -2.0:
@@ -145,8 +154,8 @@ class Fahrstrasse:
                 else:
                     self.aufloesepunkte.append(aufl)
 
-        # Vorsignale ansteuern
-        if self.start.reftyp == REFTYP_SIGNAL and not self.ziel.signal().ist_hilfshauptsignal:
+        # Vorsignale ansteuern. Erst *nach* Abarbeiten aller Einzelfahrstrassen, da deren Ereignisse "Vorsignal in Fahrstrasse verknuepfen" Prioritaet haben!
+        if self.start.reftyp == REFTYP_SIGNAL and len(self.signale) > 0 and not self.signale[0].ist_ersatzsignal:
             for vsig in einzelfahrstrassen[0].start.knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
                 if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in self.vorsignale):
                     spalte = None
