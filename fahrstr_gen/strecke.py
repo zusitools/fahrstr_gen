@@ -187,6 +187,7 @@ class Signal:
         self.gegengleisanzeiger = 0 # Signalbild-ID
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
         self.richtungsvoranzeiger = defaultdict(int) # Ziel -> Signalbild-ID
+        self.hat_sigframes = False # Hat das Signal ueberhaupt Landschaftsdateien?
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
 
@@ -197,6 +198,8 @@ class Signal:
                 self.zeilen.append(SignalZeile(int(n.get("FahrstrTyp", 0)), float(n.attrib.get("HsigGeschw", 0))))
             elif n.tag == "VsigBegriff":
                 self.spalten.append(float(n.attrib.get("VsigGeschw", 0)))
+            elif n.tag == "SignalFrame":
+                self.hat_sigframes = True
             elif n.tag == "MatrixEintrag":
                 for ereignis in n:
                     if ereignis.tag == "Ereignis":
@@ -271,6 +274,8 @@ class Signal:
     # Gibt die Zeile zurueck, die die Zeile Nummer `zeilenidx_original` gemaess dem angegebenen Richtungsanzeiger
     # und der angegebenen Gleisangabe erweitert.
     def get_richtungsanzeiger_zeile(self, zeilenidx_original, rgl_ggl, richtungsanzeiger_ziel):
+        if not self.hat_sigframes:
+            return zeilenidx_original
         if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
             return zeilenidx_original
         if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsanzeiger:
@@ -359,6 +364,8 @@ class Signal:
     # Gibt die Spalte zurueck, die die Spalte Nummer `spaltenidx_original` gemaess dem angegebenen Richtungsanzeiger-Ziel
     # und der angegebenen Gleisangabe erweitert.
     def get_richtungsvoranzeiger_spalte(self, spaltenidx_original, rgl_ggl, richtungsanzeiger_ziel):
+        if not self.hat_sigframes:
+            return spaltenidx_original
         if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
             return spaltenidx_original
         if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsvoranzeiger:
