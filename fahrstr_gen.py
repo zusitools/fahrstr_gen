@@ -26,7 +26,10 @@ def finde_fahrstrassen(args):
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 
     loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
+
     fahrstrassen = []
+    fahrstrassen_nummerierung = defaultdict(list) # (Start-Refpunkt, ZielRefpunkt) -> [Fahrstrasse], zwecks Durchnummerierung
+
     vorsignal_graph = streckengraph.Streckengraph(FAHRSTR_TYP_VORSIGNALE)
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
@@ -48,6 +51,11 @@ def finde_fahrstrassen(args):
                             if f.name in loeschfahrstrassen_namen:
                                 logging.info("Loesche Fahrstrasse: {}".format(f.name))
                             else:
+                                if args.nummerieren:
+                                    idx = len(fahrstrassen_nummerierung[(f.start, f.ziel)])
+                                    if idx != 0:
+                                        f.name += " ({})".format(idx)
+                                    fahrstrassen_nummerierung[(f.start, f.ziel)].append(f)
                                 fahrstrassen.append(f)
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
@@ -209,6 +217,7 @@ if __name__ == '__main__':
     parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help=argparse.SUPPRESS)
     parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
     parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
+    parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
     args = parser.parse_args()
 
     logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
