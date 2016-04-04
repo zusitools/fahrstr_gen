@@ -108,6 +108,8 @@ class Fahrstrasse:
                             logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(einzelfahrstrasse.start))
                         else:
                             kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, self.rgl_ggl, self.richtungsanzeiger)
+                            if idx != kennlichtsignal_zeile:
+                                logging.info("{}: Kennlichtsignal {} an Element {} (Ref. {}) wird in Zusi nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(self.name, refpunkt.signal(), refpunkt.element_richtung, refpunkt.refnr))
                             self.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
                         break
