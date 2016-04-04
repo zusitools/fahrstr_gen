@@ -290,6 +290,7 @@ class Streckengraph:
         self.fahrstr_typ = fahrstr_typ
         self.knoten = {}  # <StrElement> -> Knoten
         self.vorsignal_graph = vorsignal_graph
+        self.bedingungen = dict()  # Einzelfahrstrasse-Name -> <Bedingung>-Knoten
         self._besuchszaehler = 1  # Ein Knoten gilt als besucht, wenn sein Besuchszaehler gleich dem Besuchszaehler des Graphen ist. Alle Knoten koennen durch Inkrementieren des Besuchszaehlers als unbesucht markiert werden.
 
     def markiere_unbesucht(self):
@@ -764,6 +765,29 @@ class Knoten:
 
         result = []
         for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
+            einzelfahrstr_name = ("Aufgleispunkt" if not ist_hsig_fuer_fahrstr_typ(self.signal(richtung), self.graph.fahrstr_typ) else self.signal(richtung).signalbeschreibung()) + \
+                    " -> " + ziel_refpunkt.signal().signalbeschreibung()
+
+            if einzelfahrstr_name in self.graph.bedingungen:
+                logging.debug("Filtere nach Bedingung '{}'".format(einzelfahrstr_name))
+                einzelfahrstrassen_gefiltert = einzelfahrstrassen
+
+                for bed in self.graph.bedingungen[einzelfahrstr_name]:
+                    if bed.tag == "FahrstrWeiche":
+                        einzelfahrstrassen_gefiltert = [f for f in einzelfahrstrassen_gefiltert if any(
+                            w.refpunkt.refnr == int(bed.get("Ref", 0)) and
+                            w.refpunkt.element_richtung.element.modul.relpath.upper() == bed.find("Datei").get("Dateiname", "").upper() and
+                            w.weichenlage == int(bed.get("FahrstrWeichenlage"))
+                            for kante in f.kantenliste() for w in kante.weichen
+                        )]
+                    else:
+                        logging.warn("Unbekannter Bedingungstyp: {}".format(bed.tag))
+
+                if len(einzelfahrstrassen_gefiltert) == 0:
+                    logging.warn("Fuer Bedingung '{}' wurden keine Fahrstrassen gefunden, die sie erfuellen".format(einzelfahrstr_name))
+                else:
+                    einzelfahrstrassen = einzelfahrstrassen_gefiltert
+
             if len(einzelfahrstrassen) > 1:
                 logging.debug("{} Einzelfahrstrassen zu {} gefunden: {}".format(
                     len(einzelfahrstrassen), ziel_refpunkt.signal(),

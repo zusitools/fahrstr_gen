@@ -30,6 +30,11 @@ def finde_fahrstrassen(args):
     fahrstrassen = []
     fahrstrassen_nummerierung = defaultdict(list) # (Start-Refpunkt, ZielRefpunkt) -> [Fahrstrasse], zwecks Durchnummerierung
 
+    bedingungen = dict()
+    if args.bedingungen is not None:
+        for bedingung in ET.parse(args.bedingungen).getroot().findall("Bedingung"):
+            bedingungen[bedingung.attrib["EinzelFahrstrName"]] = bedingung
+
     vorsignal_graph = streckengraph.Streckengraph(FAHRSTR_TYP_VORSIGNALE)
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
@@ -37,6 +42,8 @@ def finde_fahrstrassen(args):
             graph = streckengraph.Streckengraph(fahrstr_typ, vorsignal_graph)
         else:
             graph = streckengraph.Streckengraph(fahrstr_typ)
+
+        graph.bedingungen = bedingungen
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
             if str_element in modulverwaltung.dieses_modul.referenzpunkte:
@@ -218,6 +225,7 @@ if __name__ == '__main__':
     parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
     parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
     parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
+    parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
     args = parser.parse_args()
 
     logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
