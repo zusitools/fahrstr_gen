@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import xml.etree.ElementTree as ET
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, OrderedDict
 
 from . import strecke
 from .konstanten import *
@@ -760,7 +760,7 @@ class Knoten:
     # Pro Zielsignal wird nur eine Einzelfahrstrasse behalten, auch wenn alternative Fahrwege existieren.
     def _get_einzelfahrstrassen(self, richtung):
         # Zielsignal-Refpunkt -> [EinzelFahrstrasse]
-        einzelfahrstrassen_by_zielsignal = defaultdict(list)
+        einzelfahrstrassen_by_zielsignal = OrderedDict()  # Reihenfolge, in der die Zielsignale gefunden wurden, ist wichtig fuer Nummerierung
         for kante in self.get_nachfolger_kanten(richtung):
             if kante.ziel is not None:
                 f = EinzelFahrstrasse()
@@ -808,7 +808,10 @@ class Knoten:
         signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.graph.fahrstr_typ):
             logging.debug("Zielsignal gefunden: {}".format(signal))
-            ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
+            try:
+                ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
+            except KeyError:
+                ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)] = [fahrstrasse]
             return
 
         folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
