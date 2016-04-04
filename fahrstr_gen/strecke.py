@@ -190,6 +190,8 @@ class Signal:
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
 
+        self.vsig_verkn_warnung = False # Wurde Warnung ausgegeben?
+
         for n in self.xml_knoten:
             if n.tag == "HsigBegriff":
                 self.zeilen.append(SignalZeile(int(n.get("FahrstrTyp", 0)), float(n.attrib.get("HsigGeschw", 0))))
@@ -348,8 +350,9 @@ class Signal:
                 spalte_kleinergleich = idx
                 geschw_kleinergleich = vsig_geschw
 
-        if geschw_kleinergleich == 0 and spalte_kleinergleich != 0:
+        if geschw_kleinergleich == 0 and spalte_kleinergleich != 0 and not self.vsig_verkn_warnung:
             logging.warn("{}: Spalte mit Geschwindigkeit 0 ist nicht erste Spalte, dies fuehrt in Zusi aktuell zu einer falschen Vorsignalverknuepfung.".format(self))
+            self.vsig_verkn_warnung = True
 
         return spalte_kleinergleich
 
