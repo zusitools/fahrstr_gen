@@ -44,8 +44,11 @@ def finde_fahrstrassen(args):
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.element_richtung.richtung == richtung
                         ):
 
-                        fahrstrassen.extend([f for f in graph.get_knoten(str_element).get_fahrstrassen(richtung)
-                            if f.name not in loeschfahrstrassen_namen])
+                        for f in graph.get_knoten(str_element).get_fahrstrassen(richtung):
+                            if f.name in loeschfahrstrassen_namen:
+                                logging.info("Loesche Fahrstrasse: {}".format(f.name))
+                            else:
+                                fahrstrassen.append(f)
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
     if strecke is not None:

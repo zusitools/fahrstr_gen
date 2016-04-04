@@ -397,7 +397,6 @@ class Knoten:
         result = []
         for einzelfahrstrasse in self.get_einzelfahrstrassen(richtung):
             self._get_fahrstrassen_rek([einzelfahrstrasse], result)
-        # TODO: filtern nach Loeschliste in self.modul
         return result
 
     # Gibt alle von diesem Knoten ausgehenden Einzelfahrstrassen in der angegebenen Richtung zurueck.
