@@ -24,6 +24,12 @@ def findall_2(node, tag1, tag2):
             return [n2 for n2 in n if n2.tag == tag2]
     return []
 
+# Betrachtet die Kindknoten von "node" mit demselben Tag wie "kindknoten" und fuegt diesen Knoten
+# nach Knoten Nummer "pos" in diese Liste ein. Wenn pos == -1, fuegt es ihn am Ende ein.
+# Nicht schnell, wird aber auch nicht haeufig gebraucht.
+def kindknoten_einfuegen(node, kindknoten, pos):
+    node.insert([idx for idx, n in enumerate(node) if n.tag == kindknoten.tag][pos] + 1, kindknoten)
+
 class Element:
     def __init__(self, modul, xml_knoten):
         self.modul = modul
@@ -304,30 +310,19 @@ class Signal:
         # TODO: Warnen, wenn nicht im aktuellen Modul.
 
         # Neuer <HsigBegriff>-Knoten
-        einfuegeindex_hsigbegriff = 1
-        for idx, n in enumerate(self.xml_knoten):
-            if n.tag == "HsigBegriff":
-                einfuegeindex_hsigbegriff = idx + 1
-
         self.zeilen.append(self.zeilen[zeilenidx_original])
         hsig_begriff_knoten = ET.Element("HsigBegriff")
         if self.zeilen[zeilenidx_original].fahrstr_typ != 0:
             hsig_begriff_knoten.set("FahrstrTyp", str(self.zeilen[zeilenidx_original].fahrstr_typ))
         if self.zeilen[zeilenidx_original].hsig_geschw != 0:
             hsig_begriff_knoten.set("HsigGeschw", str(self.zeilen[zeilenidx_original].hsig_geschw))
-        self.xml_knoten.insert(einfuegeindex_hsigbegriff, hsig_begriff_knoten)
+        kindknoten_einfuegen(self.xml_knoten, hsig_begriff_knoten, -1)
 
         # Neue <MatrixEintrag>-Knoten
-        einfuegeindex_matrixeintrag = 1
-        for idx, n in enumerate(self.xml_knoten):
-            if n.tag == "MatrixEintrag":
-                einfuegeindex_matrixeintrag = idx + 1
-
         for eintrag in matrix[zeilenidx_original * len(self.spalten) : (zeilenidx_original+1) * len(self.spalten)]:
             neuer_eintrag = deepcopy(eintrag)
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
-            self.xml_knoten.insert(einfuegeindex_matrixeintrag, neuer_eintrag)
-            einfuegeindex_matrixeintrag += 1
+            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, -1)
 
         return len(self.zeilen) - 1
 
@@ -389,8 +384,24 @@ class Signal:
             if vsig_geschw == self.spalten[spaltenidx_original] and int(matrix[idx].get("Signalbild", 0)) == zielsignalbild:
                 return idx
 
-        # Nicht gefunden. TODO: Matrix erweitern.
-        return None
+        # Nicht gefunden. Matrix erweitern.
+        # TODO: Warnen, wenn nicht im aktuellen Modul.
+        assert(len(matrix) == len(self.zeilen) * len(self.spalten))
+
+        # Neuer <VsigBegriff>-Knoten
+        vsig_begriff_knoten = ET.Element("VsigBegriff")
+        if self.spalten[spaltenidx_original] != 0:
+            vsig_begriff_knoten.set("VsigGeschw", str(self.spalten[spaltenidx_original]))
+        kindknoten_einfuegen(self.xml_knoten, vsig_begriff_knoten, -1)
+
+        # Neue <MatrixEintrag>-Knoten
+        for idx in range(0, len(self.zeilen)):
+            neuer_eintrag = deepcopy(matrix[idx * len(self.spalten) + spaltenidx_original])
+            neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
+            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, idx * (len(self.spalten) + 1) + (len(self.spalten) - 1))
+
+        self.spalten.append(self.spalten[spaltenidx_original])
+        return len(self.spalten) - 1
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
