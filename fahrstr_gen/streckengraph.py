@@ -579,6 +579,7 @@ class Knoten:
 
             # Ereignisse am aktuellen Element verarbeiten
             hat_ende_weichenbereich = False
+            hat_aufloesepunkt = False
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
@@ -608,6 +609,7 @@ class Knoten:
                     if refpunkt is None:
                         logging.warn("Element {} enthaelt ein Ereignis \"Fahrstrasse aufloesen\", aber es existiert kein passender Referenzpunkt. Die Aufloese-Verknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
+                        hat_aufloesepunkt = True
                         kante.aufloesepunkte.append(refpunkt)
 
                 elif ereignis_nr == EREIGNIS_SIGNALHALTFALL:
@@ -670,6 +672,8 @@ class Knoten:
             kante.laenge += element_richtung.element.laenge()
 
             if self.graph.ist_knoten(element_richtung.element):
+                if hat_aufloesepunkt and len(element_richtung.nachfolger()) > 1:
+                    logging.warn("An Element {} liegt ein Ereignis \"Fahrstrasse aufloesen\" in einem Verzweigungselement".format(element_richtung))
                 break
 
             nachfolger = element_richtung.nachfolger()
