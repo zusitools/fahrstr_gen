@@ -14,6 +14,12 @@ from collections import defaultdict
 
 import logging
 
+def refpunkt_fmt(refpunkt):
+    pfad = refpunkt[1]
+    if pfad.rfind('\\') != -1:
+        pfad = pfad[pfad.rfind('\\')+1:]
+    return "({},{})".format(pfad, refpunkt[0])
+
 def finde_fahrstrassen(args):
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
     modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname).getroot())
@@ -118,36 +124,36 @@ def finde_fahrstrassen(args):
                 register_neu = set((register_neu.refnr, register_neu.element_richtung.element.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
 
                 for refpunkt in register_alt - register_neu:
-                    print("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                    print("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in register_neu - register_alt:
-                    print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+                    print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Aufloesepunkte
                 aufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrAufloesung"))
                 aufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
 
                 for refpunkt in aufloesepunkte_alt - aufloesepunkte_neu:
-                    print("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                    print("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in aufloesepunkte_neu - aufloesepunkte_alt:
-                    print("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+                    print("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Signalhaltfallpunkte
                 sighaltfallpunkte_alt = set((int(haltfall.get("Ref", 0)), haltfall.find("./Datei").get("Dateiname", "").upper()) for haltfall in fahrstr_alt.iterfind("./FahrstrSigHaltfall"))
                 sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.element_richtung.element.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
 
                 for refpunkt in sighaltfallpunkte_alt - sighaltfallpunkte_neu:
-                    print("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                    print("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sighaltfallpunkte_neu - sighaltfallpunkte_alt:
-                    print("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+                    print("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Teilaufloesepunkte
                 teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
 
                 for refpunkt in teilaufloesepunkte_alt - teilaufloesepunkte_neu:
-                    print("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt))
+                    print("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in teilaufloesepunkte_neu - teilaufloesepunkte_alt:
-                    print("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt))
+                    print("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Weichen
                 weichenstellungen_alt_vs_neu = defaultdict(dict)
@@ -158,11 +164,11 @@ def finde_fahrstrassen(args):
 
                 for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in weichenstellungen:
-                        print("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, weichen_refpunkt))
+                        print("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt)))
                     elif "neu" not in weichenstellungen:
-                        print("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, weichen_refpunkt))
+                        print("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt)))
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
-                        print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, weichen_refpunkt, weichenstellungen["alt"], weichenstellungen["neu"]))
+                        print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"], weichenstellungen["neu"]))
 
                 # Hauptsignale
                 hsig_alt_vs_neu = defaultdict(dict)
@@ -173,11 +179,11 @@ def finde_fahrstrassen(args):
 
                 for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in hsig:
-                        print("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, hsig_refpunkt))
+                        print("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif "neu" not in hsig:
-                        print("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, hsig_refpunkt))
+                        print("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif hsig["alt"] != hsig["neu"]:
-                        print("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, hsig_refpunkt, hsig["alt"], hsig["neu"]))
+                        print("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt), hsig["alt"], hsig["neu"]))
 
                 # Vorsignale
                 vsig_alt_vs_neu = defaultdict(dict)
@@ -188,11 +194,11 @@ def finde_fahrstrassen(args):
 
                 for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in vsig:
-                        print("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, vsig_refpunkt))
+                        print("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif "neu" not in vsig:
-                        print("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, vsig_refpunkt))
+                        print("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif vsig["alt"] != vsig["neu"]:
-                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, vsig_refpunkt, vsig["alt"], vsig["neu"]))
+                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
