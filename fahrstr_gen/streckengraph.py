@@ -120,6 +120,8 @@ class Fahrstrasse:
                 for idx, zeile in enumerate(self.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
                         self.signale.append(FahrstrHauptsignal(self.ziel, idx, False))
+                        if self.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
+                            logging.warn("{}: Signal {} an Element {} (Ref. {}) wird in Zusi momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(self.name, self.ziel.signal(), self.ziel.element_richtung, self.ziel.refnr))
                         break
 
             for kante in einzelfahrstrasse.kantenliste():
