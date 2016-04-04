@@ -807,16 +807,14 @@ class Knoten:
             # Fahrstrasse nur abschliessen, wenn schon ein Signal mit "Kennlichtschaltung Nachfolgersignal" aufgenommen wurde.
             # Ansonsten Fahrstrasse weiterfuehren.
 
-            # TODO: Wenn mehr als eine Einzelfahrstrasse vorhanden ist, dann ist auf jeden Fall ein Kennlichtsignal beteiligt?
+            # Wenn mehr als eine Einzelfahrstrasse vorhanden ist, dann ist auf jeden Fall ein Kennlichtsignal beteiligt.
             if len(einzelfahrstr_liste) == 1:
-                fahrstr_abschliessen = False
-                fahrstr_weiterfuehren = True
-                
-                # erste_fahrstrasse = einzelfahrstr_liste[0]
-                # startknoten = erste_fahrstrasse.kanten.eintrag.start
-                # startrichtung = erste_fahrstrasse.kanten.eintrag.startrichtung
-                # startsignal = startknoten.signal(startrichtung)
-                # if startsignal is None or int(startsignal.get("SignalFlags", 0)) & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
+                # TODO: Laut Zusi-Dokumentation muesste man jetzt pruefen, ob das Startsignal "Kennlichtschaltung mit Nachfolgesignal" hat.
+                # Zusi verhaelt sich hier aber anders als seine Dokumentation und ueberspringt diesen Check ganz.
+                #startsignal = einzelfahrstr_liste[0].start.signal()
+                #if startsignal is not None and startsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
+                    fahrstr_abschliessen = False
+                    fahrstr_weiterfuehren = True
 
         if zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
             fahrstr_weiterfuehren = True
