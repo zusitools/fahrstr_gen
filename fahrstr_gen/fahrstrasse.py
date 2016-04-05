@@ -14,6 +14,8 @@ FahrstrWeichenstellung = namedtuple('FahrstrWeichenstellung', ['refpunkt', 'weic
 FahrstrHauptsignal = namedtuple('FahrstrHauptsignal', ['refpunkt', 'zeile', 'ist_ersatzsignal'])
 FahrstrVorsignal = namedtuple('FahrstrVorsignal', ['refpunkt', 'spalte'])
 
+FahrstrFlankenschutzWeichenstellung = namedtuple('FahrstrFlankenschutzStellung', ['refpunkt', 'weichenlage', 'abstand'])  # Abstand zum Gefahrpunkt, dient als Prioritaet bei mehreren Flankenschutzstellungen
+
 # Eine (simulatortaugliche) Fahrstrasse, die aus einer oder mehreren Einzeifahrstrassen besteht.
 class Fahrstrasse:
     def __init__(self, fahrstr_typ):

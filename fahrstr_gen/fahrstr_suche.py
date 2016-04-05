@@ -268,18 +268,18 @@ class FahrstrassenSuche:
 
                 # Flankenschutz
                 if self.flankenschutz_graph is not None:
-                    if kante.start_nachfolger_idx is not None:
-                        flankenschutzknoten_start = self.flankenschutz_graph.get_knoten(kante.start.knoten.element)
-                        if flankenschutzknoten_start is not None:
-                            flankenschutz_stellungen.extend(flankenschutzknoten_start.get_flankenschutz_stellungen(kante.start.richtung, kante.start_nachfolger_idx))
-                    if kante.ziel_vorgaenger_idx is not None:
-                        flankenschutzknoten_ziel = self.flankenschutz_graph.get_knoten(kante.ziel.knoten.element)
-                        if flankenschutzknoten_ziel is not None:
-                            flankenschutz_stellungen.extend(flankenschutzknoten_ziel.get_flankenschutz_stellungen(gegenrichtung(kante.ziel.richtung), kante.ziel_vorgaenger_idx))
+                    for knoten, richtung, nachfolger_idx in [
+                            (self.flankenschutz_graph.get_knoten(kante.start.knoten.element), kante.start.richtung, kante.start_nachfolger_idx),
+                            (self.flankenschutz_graph.get_knoten(kante.ziel.knoten.element), gegenrichtung(kante.ziel.richtung), kante.ziel_vorgaenger_idx)]:
+                        if knoten is not None and nachfolger_idx is not None:
+                            # Flankenschutz-Stellungen mit geringerem Abstand ueberschreiben andere.
+                            flankenschutz_neu = knoten.get_flankenschutz_stellungen(richtung, nachfolger_idx)
+                            flankenschutz_stellungen = [w for w in flankenschutz_stellungen if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_neu)]
+                            flankenschutz_stellungen.extend([w for w in flankenschutz_neu if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_stellungen)])
 
         for weichenstellung in flankenschutz_stellungen:
-            if weichenstellung not in result.weichen:
-                result.weichen.append(weichenstellung)
+            if weichenstellung.weichenlage != 1 and weichenstellung not in result.weichen:
+                result.weichen.append(FahrstrWeichenstellung(weichenstellung.refpunkt, weichenstellung.weichenlage))
 
         # Aufloesepunkte suchen. Wenn wir vorher schon einen Aufloesepunkt gefunden haben, lag er im Zielelement der Fahrstrasse,
         # und es muss nicht weiter gesucht werden.

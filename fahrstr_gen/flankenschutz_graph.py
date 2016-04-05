@@ -3,7 +3,7 @@
 from .konstanten import *
 from .streckengraph import Streckengraph, Knoten
 from .strecke import gegenrichtung
-from .fahrstrasse import FahrstrWeichenstellung
+from .fahrstrasse import FahrstrFlankenschutzWeichenstellung
 
 import logging
 
@@ -37,7 +37,6 @@ class FlankenschutzGraphKnoten(Knoten):
         # Von den nachfolgenden Informationen existiert ein Dictionary  pro Richtung.
         # In jedem Dictionary steht mit Schluessel i eine Liste von Weichenstellungen, 
         # die eingefuegt werden muessen, wenn am Element der Nachfolger Nummer i gestellt wird.
-        # Es werden nur solche Weichenstellungen angegeben, die nicht der Vorzugslage der Weiche entsprechen.
         self.flankenschutz_stellungen = [dict(), dict()]
 
     # Gibt die Weichenstellungen zurueck, die eingefuegt werden muessen, um dem Element Flankenschutz
@@ -85,13 +84,11 @@ class FlankenschutzGraphKnoten(Knoten):
                                     "Die Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung, element_richtung_vorgaenger))
                             return
 
-                        if vorgaenger_index == 0:
-                            # Die Weiche steht in ihrer Vorrangstellung in Richtung von `self`. Stelle sie also um. 
-                            weichen_refpunkt = element_richtung.element.refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
-                            if weichen_refpunkt is None:
-                                logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
-                                        "Diese Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung))
-                            else:
-                                result.append(FahrstrWeichenstellung(weichen_refpunkt, len(vorgaenger_liste)))
+                        weichen_refpunkt = element_richtung.element.refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
+                        if weichen_refpunkt is None:
+                            logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
+                                    "Diese Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung))
+                        else:
+                            result.append(FahrstrFlankenschutzWeichenstellung(weichen_refpunkt, len(vorgaenger_liste) if vorgaenger_index == 0 else 1, laenge))
 
         return result
