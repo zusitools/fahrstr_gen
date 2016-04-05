@@ -35,7 +35,7 @@ class Fahrstrasse:
             self.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
 
         self.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
-        self.zufallswert = float(self.ziel.signal().xml_knoten.get("Zufallswert", 0))
+        self.zufallswert = float(self.ziel.signal().xml_knoten.get("ZufallsWert", 0))
 
         self.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
 
@@ -193,7 +193,7 @@ class Fahrstrasse:
             result.attrib["FahrstrTyp"] = "TypLZB"
 
         if self.zufallswert != 0:
-            result.set("Zufallwert", str(self.zufallswert))
+            result.set("ZufallsWert", "{:g}".format(self.zufallswert))
         if self.rgl_ggl != 0:
             result.set("RglGgl", str(self.rgl_ggl))
         if len(self.streckenname) > 0:
