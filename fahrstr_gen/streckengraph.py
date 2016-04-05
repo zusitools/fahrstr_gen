@@ -69,6 +69,9 @@ class KnotenUndRichtung(namedtuple('KnotenUndRichtung', ['knoten', 'richtung']))
     def __str__(self):
         return str(self.knoten) + ("b" if self.richtung == NORM else "g")
 
+    def element_und_richtung(self):
+        return ElementUndRichtung(self.knoten.element, self.richtung)
+
     def signal(self):
         return self.knoten.element.signal(self.richtung)
 

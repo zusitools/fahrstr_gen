@@ -107,6 +107,8 @@ class FahrstrGraphKnoten(Knoten):
     # Erweitert die angegebene Kante, die am Nachfolger 'element_richtung' dieses Knotens beginnt.
     # Gibt None zurueck, wenn keine fahrstrassenrelevante Kante existiert.
     def _neue_nachfolger_kante(self, kante, element_richtung):
+        element_richtung_vorgaenger = kante.start.element_und_richtung()
+
         while element_richtung is not None:
             # Bei Ereignis "Keine Fahrstrasse einrichten" sofort abbrechen (keine weiteren Ereignisse/Signale an diesem Element betrachten)
             keine_fahrstr_einrichten = False
@@ -309,36 +311,28 @@ class FahrstrGraphKnoten(Knoten):
                 break
 
             assert(len(nachfolger) == 1)  # sonst waere es ein Knoten
-            element_richtung_neu = nachfolger[0]
-
-            if element_richtung_neu is None:
-                element_richtung = None
-                break
-
-            nachfolger_vorgaenger = element_richtung_neu.vorgaenger()
-            if nachfolger_vorgaenger is not None and len(nachfolger_vorgaenger) > 1:
-                # Stumpf befahrene Weiche stellen
-                weichen_refpunkt = self.graph.get_knoten(element_richtung_neu.element).refpunkt(gegenrichtung(element_richtung_neu.richtung), REFTYP_WEICHE)
-                if weichen_refpunkt is None:
-                    logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
-                            "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
-                            self.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
-                    return None
-
-                try:
-                    kante.ziel_vorgaenger_idx = nachfolger_vorgaenger.index(element_richtung)
-                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, kante.ziel_vorgaenger_idx + 1))
-                except ValueError:
-                    logging.warn(("Stellung der stumpf befahrenen Weiche an Element {} {} von Element {} {} kommend konnte nicht ermittelt werden. " +
-                            "Es werden keine Fahrstrassen ueber das letztere Element erzeugt.").format(
-                            element_richtung_neu.element.attrib["Nr"], "blau" if element_richtung_neu.richtung == NORM else "gruen",
-                            element_richtung.element.attrib["Nr"], "blau" if element_richtung.richtung == NORM else "gruen"))
-                    return None
-
-            element_richtung = element_richtung_neu
+            element_richtung_vorgaenger = element_richtung
+            element_richtung = nachfolger[0]
 
         if element_richtung is not None:
             kante.ziel = self.graph.get_knoten(element_richtung.element).richtung(element_richtung.richtung)
+
+            # Ggf. stumpf befahrene Weiche im Zielknoten stellen
+            ziel_vorgaenger = element_richtung.vorgaenger()
+            if len(ziel_vorgaenger) > 1:
+                weichen_refpunkt = self.graph.get_knoten(element_richtung.element).refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
+                if weichen_refpunkt is None:
+                    logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
+                            "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(element_richtung))
+                    return None
+
+                try:
+                    kante.ziel_vorgaenger_idx = ziel_vorgaenger.index(element_richtung_vorgaenger)
+                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, kante.ziel_vorgaenger_idx + 1))
+                except ValueError:
+                    logging.warn(("Stellung der stumpf befahrenen Weiche an Element {} von Element {} kommend konnte nicht ermittelt werden. " +
+                            "Es werden keine Fahrstrassen ueber das letztere Element erzeugt.").format(element_richtung, element_richtung_vorgaenger))
+                    return None
 
         return kante
 
