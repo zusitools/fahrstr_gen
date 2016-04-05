@@ -5,17 +5,18 @@ from collections import OrderedDict
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
-from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_min, str_geschw
+from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_min, str_geschw, gegenrichtung
 from . import modulverwaltung
 
 import logging
 
 class FahrstrassenSuche:
-    def __init__(self, fahrstr_typ, bedingungen, vorsignal_graph):
+    def __init__(self, fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph):
         self.einzelfahrstrassen = dict()  # KnotenUndRichtung -> [EinzelFahrstrasse]
         self.fahrstr_typ = fahrstr_typ
         self.bedingungen = bedingungen
         self.vorsignal_graph = vorsignal_graph
+        self.flankenschutz_graph = flankenschutz_graph
 
     # Gibt alle vom angegebenen Knoten ausgehenden (kombinierten) Fahrstrassen in der angegebenen Richtung zurueck.
     def get_fahrstrassen(self, knoten, richtung):
@@ -186,6 +187,8 @@ class FahrstrassenSuche:
 
         logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\"".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger))
 
+        flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
+
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             if idx == 0:
                 # Startsignal ansteuern
@@ -263,6 +266,20 @@ class FahrstrassenSuche:
                             zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, result.rgl_ggl, result.richtungsanzeiger)
                             result.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))
                 result.vorsignale.extend(kante.vorsignale)
+
+                # Flankenschutz
+                if kante.start_nachfolger_idx is not None:
+                    flankenschutzknoten_start = self.flankenschutz_graph.get_knoten(kante.start.knoten.element)
+                    if flankenschutzknoten_start is not None:
+                        flankenschutz_stellungen.extend(flankenschutzknoten_start.get_flankenschutz_stellungen(kante.start.richtung, kante.start_nachfolger_idx))
+                if kante.ziel_vorgaenger_idx is not None:
+                    flankenschutzknoten_ziel = self.flankenschutz_graph.get_knoten(kante.ziel.knoten.element)
+                    if flankenschutzknoten_ziel is not None:
+                        flankenschutz_stellungen.extend(flankenschutzknoten_ziel.get_flankenschutz_stellungen(gegenrichtung(kante.ziel.richtung), kante.ziel_vorgaenger_idx))
+
+        for weichenstellung in flankenschutz_stellungen:
+            if weichenstellung not in result.weichen:
+                result.weichen.append(weichenstellung)
 
         # Aufloesepunkte suchen. Wenn wir vorher schon einen Aufloesepunkt gefunden haben, lag er im Zielelement der Fahrstrasse,
         # und es muss nicht weiter gesucht werden.

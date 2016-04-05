@@ -6,6 +6,7 @@ from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ, Element
 from fahrstr_gen.fahrstr_suche import FahrstrassenSuche
 from fahrstr_gen.fahrstr_graph import FahrstrGraph
 from fahrstr_gen.vorsignal_graph import VorsignalGraph
+from fahrstr_gen.flankenschutz_graph import FlankenschutzGraph
 
 import xml.etree.ElementTree as ET
 import argparse
@@ -43,10 +44,11 @@ def finde_fahrstrassen(args):
             bedingungen[bedingung.attrib["EinzelFahrstrName"]] = bedingung
 
     vorsignal_graph = VorsignalGraph()
+    flankenschutz_graph = FlankenschutzGraph()
 
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
-        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen, vorsignal_graph)
+        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph)
         graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):

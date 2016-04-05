@@ -189,6 +189,7 @@ class Signal:
         self.spalten = []
         self.signalgeschwindigkeit = None
         self.ist_hilfshauptsignal = False
+        self.ist_gleissperre = False
 
         self.gegengleisanzeiger = 0 # Signalbild-ID
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
@@ -212,6 +213,8 @@ class Signal:
                         ereignisnr = int(ereignis.get("Er", 0))
                         if ereignisnr == EREIGNIS_HILFSHAUPTSIGNAL:
                             self.ist_hilfshauptsignal = True
+                        elif ereignisnr == EREIGNIS_ENTGLEISEN and float(ereignis.get("Wert", 0)) == 0:
+                            self.ist_gleissperre = True
                         elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None:
                             self.signalgeschwindigkeit = float(ereignis.get("Wert", 0))
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
