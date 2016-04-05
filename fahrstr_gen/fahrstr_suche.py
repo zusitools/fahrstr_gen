@@ -268,14 +268,15 @@ class FahrstrassenSuche:
                 result.vorsignale.extend(kante.vorsignale)
 
                 # Flankenschutz
-                if kante.start_nachfolger_idx is not None:
-                    flankenschutzknoten_start = self.flankenschutz_graph.get_knoten(kante.start.knoten.element)
-                    if flankenschutzknoten_start is not None:
-                        flankenschutz_stellungen.extend(flankenschutzknoten_start.get_flankenschutz_stellungen(kante.start.richtung, kante.start_nachfolger_idx))
-                if kante.ziel_vorgaenger_idx is not None:
-                    flankenschutzknoten_ziel = self.flankenschutz_graph.get_knoten(kante.ziel.knoten.element)
-                    if flankenschutzknoten_ziel is not None:
-                        flankenschutz_stellungen.extend(flankenschutzknoten_ziel.get_flankenschutz_stellungen(gegenrichtung(kante.ziel.richtung), kante.ziel_vorgaenger_idx))
+                if self.flankenschutz_graph is not None:
+                    if kante.start_nachfolger_idx is not None:
+                        flankenschutzknoten_start = self.flankenschutz_graph.get_knoten(kante.start.knoten.element)
+                        if flankenschutzknoten_start is not None:
+                            flankenschutz_stellungen.extend(flankenschutzknoten_start.get_flankenschutz_stellungen(kante.start.richtung, kante.start_nachfolger_idx))
+                    if kante.ziel_vorgaenger_idx is not None:
+                        flankenschutzknoten_ziel = self.flankenschutz_graph.get_knoten(kante.ziel.knoten.element)
+                        if flankenschutzknoten_ziel is not None:
+                            flankenschutz_stellungen.extend(flankenschutzknoten_ziel.get_flankenschutz_stellungen(gegenrichtung(kante.ziel.richtung), kante.ziel_vorgaenger_idx))
 
         for weichenstellung in flankenschutz_stellungen:
             if weichenstellung not in result.weichen:
@@ -291,7 +292,7 @@ class FahrstrassenSuche:
                     result.aufloesepunkte.append(aufl)
 
         # Vorsignale ansteuern. Erst *nach* Abarbeiten aller Einzelfahrstrassen, da deren Ereignisse "Vorsignal in Fahrstrasse verknuepfen" Prioritaet haben!
-        if result.start.reftyp == REFTYP_SIGNAL and len(result.signale) > 0 and not result.signale[0].ist_ersatzsignal:
+        if self.vorsignal_graph is not None and result.start.reftyp == REFTYP_SIGNAL and len(result.signale) > 0 and not result.signale[0].ist_ersatzsignal:
             vorsignal_knoten = self.vorsignal_graph.get_knoten(einzelfahrstrassen[0].start.knoten.element)
             if vorsignal_knoten is not None:
                 for vsig in vorsignal_knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):

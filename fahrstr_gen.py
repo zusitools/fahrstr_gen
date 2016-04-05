@@ -48,7 +48,9 @@ def finde_fahrstrassen(args):
 
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
-        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph)
+        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen,
+                vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
+                flankenschutz_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None)
         graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
