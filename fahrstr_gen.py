@@ -194,9 +194,9 @@ def finde_fahrstrassen(args):
 
                 for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in weichenstellungen:
-                        logging.info("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt)))
+                        logging.info("{}: Weichenstellung {} (Nachfolger {}) ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["neu"]))
                     elif "neu" not in weichenstellungen:
-                        logging.info("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt)))
+                        logging.info("{}: Weichenstellung {} (Nachfolger {}) ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"]))
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
                         logging.info("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"], weichenstellungen["neu"]))
 
