@@ -488,10 +488,14 @@ def _escape(txt):
 # Keine Einrueckung, Attributreihenfolge gleich, Zeilenende CR+LF.
 def writeuglyxml(fp, elem):
     tag = elem.tag
+    try:
+        attrib_order = st3_attrib_order[tag]
+    except KeyError:
+        attrib_order = []
 
     fp.write(u"<{}".format(tag).encode("utf-8"))
 
-    for k, v in sorted(elem.attrib.items(), key = lambda i: i[0] if tag not in st3_attrib_order else st3_attrib_order[tag].index(i[0])):
+    for k, v in sorted(elem.attrib.items(), key = lambda i: 9999 if i[0] not in attrib_order else attrib_order.index(i[0])):
       fp.write(u" {}=\"{}\"".format(k, _escape(v)).encode("utf-8"))
 
     if len(elem):
