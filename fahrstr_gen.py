@@ -86,6 +86,8 @@ def finde_fahrstrassen(args):
             os.remove(fp.name)
 
         elif args.modus == 'vergleiche':
+            logging.info("Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.")
+
             alt_vs_neu = defaultdict(dict)
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
                 alt_vs_neu[fahrstrasse_alt.attrib["FahrstrName"]]["alt"] = fahrstrasse_alt
@@ -223,6 +225,8 @@ def finde_fahrstrassen(args):
                         logging.info("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif vsig["alt"] != vsig["neu"]:
                         logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
+
+            logging.info("Fahrstrassen-Vergleich abgeschlossen.".format(name))
 
 # http://stackoverflow.com/a/35365616/1083696
 class LoggingHandlerFrame(tkinter.ttk.Frame):
