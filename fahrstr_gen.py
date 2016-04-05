@@ -102,6 +102,8 @@ def finde_fahrstrassen(args):
 
                 laenge_alt = float(fahrstr_alt.get("Laenge", 0))
                 if abs(laenge_alt - fahrstr_neu.laenge) > 1:
+                    # TODO: Zusi berechnet die Fahrstrassenlaenge inklusive Start-, aber ohne Zielelement.
+                    # Wir berechnen exklusive Start, inklusive Ziel, was richtiger scheint.
                     # print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
                     pass
 

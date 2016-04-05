@@ -258,7 +258,7 @@ class EinzelFahrstrasse:
             self.start = kante.start
         self.ziel = kante.ziel
         self.kanten = ListenEintrag(kante, self.kanten)
-        self.laenge = self.laenge + kante.laenge
+        self.laenge += kante.laenge
         if not self.hat_ende_weichenbereich:
             self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
         self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
