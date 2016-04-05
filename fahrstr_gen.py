@@ -232,13 +232,10 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
             logging.Handler.__init__(self)
             self.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
             self.widget = widget
-            self.widget.config(state='disabled')
 
         def emit(self, record):
-            self.widget.config(state='normal')
             self.widget.insert(tkinter.END, self.format(record) + "\n")
             self.widget.see(tkinter.END)
-            self.widget.config(state='disabled')
 
     def __init__(self, *args, **kwargs):
         tkinter.ttk.Frame.__init__(self, *args, **kwargs)
@@ -258,23 +255,20 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
         self.logging_handler = LoggingHandlerFrame.Handler(self.text)
 
     def clear(self):
-        self.text.config(state='normal')
         self.text.delete(1.0, tkinter.END)
-        self.text.config(state='disabled')
 
     def setLevel(self, level):
         self.logging_handler.setLevel(level)
 
 def gui():
     def btn_start_callback():
-        ent_log.logging_handler.setLevel(logging.INFO)
+        ent_log.logging_handler.setLevel(logging.DEBUG if var_debug.get() else logging.INFO)
         ent_log.clear()
 
         try:
-            args = namedtuple('args', ['dateiname', 'modus', 'debug', 'nummerieren', 'bedingungen'])
+            args = namedtuple('args', ['dateiname', 'modus', 'nummerieren', 'bedingungen'])
             args.dateiname = ent_dateiname.get()
             args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
-            args.debug = var_debug.get()
             args.nummerieren = var_nummerieren.get()
             args.bedingungen = None
             finde_fahrstrassen(args)
@@ -285,6 +279,10 @@ def gui():
         filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'), filetypes=[('ST3-Dateien', '.st3'), ('Alle Dateien', '*')])
         ent_dateiname.delete(0, tkinter.END)
         ent_dateiname.insert(0, filename)
+
+    def btn_logkopieren_callback():
+        root.clipboard_clear()
+        root.clipboard_append(ent_log.text.get(1.0, tkinter.END))
 
     root = tkinter.Tk()
     root.wm_title("Fahrstrassengenerierung")
@@ -307,19 +305,24 @@ def gui():
     chk_debug.grid(row=2, column=1, columnspan=2, sticky=tkinter.W)
 
     var_vergleiche = tkinter.BooleanVar()
-    chk_vergleiche = tkinter.Checkbutton(frame, text="Erzeugte Fahrstrassen mit existierenden vergleichen", variable=var_vergleiche)
+    chk_vergleiche = tkinter.Checkbutton(frame, text="Nichts schreiben, stattdessen erzeugte Fahrstrassen mit existierenden vergleichen", variable=var_vergleiche)
     chk_vergleiche.grid(row=3, column=1, columnspan=2, sticky=tkinter.W)
 
     btn_start = tkinter.Button(frame, text="Start", command=btn_start_callback)
-    btn_start.grid(row=98)
+    btn_start.grid(row=98, columnspan=3, sticky='we')
 
     ent_log = LoggingHandlerFrame(frame)
     ent_log.grid(row=99, columnspan=3, sticky='wens')
     logging.getLogger().addHandler(ent_log.logging_handler)
     logging.getLogger().setLevel(logging.DEBUG)  # wird durch handler.setLevel eventuell weiter herabgesetzt
-    frame.rowconfigure(99, minsize=100)
 
-    frame.pack()
+    btn_logkopieren = tkinter.Button(frame, text="Log kopieren", command=btn_logkopieren_callback)
+    btn_logkopieren.grid(row=100, columnspan=3, sticky='we')
+
+    frame.rowconfigure(99, minsize=100, weight=1)
+    frame.columnconfigure(1, weight=1)
+
+    frame.pack(fill=tkinter.BOTH, expand=tkinter.YES)
     tkinter.mainloop()
 
 if __name__ == '__main__':
