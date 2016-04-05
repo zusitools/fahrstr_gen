@@ -10,9 +10,13 @@ import operator
 import tempfile
 import shutil
 import os
-from collections import defaultdict
+import sys
+from collections import defaultdict, namedtuple
 
 import logging
+import tkinter
+import tkinter.filedialog
+import tkinter.ttk
 
 def refpunkt_fmt(refpunkt):
     pfad = refpunkt[1]
@@ -220,32 +224,134 @@ def finde_fahrstrassen(args):
                     elif vsig["alt"] != vsig["neu"]:
                         print("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
 
+# http://stackoverflow.com/a/35365616/1083696
+class LoggingHandlerFrame(tkinter.ttk.Frame):
+
+    class Handler(logging.Handler):
+        def __init__(self, widget):
+            logging.Handler.__init__(self)
+            self.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+            self.widget = widget
+            self.widget.config(state='disabled')
+
+        def emit(self, record):
+            self.widget.config(state='normal')
+            self.widget.insert(tkinter.END, self.format(record) + "\n")
+            self.widget.see(tkinter.END)
+            self.widget.config(state='disabled')
+
+    def __init__(self, *args, **kwargs):
+        tkinter.ttk.Frame.__init__(self, *args, **kwargs)
+
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=0)
+        self.rowconfigure(0, weight=1)
+
+        self.scrollbar = tkinter.Scrollbar(self)
+        self.scrollbar.grid(row=0, column=1, sticky=(tkinter.N,tkinter.S,tkinter.E))
+
+        self.text = tkinter.Text(self, yscrollcommand=self.scrollbar.set)
+        self.text.grid(row=0, column=0, sticky=(tkinter.N,tkinter.S,tkinter.E,tkinter.W))
+
+        self.scrollbar.config(command=self.text.yview)
+
+        self.logging_handler = LoggingHandlerFrame.Handler(self.text)
+
+    def clear(self):
+        self.text.config(state='normal')
+        self.text.delete(1.0, tkinter.END)
+        self.text.config(state='disabled')
+
+    def setLevel(self, level):
+        self.logging_handler.setLevel(level)
+
+def gui():
+    def btn_start_callback():
+        ent_log.logging_handler.setLevel(logging.INFO)
+        ent_log.clear()
+
+        try:
+            args = namedtuple('args', ['dateiname', 'modus', 'debug', 'nummerieren', 'bedingungen'])
+            args.dateiname = ent_dateiname.get()
+            args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
+            args.debug = var_debug.get()
+            args.nummerieren = var_nummerieren.get()
+            args.bedingungen = None
+            finde_fahrstrassen(args)
+        except Exception as e:
+            logging.exception(e)
+
+    def btn_dateiname_callback():
+        filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'), filetypes=[('ST3-Dateien', '.st3'), ('Alle Dateien', '*')])
+        ent_dateiname.delete(0, tkinter.END)
+        ent_dateiname.insert(0, filename)
+
+    root = tkinter.Tk()
+    root.wm_title("Fahrstrassengenerierung")
+
+    frame = tkinter.Frame(root)
+
+    lbl_dateiname = tkinter.Label(frame, text="ST3-Datei: ")
+    lbl_dateiname.grid(row=0, column=0, sticky=tkinter.W)
+    ent_dateiname = tkinter.Entry(frame, width=50)
+    ent_dateiname.grid(row=0, column=1, sticky=(tkinter.W,tkinter.E))
+    btn_dateiname = tkinter.Button(frame, text="...", command=btn_dateiname_callback)
+    btn_dateiname.grid(row=0, column=2, sticky=tkinter.W)
+
+    var_nummerieren = tkinter.BooleanVar()
+    chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (3D-Editor 3.1.0.4+)", variable=var_nummerieren)
+    chk_nummerieren.grid(row=1, column=1, columnspan=2, sticky=tkinter.W)
+
+    var_debug = tkinter.BooleanVar()
+    chk_debug = tkinter.Checkbutton(frame, text="Debug-Ausgaben anzeigen", variable=var_debug)
+    chk_debug.grid(row=2, column=1, columnspan=2, sticky=tkinter.W)
+
+    var_vergleiche = tkinter.BooleanVar()
+    chk_vergleiche = tkinter.Checkbutton(frame, text="Erzeugte Fahrstrassen mit existierenden vergleichen", variable=var_vergleiche)
+    chk_vergleiche.grid(row=3, column=1, columnspan=2, sticky=tkinter.W)
+
+    btn_start = tkinter.Button(frame, text="Start", command=btn_start_callback)
+    btn_start.grid(row=98)
+
+    ent_log = LoggingHandlerFrame(frame)
+    ent_log.grid(row=99, columnspan=3, sticky='wens')
+    logging.getLogger().addHandler(ent_log.logging_handler)
+    logging.getLogger().setLevel(logging.DEBUG)  # wird durch handler.setLevel eventuell weiter herabgesetzt
+    frame.rowconfigure(99, minsize=100)
+
+    frame.pack()
+    tkinter.mainloop()
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
-    parser.add_argument('dateiname')
-    parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help=argparse.SUPPRESS)
-    parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
-    parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
-    parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
-    parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
-    args = parser.parse_args()
-
-    logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
-
-    if args.profile == 'profile':
-        import profile, pstats
-        p = profile.Profile()
-        p.run('finde_fahrstrassen(args)')
-        s = pstats.Stats(p)
-        s.strip_dirs()
-        s.sort_stats('cumtime')
-        s.print_stats()
-        s.print_callers()
-    elif args.profile == 'line_profiler':
-        import line_profiler
-        p = line_profiler.LineProfiler(finde_fahrstrassen)
-        # p.add_function(...)
-        p.run('finde_fahrstrassen(args)')
-        p.print_stats()
+    if len(sys.argv) == 1:
+        # Ohne Parameter wird die GUI-Version aufgerufen.
+        gui()
     else:
-        finde_fahrstrassen(args)
+        parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
+        parser.add_argument('dateiname')
+        parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
+        parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
+        parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
+        parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
+        parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
+        args = parser.parse_args()
+
+        logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
+
+        if args.profile == 'profile':
+            import profile, pstats
+            p = profile.Profile()
+            p.run('finde_fahrstrassen(args)')
+            s = pstats.Stats(p)
+            s.strip_dirs()
+            s.sort_stats('cumtime')
+            s.print_stats()
+            s.print_callers()
+        elif args.profile == 'line_profiler':
+            import line_profiler
+            p = line_profiler.LineProfiler(finde_fahrstrassen)
+            # p.add_function(...)
+            p.run('finde_fahrstrassen(args)')
+            p.print_stats()
+        else:
+            finde_fahrstrassen(args)
