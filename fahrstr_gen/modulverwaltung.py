@@ -135,7 +135,7 @@ def read_registry_strings(keys, valuenames):
 
 # aus zusicommon, angepasst
 def get_zusi_datapath():
-    result = os.environ['ZUSI3_DATAPATH']
+    result = os.environ.get("ZUSI3_DATAPATH", None)
 
     if result is not None:
         return result
