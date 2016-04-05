@@ -96,88 +96,88 @@ def finde_fahrstrassen(args):
                 try:
                     fahrstr_alt = fahrstrassen["alt"]
                 except KeyError:
-                    print("{} existiert in Zusi nicht".format(name))
+                    logging.info("{} existiert in Zusi nicht".format(name))
                     continue
                 try:
                     fahrstr_neu = fahrstrassen["neu"]
                 except KeyError:
-                    print("{} existiert in Zusi, wurde aber nicht erzeugt".format(name))
+                    logging.info("{} existiert in Zusi, wurde aber nicht erzeugt".format(name))
                     continue
 
                 laenge_alt = float(fahrstr_alt.get("Laenge", 0))
                 if abs(laenge_alt - fahrstr_neu.laenge) > 1:
                     # TODO: Zusi berechnet die Fahrstrassenlaenge inklusive Start-, aber ohne Zielelement.
                     # Wir berechnen exklusive Start, inklusive Ziel, was richtiger scheint.
-                    # print("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
+                    # logging.info("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
                     pass
 
                 fahrstr_typ = fahrstr_alt.get("FahrstrTyp", "")
                 if fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_RANGIER and fahrstr_typ != "TypRangier":
-                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypRangier".format(name, fahrstr_typ))
+                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypRangier".format(name, fahrstr_typ))
                 elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_ZUG and fahrstr_typ != "TypZug":
-                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypZug".format(name, fahrstr_typ))
+                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypZug".format(name, fahrstr_typ))
                 elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_LZB and fahrstr_typ != "TypLZB":
-                    print("{}: unterschiedlicher Fahrstrassentyp: {} vs TypLZB".format(name, fahrstr_typ))
+                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypLZB".format(name, fahrstr_typ))
 
                 rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
                 if fahrstr_neu.rgl_ggl != rgl_ggl_alt:
-                    print("{}: unterschiedliche RglGgl-Spezifikation: {} vs {}".format(name, rgl_ggl_alt, fahrstr_neu.rgl_ggl))
+                    logging.info("{}: unterschiedliche RglGgl-Spezifikation: {} vs {}".format(name, rgl_ggl_alt, fahrstr_neu.rgl_ggl))
 
                 streckenname_alt = fahrstr_alt.get("FahrstrStrecke", "")
                 if fahrstr_neu.streckenname != streckenname_alt:
-                    print("{}: unterschiedlicher Streckenname: {} vs {}".format(name, streckenname_alt, fahrstr_neu.streckenname))
+                    logging.info("{}: unterschiedlicher Streckenname: {} vs {}".format(name, streckenname_alt, fahrstr_neu.streckenname))
 
                 zufallswert_alt = float(fahrstr_alt.get("ZufallsWert", 0))
                 if fahrstr_neu.zufallswert != zufallswert_alt:
-                    print("{}: unterschiedlicher Zufallswert: {} vs {}".format(name, zufallswert_alt, fahrstr_neu.zufallswert))
+                    logging.info("{}: unterschiedlicher Zufallswert: {} vs {}".format(name, zufallswert_alt, fahrstr_neu.zufallswert))
 
                 start_alt = fahrstr_alt.find("./FahrstrStart")
                 start_alt_refnr = int(start_alt.get("Ref", 0))
                 start_alt_modul = start_alt.find("./Datei").get("Dateiname", "")
                 if start_alt_refnr != fahrstr_neu.start.refnr or start_alt_modul.upper() != fahrstr_neu.start.element_richtung.element.modul.relpath.upper():
-                    print("{}: unterschiedlicher Start: {}@{} vs. {}@{}".format(name, start_alt_refnr, start_alt_modul, fahrstr_neu.start.refnr, fahrstr_neu.start.element_richtung.element.modul.relpath))
+                    logging.info("{}: unterschiedlicher Start: {}@{} vs. {}@{}".format(name, start_alt_refnr, start_alt_modul, fahrstr_neu.start.refnr, fahrstr_neu.start.element_richtung.element.modul.relpath))
 
                 ziel_alt = fahrstr_alt.find("./FahrstrZiel")
                 ziel_alt_refnr = int(ziel_alt.get("Ref", 0))
                 ziel_alt_modul = ziel_alt.find("./Datei").get("Dateiname", "")
                 if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.element_richtung.element.modul.relpath.upper():
-                    print("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.element_richtung.element.modul.relpath))
+                    logging.info("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.element_richtung.element.modul.relpath))
 
                 # Register
                 register_alt = set((int(register_alt.get("Ref", 0)), register_alt.find("./Datei").get("Dateiname", "").upper()) for register_alt in fahrstr_alt.iterfind("./FahrstrRegister"))
                 register_neu = set((register_neu.refnr, register_neu.element_richtung.element.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
 
                 for refpunkt in register_alt - register_neu:
-                    print("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in register_neu - register_alt:
-                    print("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Aufloesepunkte
                 aufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrAufloesung"))
                 aufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
 
                 for refpunkt in aufloesepunkte_alt - aufloesepunkte_neu:
-                    print("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in aufloesepunkte_neu - aufloesepunkte_alt:
-                    print("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Signalhaltfallpunkte
                 sighaltfallpunkte_alt = set((int(haltfall.get("Ref", 0)), haltfall.find("./Datei").get("Dateiname", "").upper()) for haltfall in fahrstr_alt.iterfind("./FahrstrSigHaltfall"))
                 sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.element_richtung.element.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
 
                 for refpunkt in sighaltfallpunkte_alt - sighaltfallpunkte_neu:
-                    print("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sighaltfallpunkte_neu - sighaltfallpunkte_alt:
-                    print("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Teilaufloesepunkte
                 teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
 
                 for refpunkt in teilaufloesepunkte_alt - teilaufloesepunkte_neu:
-                    print("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in teilaufloesepunkte_neu - teilaufloesepunkte_alt:
-                    print("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
+                    logging.info("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Weichen
                 weichenstellungen_alt_vs_neu = defaultdict(dict)
@@ -188,11 +188,11 @@ def finde_fahrstrassen(args):
 
                 for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in weichenstellungen:
-                        print("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt)))
+                        logging.info("{}: Weichenstellung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt)))
                     elif "neu" not in weichenstellungen:
-                        print("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt)))
+                        logging.info("{}: Weichenstellung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt)))
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
-                        print("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"], weichenstellungen["neu"]))
+                        logging.info("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"], weichenstellungen["neu"]))
 
                 # Hauptsignale
                 hsig_alt_vs_neu = defaultdict(dict)
@@ -203,11 +203,11 @@ def finde_fahrstrassen(args):
 
                 for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in hsig:
-                        print("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt)))
+                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif "neu" not in hsig:
-                        print("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt)))
+                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif hsig["alt"] != hsig["neu"]:
-                        print("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt), hsig["alt"], hsig["neu"]))
+                        logging.info("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt), hsig["alt"], hsig["neu"]))
 
                 # Vorsignale
                 vsig_alt_vs_neu = defaultdict(dict)
@@ -218,11 +218,11 @@ def finde_fahrstrassen(args):
 
                 for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in vsig:
-                        print("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt)))
+                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif "neu" not in vsig:
-                        print("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
+                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif vsig["alt"] != vsig["neu"]:
-                        print("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
+                        logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
 
 # http://stackoverflow.com/a/35365616/1083696
 class LoggingHandlerFrame(tkinter.ttk.Frame):
