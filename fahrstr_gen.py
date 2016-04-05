@@ -3,6 +3,9 @@
 from fahrstr_gen import modulverwaltung, streckengraph, strecke
 from fahrstr_gen.konstanten import *
 from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ, Element
+from fahrstr_gen.fahrstr_suche import FahrstrassenSuche
+from fahrstr_gen.fahrstr_graph import FahrstrGraph
+from fahrstr_gen.vorsignal_graph import VorsignalGraph
 
 import xml.etree.ElementTree as ET
 import argparse
@@ -39,15 +42,12 @@ def finde_fahrstrassen(args):
         for bedingung in ET.parse(args.bedingungen).getroot().findall("Bedingung"):
             bedingungen[bedingung.attrib["EinzelFahrstrName"]] = bedingung
 
-    vorsignal_graph = streckengraph.Streckengraph(FAHRSTR_TYP_VORSIGNALE)
+    vorsignal_graph = VorsignalGraph()
+
     for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
-        if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
-            graph = streckengraph.Streckengraph(fahrstr_typ, vorsignal_graph)
-        else:
-            graph = streckengraph.Streckengraph(fahrstr_typ)
-
-        graph.bedingungen = bedingungen
+        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen, vorsignal_graph)
+        graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
             if str_element in modulverwaltung.dieses_modul.referenzpunkte:
@@ -58,7 +58,7 @@ def finde_fahrstrassen(args):
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.element_richtung.richtung == richtung
                         ):
 
-                        for f in graph.get_knoten(str_element).get_fahrstrassen(richtung):
+                        for f in fahrstr_suche.get_fahrstrassen(graph.get_knoten(str_element), richtung):
                             if f.name in loeschfahrstrassen_namen:
                                 logging.info("Loesche Fahrstrasse: {}".format(f.name))
                             else:
@@ -226,7 +226,7 @@ def finde_fahrstrassen(args):
                     elif vsig["alt"] != vsig["neu"]:
                         logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
 
-            logging.info("Fahrstrassen-Vergleich abgeschlossen.".format(name))
+            logging.info("Fahrstrassen-Vergleich abgeschlossen.")
 
 # http://stackoverflow.com/a/35365616/1083696
 class LoggingHandlerFrame(tkinter.ttk.Frame):
