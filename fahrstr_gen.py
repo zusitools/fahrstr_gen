@@ -50,7 +50,7 @@ def finde_fahrstrassen(args):
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
         fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen,
                 vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
-                flankenschutz_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None)
+                flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None)
         graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
@@ -274,10 +274,11 @@ def gui():
         ent_log.clear()
 
         try:
-            args = namedtuple('args', ['dateiname', 'modus', 'nummerieren', 'bedingungen'])
+            args = namedtuple('args', ['dateiname', 'modus', 'nummerieren', 'bedingungen', 'flankenschutz'])
             args.dateiname = ent_dateiname.get()
             args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
             args.nummerieren = var_nummerieren.get()
+            args.flankenschutz = var_flankenschutz.get()
             args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
             finde_fahrstrassen(args)
         except Exception as e:
@@ -320,6 +321,10 @@ def gui():
     chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (3D-Editor 3.1.0.4+)", variable=var_nummerieren)
     chk_nummerieren.grid(row=20, column=1, columnspan=2, sticky=tkinter.W)
 
+    var_flankenschutz = tkinter.BooleanVar()
+    chk_flankenschutz = tkinter.Checkbutton(frame, text="Weichen in Flankenschutz-Stellung verknuepfen", variable=var_flankenschutz)
+    chk_flankenschutz.grid(row=25, column=1, columnspan=2, sticky=tkinter.W)
+
     var_debug = tkinter.BooleanVar()
     chk_debug = tkinter.Checkbutton(frame, text="Debug-Ausgaben anzeigen", variable=var_debug)
     chk_debug.grid(row=30, column=1, columnspan=2, sticky=tkinter.W)
@@ -357,6 +362,7 @@ if __name__ == '__main__':
         parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
         parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
         parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
+        parser.add_argument('--flankenschutz', action='store_true', help="Weichen in Flankenschutzstellung in Fahrstrassen verknuepfen")
         args = parser.parse_args()
 
         logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
