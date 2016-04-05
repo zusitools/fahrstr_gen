@@ -270,7 +270,7 @@ def gui():
             args.dateiname = ent_dateiname.get()
             args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
             args.nummerieren = var_nummerieren.get()
-            args.bedingungen = None
+            args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
             finde_fahrstrassen(args)
         except Exception as e:
             logging.exception(e)
@@ -279,6 +279,11 @@ def gui():
         filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'), filetypes=[('ST3-Dateien', '.st3'), ('Alle Dateien', '*')])
         ent_dateiname.delete(0, tkinter.END)
         ent_dateiname.insert(0, filename)
+
+    def btn_bedingungen_callback():
+        filename = tkinter.filedialog.askopenfilename()
+        ent_bedingungen.delete(0, tkinter.END)
+        ent_bedingungen.insert(0, filename)
 
     def btn_logkopieren_callback():
         root.clipboard_clear()
@@ -296,17 +301,24 @@ def gui():
     btn_dateiname = tkinter.Button(frame, text="...", command=btn_dateiname_callback)
     btn_dateiname.grid(row=0, column=2, sticky=tkinter.W)
 
+    lbl_bedingungen = tkinter.Label(frame, text="Bedingungsdatei (fuer Profis): ")
+    lbl_bedingungen.grid(row=10, column=0, sticky=tkinter.W)
+    ent_bedingungen = tkinter.Entry(frame, width=50)
+    ent_bedingungen.grid(row=10, column=1, sticky=(tkinter.W,tkinter.E))
+    btn_bedingungen = tkinter.Button(frame, text="...", command=btn_bedingungen_callback)
+    btn_bedingungen.grid(row=10, column=2, sticky=tkinter.W)
+
     var_nummerieren = tkinter.BooleanVar()
     chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (3D-Editor 3.1.0.4+)", variable=var_nummerieren)
-    chk_nummerieren.grid(row=1, column=1, columnspan=2, sticky=tkinter.W)
+    chk_nummerieren.grid(row=20, column=1, columnspan=2, sticky=tkinter.W)
 
     var_debug = tkinter.BooleanVar()
     chk_debug = tkinter.Checkbutton(frame, text="Debug-Ausgaben anzeigen", variable=var_debug)
-    chk_debug.grid(row=2, column=1, columnspan=2, sticky=tkinter.W)
+    chk_debug.grid(row=30, column=1, columnspan=2, sticky=tkinter.W)
 
     var_vergleiche = tkinter.BooleanVar()
     chk_vergleiche = tkinter.Checkbutton(frame, text="Nichts schreiben, stattdessen erzeugte Fahrstrassen mit existierenden vergleichen", variable=var_vergleiche)
-    chk_vergleiche.grid(row=3, column=1, columnspan=2, sticky=tkinter.W)
+    chk_vergleiche.grid(row=40, column=1, columnspan=2, sticky=tkinter.W)
 
     btn_start = tkinter.Button(frame, text="Start", command=btn_start_callback)
     btn_start.grid(row=98, columnspan=3, sticky='we')
