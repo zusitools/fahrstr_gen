@@ -438,6 +438,7 @@ st3_attrib_order = {
     "InfoGegenRichtung": ["vMax", "km", "pos", "Reg", "KoppelWeicheNr", "KoppelWeicheNorm"],
     "InfoNormRichtung": ["vMax", "km", "pos", "Reg", "KoppelWeicheNr", "KoppelWeicheNorm"],
     "Kachelpfad": ["Dateiname", "NurInfo"],
+    "KoppelSignal": ["ReferenzNr"],
     "lookat": ["X", "Y", "Z"],
     "MatrixEintrag": ["Signalbild", "MatrixGeschw", "SignalID"],
     "MondTex": ["Dateiname", "NurInfo"],
