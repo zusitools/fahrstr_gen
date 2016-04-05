@@ -208,7 +208,6 @@ class FahrstrassenSuche:
                         if zeile_ersatzsignal is None:
                             logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Die Signalverknuepfung wird nicht eingerichtet.".format(result.name, result.rgl_ggl))
                         else:
-                            # TODO Richtungsanzeiger
                             result.signale.append(FahrstrHauptsignal(result.start, zeile_ersatzsignal, True))
                     else:
                         if zeile_regulaer is None:
