@@ -75,7 +75,7 @@ def finde_fahrstrassen(args):
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
                 strecke.remove(fahrstrasse_alt)
             for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
-                logging.info(fahrstrasse_neu.name)
+                logging.info("Fahrstrasse erzeugt: {}".format(fahrstrasse_neu.name))
                 strecke.append(fahrstrasse_neu.to_xml())
             fp = tempfile.NamedTemporaryFile('wb', delete = False)
             with fp:
