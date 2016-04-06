@@ -355,7 +355,7 @@ class Signal:
                 spalte_kleinergleich = idx
                 geschw_kleinergleich = vsig_geschw
 
-        if geschw_kleinergleich == 0 and spalte_kleinergleich != 0 and not self.vsig_verkn_warnung:
+        if spalte_kleinergleich is not None and geschw_kleinergleich == 0 and spalte_kleinergleich != 0 and not self.vsig_verkn_warnung:
             logging.warn("{}: Spalte mit Geschwindigkeit 0 ist nicht erste Spalte, dies wuerde im 3D-Editor momentan zu einer fehlerhaften Vorsignalverknuepfung fuehren.".format(self))
             self.vsig_verkn_warnung = True
 
