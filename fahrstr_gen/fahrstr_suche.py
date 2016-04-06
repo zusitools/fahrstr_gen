@@ -203,7 +203,7 @@ class FahrstrassenSuche:
                         logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.rgl_ggl))
                         nutze_ersatzsignal = False
                     elif not nutze_ersatzsignal and zeile_regulaer is None:
-                        logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_geschw(result.signalgeschwindigkeit)))
+                        logging.warn("{}: Startsignal hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
                         nutze_ersatzsignal = True
 
                     if nutze_ersatzsignal:
@@ -217,7 +217,7 @@ class FahrstrassenSuche:
                             result.signale.append(FahrstrHauptsignal(result.start, zeile_ersatzsignal, True))
                     else:
                         if zeile_regulaer is None:
-                            logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_geschw(result.signalgeschwindigkeit)))
+                            logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
                             return None
                         else:
                             zeile_regulaer = result.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, result.rgl_ggl, result.richtungsanzeiger)
@@ -240,7 +240,7 @@ class FahrstrassenSuche:
                         break
 
                 if not gefunden:
-                    logging.error("{}: Kennlichtsignal {} an Element {} hat keine Zeile fuer Kennlicht (Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), einzelfahrstrasse.start))
+                    logging.error("{}: Kennlichtsignal {} an Element {} hat keine Zeile fuer Kennlicht (Typ {}, Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), einzelfahrstrasse.start, str_fahrstr_typ(self.fahrstr_typ)))
                     return None
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
@@ -269,7 +269,7 @@ class FahrstrassenSuche:
                     else:
                         zeile = signal_verkn.refpunkt.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
                         if zeile is None:
-                            logging.warn("{}: Signal {} ({}) hat keine Zeile fuer Geschwindigkeit {}".format(result.name, signal_verkn.refpunkt.signal(), signal_verkn.refpunkt, str_geschw(result.signalgeschwindigkeit)))
+                            logging.warn("{}: Signal {} ({}) hat keine Zeile fuer Typ {}, Geschwindigkeit {} und wird daher nicht in der Fahrstrasse verknuepft.".format(result.name, signal_verkn.refpunkt.signal(), signal_verkn.refpunkt, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
                         else:
                             zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, result.rgl_ggl, result.richtungsanzeiger)
                             result.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))
@@ -312,6 +312,7 @@ class FahrstrassenSuche:
                                     spalte = idx
                                     break
                             if spalte is None:
+                                # Das ist ziemlich normal, etwa bei 500-Hz-Magneten.
                                 logging.debug("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(result.name, vsig.signal(), vsig.element_richtung, result.signalgeschwindigkeit))
                         if spalte is None:
                             spalte = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit)
