@@ -14,7 +14,15 @@ FAHRSTR_TYP_RANGIER = 2
 FAHRSTR_TYP_ZUG = 4
 FAHRSTR_TYP_LZB = 8
 
-FAHRSTR_TYP_VORSIGNALE = -1  # Spezieller Fahrstrassentyp zum Aufbau eines Vorsignal-Streckengraphen fuer Zug- und LZB-Fahrstrassen
+def str_fahrstr_typ(typ):
+    if typ == FAHRSTR_TYP_FAHRWEG:
+        return "Fahrweg"
+    elif typ == FAHRSTR_TYP_RANGIER:
+        return "Rangierfahrt"
+    elif typ == FAHRSTR_TYP_ZUG:
+        return "Zugfahrt"
+    elif typ == FAHRSTR_TYP_LZB:
+        return "LZB"
 
 EREIGNIS_SIGNALGESCHWINDIGKEIT = 1
 EREIGNIS_SIGNALHALTFALL = 3

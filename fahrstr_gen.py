@@ -56,8 +56,17 @@ def finde_fahrstrassen(args):
     vorsignal_graph = VorsignalGraph()
     flankenschutz_graph = FlankenschutzGraph()
 
-    for fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]:
-        logging.debug("Generiere Fahrstrassen vom Typ {}".format(fahrstr_typ))
+    fahrstr_typen = []
+    for s in map(lambda s: s.lower().strip(), args.fahrstr_typen.split(",")):
+        if s.startswith("r"):
+            fahrstr_typen.append(FAHRSTR_TYP_RANGIER)
+        elif s.startswith("z"):
+            fahrstr_typen.append(FAHRSTR_TYP_ZUG)
+        elif s.startswith("l"):
+            fahrstr_typen.append(FAHRSTR_TYP_LZB)
+
+    for fahrstr_typ in fahrstr_typen:
+        logging.debug("Generiere Fahrstrassen vom Typ {}".format(str_fahrstr_typ(fahrstr_typ)))
         fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen,
                 vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
                 flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None)
@@ -370,6 +379,7 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
         parser.add_argument('dateiname')
         parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
+        parser.add_argument('--fahrstr_typen', default="zug,lzb", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, lzb)")
         parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
         parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
         parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
