@@ -53,7 +53,7 @@ class Fahrstrasse:
             result.attrib["FahrstrTyp"] = "TypLZB"
 
         if self.zufallswert != 0:
-            result.set("ZufallsWert", "{:g}".format(self.zufallswert))
+            result.set("ZufallsWert", "{:f}".format(self.zufallswert).rstrip('0').rstrip('.'))
         if self.rgl_ggl != 0:
             result.set("RglGgl", str(self.rgl_ggl))
         if len(self.streckenname) > 0:

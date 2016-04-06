@@ -318,7 +318,7 @@ class Signal:
         if self.zeilen[zeilenidx_original].fahrstr_typ != 0:
             hsig_begriff_knoten.set("FahrstrTyp", str(self.zeilen[zeilenidx_original].fahrstr_typ))
         if self.zeilen[zeilenidx_original].hsig_geschw != 0:
-            hsig_begriff_knoten.set("HsigGeschw", str(self.zeilen[zeilenidx_original].hsig_geschw))
+            hsig_begriff_knoten.set("HsigGeschw", "{:f}".format(self.zeilen[zeilenidx_original].hsig_geschw).rstrip('0').rstrip('.'))
         kindknoten_einfuegen(self.xml_knoten, hsig_begriff_knoten, -1)
 
         # Neue <MatrixEintrag>-Knoten
@@ -395,7 +395,7 @@ class Signal:
         # Neuer <VsigBegriff>-Knoten
         vsig_begriff_knoten = ET.Element("VsigBegriff")
         if self.spalten[spaltenidx_original] != 0:
-            vsig_begriff_knoten.set("VsigGeschw", str(self.spalten[spaltenidx_original]))
+            vsig_begriff_knoten.set("VsigGeschw", "{:f}".format(self.spalten[spaltenidx_original]).rstrip('0').rstrip('.'))
         kindknoten_einfuegen(self.xml_knoten, vsig_begriff_knoten, -1)
 
         # Neue <MatrixEintrag>-Knoten
