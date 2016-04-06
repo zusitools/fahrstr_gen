@@ -368,7 +368,7 @@ if __name__ == '__main__':
         logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
 
         if args.profile == 'profile':
-            import profile, pstats
+            import cProfile as profile, pstats
             p = profile.Profile()
             p.run('finde_fahrstrassen(args)')
             s = pstats.Stats(p)
