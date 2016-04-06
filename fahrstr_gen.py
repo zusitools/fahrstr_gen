@@ -311,6 +311,10 @@ def gui():
         try:
             args = namedtuple('args', ['dateiname', 'modus', 'nummerieren', 'bedingungen', 'flankenschutz'])
             args.dateiname = ent_dateiname.get()
+            args.fahrstr_typen = ",".join([
+                "r" if var_typ_rangier.get() else "",
+                "z" if var_typ_zug.get() else "",
+                "l" if var_typ_lzb.get() else ""])
             args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
             args.nummerieren = var_nummerieren.get()
             args.flankenschutz = var_flankenschutz.get()
@@ -354,6 +358,24 @@ def gui():
     ent_bedingungen.grid(row=10, column=1, sticky=(tkinter.W,tkinter.E))
     btn_bedingungen = tkinter.Button(frame, text="...", command=btn_bedingungen_callback)
     btn_bedingungen.grid(row=10, column=2, sticky=tkinter.W)
+
+    frame_fahrstr_typen = tkinter.Frame(frame)
+
+    var_typ_rangier = tkinter.BooleanVar()
+    chk_typ_rangier = tkinter.Checkbutton(frame_fahrstr_typen, text="Rangierfahrstrassen", variable=var_typ_rangier)
+    chk_typ_rangier.grid(row=0, column=1, sticky=tkinter.W)
+
+    var_typ_zug = tkinter.BooleanVar()
+    var_typ_zug.set(True)
+    chk_typ_zug = tkinter.Checkbutton(frame_fahrstr_typen, text="Zugfahrstrassen", variable=var_typ_zug)
+    chk_typ_zug.grid(row=0, column=2, sticky=tkinter.W)
+
+    var_typ_lzb = tkinter.BooleanVar()
+    var_typ_lzb.set(True)
+    chk_typ_lzb = tkinter.Checkbutton(frame_fahrstr_typen, text="LZB-Fahrstrassen", variable=var_typ_lzb)
+    chk_typ_lzb.grid(row=0, column=3, sticky=tkinter.W)
+
+    frame_fahrstr_typen.grid(row=15, column=1, sticky=(tkinter.W,tkinter.E))
 
     var_nummerieren = tkinter.BooleanVar()
     chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (3D-Editor 3.1.0.4+)", variable=var_nummerieren)
