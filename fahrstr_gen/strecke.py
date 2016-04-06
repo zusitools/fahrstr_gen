@@ -492,22 +492,25 @@ def _escape(txt):
 
 # Schreibt eine Streckendatei im selben Format wie Zusi, um Diffs zu minimieren:
 # Keine Einrueckung, Attributreihenfolge gleich, Zeilenende CR+LF.
-def writeuglyxml(fp, elem):
+def writeuglyxml(fp, elem, start=True, buf=[]):
     tag = elem.tag
     try:
         attrib_order = st3_attrib_order[tag]
     except KeyError:
         attrib_order = []
 
-    fp.write(u"<{}".format(tag).encode("utf-8"))
+    buf.append(u"<{}".format(tag))
 
     for k, v in sorted(elem.attrib.items(), key = lambda i: 9999 if i[0] not in attrib_order else attrib_order.index(i[0])):
-      fp.write(u" {}=\"{}\"".format(k, _escape(v)).encode("utf-8"))
+      buf.append(u" {}=\"{}\"".format(k, _escape(v)))
 
     if len(elem):
-      fp.write(u">\r\n".encode("utf-8"))
+      buf.append(u">\r\n")
       for child in elem:
-        writeuglyxml(fp, child)
-      fp.write(u"</{}>\r\n".format(tag).encode("utf-8"))
+        writeuglyxml(fp, child, False, buf)
+      buf.append(u"</{}>\r\n".format(tag))
     else:
-      fp.write(u"/>\r\n".encode("utf-8"))
+      buf.append(u"/>\r\n")
+
+    if start:
+        fp.write(''.join(buf).encode("utf-8"))
