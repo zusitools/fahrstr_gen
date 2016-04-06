@@ -103,7 +103,7 @@ def finde_fahrstrassen(args):
             modulverwaltung.dieses_modul.schreibe_moduldatei()
 
             for modul in modulverwaltung.module.values():
-                if modul.geaendert and modul != modulverwaltung.dieses_modul:
+                if modul is not None and modul.geaendert and modul != modulverwaltung.dieses_modul:
                     if abfrage_janein("Modul {} wurde bei der Fahrstrassenerzeugung ebenfalls geaendert. Aenderungen speichern?".format(modul.dateiname)):
                         modul.schreibe_moduldatei()
 
