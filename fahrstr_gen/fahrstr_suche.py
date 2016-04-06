@@ -198,10 +198,10 @@ class FahrstrassenSuche:
                     nutze_ersatzsignal = result.ziel.signal().ist_hilfshauptsignal
 
                     if nutze_ersatzsignal and zeile_ersatzsignal is None:
-                        logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Zwecks Kompatibilitaet mit Zusi wird die regulaere Matrix angesteuert.".format(result.name, result.rgl_ggl))
+                        logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.rgl_ggl))
                         nutze_ersatzsignal = False
                     elif not nutze_ersatzsignal and zeile_regulaer is None:
-                        logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Zwecks Kompatibilitaet mit Zusi wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_geschw(result.signalgeschwindigkeit)))
+                        logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_geschw(result.signalgeschwindigkeit)))
                         nutze_ersatzsignal = True
 
                     if nutze_ersatzsignal:
@@ -240,7 +240,7 @@ class FahrstrassenSuche:
                     if zeile.hsig_geschw == -999.0:
                         result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
-                            logging.info("{}: Signal {} an Element {} (Ref. {}) wird in Zusi momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.element_richtung, result.ziel.refnr))
+                            logging.info("{}: Signal {} an Element {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.element_richtung, result.ziel.refnr))
                         break
 
             for kante in einzelfahrstrasse.kantenliste():
