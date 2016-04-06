@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
-from fahrstr_gen import modulverwaltung, streckengraph, strecke
+from fahrstr_gen import modulverwaltung
 from fahrstr_gen.konstanten import *
-from fahrstr_gen.strecke import writeuglyxml, ist_hsig_fuer_fahrstr_typ, Element
+from fahrstr_gen.strecke import ist_hsig_fuer_fahrstr_typ, Element
 from fahrstr_gen.fahrstr_suche import FahrstrassenSuche
 from fahrstr_gen.fahrstr_graph import FahrstrGraph
 from fahrstr_gen.vorsignal_graph import VorsignalGraph
@@ -11,8 +11,6 @@ from fahrstr_gen.flankenschutz_graph import FlankenschutzGraph
 import xml.etree.ElementTree as ET
 import argparse
 import operator
-import tempfile
-import shutil
 import os
 import sys
 from collections import defaultdict, namedtuple
@@ -20,6 +18,7 @@ from collections import defaultdict, namedtuple
 import logging
 import tkinter
 import tkinter.filedialog
+import tkinter.messagebox
 import tkinter.ttk
 
 def refpunkt_fmt(refpunkt):
@@ -28,9 +27,20 @@ def refpunkt_fmt(refpunkt):
         pfad = pfad[pfad.rfind('\\')+1:]
     return "({},{})".format(pfad, refpunkt[0])
 
+def abfrage_janein_cli(frage):
+    antwort = '?'
+    while antwort not in "jn":
+        antwort = input(frage + " [j/n] ")
+    return antwort == 'j'
+
+def abfrage_janein_gui(frage):
+    return tkinter.messagebox.askyesno("Frage", frage)
+
+abfrage_janein = abfrage_janein_cli
+
 def finde_fahrstrassen(args):
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
-    modulverwaltung.dieses_modul = modulverwaltung.Modul(dieses_modul_relpath.replace('/', '\\'), ET.parse(args.dateiname).getroot())
+    modulverwaltung.dieses_modul = modulverwaltung.Modul(args.dateiname, dieses_modul_relpath)
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 
     loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
@@ -81,13 +91,12 @@ def finde_fahrstrassen(args):
             for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
                 logging.info("Fahrstrasse erzeugt: {}".format(fahrstrasse_neu.name))
                 strecke.append(fahrstrasse_neu.to_xml())
-            fp = tempfile.NamedTemporaryFile('wb', delete = False)
-            with fp:
-                fp.write(b"\xef\xbb\xbf")
-                fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
-                writeuglyxml(fp, modulverwaltung.dieses_modul.root)
-            shutil.copyfile(fp.name, args.dateiname)
-            os.remove(fp.name)
+            modulverwaltung.dieses_modul.schreibe_moduldatei()
+
+            for modul in modulverwaltung.module.values():
+                if modul.geaendert and modul != modulverwaltung.dieses_modul:
+                    if abfrage_janein("Modul {} wurde bei der Fahrstrassenerzeugung ebenfalls geaendert. Aenderungen speichern?".format(modul.dateiname)):
+                        modul.schreibe_moduldatei()
 
         elif args.modus == 'vergleiche':
             logging.info("Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.")
@@ -297,6 +306,9 @@ def gui():
     def btn_logkopieren_callback():
         root.clipboard_clear()
         root.clipboard_append(ent_log.text.get(1.0, tkinter.END))
+
+    global abfrage_janein
+    abfrage_janein = abfrage_janein_gui
 
     root = tkinter.Tk()
     root.wm_title("Fahrstrassengenerierung")

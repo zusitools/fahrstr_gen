@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
 import xml.etree.ElementTree as ET
-import sys
 import os
-import io
-import argparse
-import math
+import tempfile
+import shutil
 from collections import defaultdict
 
 from .konstanten import *
@@ -92,9 +90,6 @@ class RefPunkt(object):
         node.attrib["Ref"] = str(self.refnr)
         ET.SubElement(node, 'Datei', { "Dateiname": self.element_richtung.element.modul.relpath, "NurInfo": "1" })
 
-def normalize_zusi_relpath(relpath):
-    return relpath.upper().replace('/', '\\')
-
 # aus zusicommon
 # From the first key in "keys" that contains a value, returns a dictionary
 # with the values indexed by "valuenames"
@@ -160,11 +155,17 @@ def get_zusi_datapath():
     except ImportError:
         return ""
 
+# Konvertiert einen Dateisystempfad in einen Pfad relativ zum Zusi-Dateiverzeichnis mit Backslash als Verzeichnistrenner.
 def get_zusi_relpath(realpath):
     if not os.path.isabs(realpath):
         realpath = os.path.abspath(realpath)
-    return os.path.relpath(realpath, get_zusi_datapath())
+    return os.path.relpath(realpath, get_zusi_datapath()).replace('/', '\\')
 
+# Gibt eine kanonische Version des angegebenen Zusi-Pfades zurueck.
+def normalize_zusi_relpath(relpath):
+    return relpath.upper().lstrip('\\').strip()
+
+# Konvertiert einen Zusi-Pfad (relativ zum Zusi-Datenverzeichnis) in einen Pfad auf dem aktuellen Dateisystem.
 def get_abspath(zusi_relpath):
     return path_insensitive(os.path.join(get_zusi_datapath(), zusi_relpath.lstrip('\\').strip().replace('\\', os.sep)))
 
@@ -174,18 +175,19 @@ module = dict()
 dieses_modul = None
 
 class Modul:
-    def __init__(self, relpath, root):
+    def __init__(self, dateiname, relpath):
         from .strecke import Element, ElementUndRichtung  # get around circular dependency by deferring the import to here
 
+        self.dateiname = dateiname
         self.relpath = relpath
-        self.root = root
-        self.streckenelemente = dict(
+        self.root = ET.parse(dateiname).getroot() # XML-Knoten
+        self.streckenelemente = dict(  # Nr -> StrElement
             (int(s.get("Nr", 0)), Element(self, s))
-            for s in root.findall("./Strecke/StrElement")
+            for s in self.root.findall("./Strecke/StrElement")
         )
 
-        self.referenzpunkte = defaultdict(list)
-        for r in root.findall("./Strecke/ReferenzElemente"):
+        self.referenzpunkte = defaultdict(list)  # Element -> [RefPunkt]
+        for r in self.root.findall("./Strecke/ReferenzElemente"):
             try:
                 element = self.streckenelemente[int(r.get("StrElement", 0))]
                 self.referenzpunkte[element].append(RefPunkt(
@@ -196,10 +198,12 @@ class Modul:
             except KeyError:
                 logging.debug("Referenzpunkt {} in Modul {} verweist auf ungueltiges Streckenelement {}".format(int(r.get("ReferenzNr", 0)), self.relpath, int(r.get("StrElement", 0))))
 
-        self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)
-        self.signale = dict()
+        self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)  # Nr -> RefPunkt
+        self.signale = dict()  # <Signal>-Knoten -> Signal
 
-    def get_signal(self, xml_knoten):
+        self.geaendert = False
+
+    def get_signal(self, element, xml_knoten):
         if xml_knoten is None:
             return None
 
@@ -207,25 +211,37 @@ class Modul:
             return self.signale[xml_knoten]
         except KeyError:
             from .strecke import Signal  # get around circular dependency by deferring the import to here
-            result = Signal(xml_knoten)
+            result = Signal(element, xml_knoten)
             self.signale[xml_knoten] = result
             return result
 
     def name_kurz(self):
         return os.path.basename(self.relpath.replace('\\', os.sep))
 
+    def schreibe_moduldatei(self):
+        from .strecke import writeuglyxml
+
+        fp = tempfile.NamedTemporaryFile('wb', delete = False)
+        with fp:
+            fp.write(b"\xef\xbb\xbf")
+            fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
+            writeuglyxml(fp, self.root)
+        shutil.copyfile(fp.name, self.dateiname)
+        os.remove(fp.name)
+
 # Sucht Knoten ./Datei und liefert Modul oder None zurueck (leerer String oder nicht vorhandener Knoten = Fallback)
 def get_modul_aus_dateiknoten(knoten, fallback):
     datei = knoten.find("./Datei")
     if datei is not None and "Dateiname" in datei.attrib:
-        modul_relpath = normalize_zusi_relpath(datei.attrib["Dateiname"])
-        if modul_relpath not in module:
-            dateiname = get_abspath(datei.attrib["Dateiname"])
+        relpath = datei.attrib["Dateiname"]
+        relpath_norm = normalize_zusi_relpath(relpath)
+        if relpath_norm not in module:
+            dateiname = get_abspath(relpath)
             try:
-                logging.debug("Lade Modul {}".format(datei.attrib["Dateiname"]))
-                module[modul_relpath] = Modul(datei.attrib["Dateiname"], ET.parse(dateiname))
+                logging.debug("Lade Modul {}".format(relpath))
+                module[relpath_norm] = Modul(dateiname, relpath)
             except FileNotFoundError:
                 logging.warn("Moduldatei {} nicht gefunden".format(dateiname))
-                module[modul_relpath] = None
-        return module[modul_relpath]
+                module[relpath_norm] = None
+        return module[relpath_norm]
     return fallback
