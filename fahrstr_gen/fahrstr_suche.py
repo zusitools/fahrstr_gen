@@ -137,7 +137,9 @@ class FahrstrassenSuche:
             fahrstr_abschliessen, fahrstr_weiterfuehren))
 
         if fahrstr_abschliessen:
-            ziel_liste.append(self._neue_fahrstrasse(einzelfahrstr_liste))
+            fstr = self._neue_fahrstrasse(einzelfahrstr_liste)
+            if fstr is not None:
+                ziel_liste.append(fstr)
         if fahrstr_weiterfuehren:
             for einzelfahrstrasse in self._get_einzelfahrstrassen(zielknoten, zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
@@ -206,12 +208,17 @@ class FahrstrassenSuche:
 
                     if nutze_ersatzsignal:
                         if zeile_ersatzsignal is None:
-                            logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Die Signalverknuepfung wird nicht eingerichtet.".format(result.name, result.rgl_ggl))
+                            if result.rgl_ggl == GLEIS_GEGENGLEIS:
+                                logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile mit Ereignis \"Gegengleis kennzeichnen\" (fuer RglGgl-Angabe {}). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, result.rgl_ggl))
+                            else:
+                                logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile ohne Ereignis \"Gegengleis kennzeichnen\" (fuer RglGgl-Angabe {}). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, result.rgl_ggl))
+                            return None
                         else:
                             result.signale.append(FahrstrHauptsignal(result.start, zeile_ersatzsignal, True))
                     else:
                         if zeile_regulaer is None:
-                            logging.warn("{}: Startsignal hat keine Zeile fuer Geschwindigkeit {}. Die Signalverknuepfung wird nicht eingerichtet.".format(result.name, str_geschw(result.signalgeschwindigkeit)))
+                            logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_geschw(result.signalgeschwindigkeit)))
+                            return None
                         else:
                             zeile_regulaer = result.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, result.rgl_ggl, result.richtungsanzeiger)
                             result.signale.append(FahrstrHauptsignal(result.start, zeile_regulaer, False))
@@ -222,17 +229,19 @@ class FahrstrassenSuche:
                     if zeile.hsig_geschw == -2.0:
                         refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
                         if refpunkt is None:
-                            logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(einzelfahrstrasse.start))
+                            logging.error("{}: Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start))
+                            return None
                         else:
                             kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, result.rgl_ggl, result.richtungsanzeiger)
                             if idx != kennlichtsignal_zeile:
-                                logging.info("{}: Kennlichtsignal {} an Element {} (Ref. {}) wird in Zusi nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.element_richtung, refpunkt.refnr))
+                                logging.info("{}: Kennlichtsignal {} an Element {} (Ref. {}) wuerde vom Zusi-3D-Editor nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.element_richtung, refpunkt.refnr))
                             result.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
                         break
 
                 if not gefunden:
-                    logging.warn("{}: An Signal {} wurde keine Kennlichtzeile (Geschwindigkeit -2) gefunden".format(result.name, einzelfahrstrasse.start.signal()))
+                    logging.error("{}: Kennlichtsignal {} an Element {} hat keine Zeile fuer Kennlicht (Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), einzelfahrstrasse.start))
+                    return None
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
             if idx == len(einzelfahrstrassen) - 1:
