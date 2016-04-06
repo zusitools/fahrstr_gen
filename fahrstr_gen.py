@@ -256,11 +256,25 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
     class Handler(logging.Handler):
         def __init__(self, widget):
             logging.Handler.__init__(self)
-            self.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
             self.widget = widget
 
+            self.widget.tag_config("error", foreground="red")
+            self.widget.tag_config("warning", foreground="orange")
+            self.widget.tag_config("info", foreground="blue")
+            self.widget.tag_config("debug", foreground="gray")
+
         def emit(self, record):
-            self.widget.insert(tkinter.END, self.format(record) + "\n")
+            if record.levelno == logging.ERROR:
+                self.widget.insert(tkinter.END, "Fehler: ", "error")
+            elif record.levelno == logging.WARNING:
+                self.widget.insert(tkinter.END, "Warnung: ", "warning")
+            elif record.levelno == logging.INFO:
+                self.widget.insert(tkinter.END, "Info: ", "info")
+            elif record.levelno == logging.DEBUG:
+                self.widget.insert(tkinter.END, "Debug: ", "debug")
+            else:
+                self.widget.insert(tkinter.END, record.levelname + ": ")
+            self.widget.insert(tkinter.END, record.getMessage() + "\n")
             self.widget.see(tkinter.END)
 
     def __init__(self, *args, **kwargs):
