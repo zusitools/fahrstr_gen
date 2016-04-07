@@ -71,7 +71,6 @@ class Element:
     def ereignisse(self, richtung):
         key = 1 if richtung == NORM else 0
         if self._ereignisse[key] is None:
-            # TODO: eventuell auch Ereignisse in Signalen beachten?
             # Die Sortierung dient primaer dazu, die Reihenfolge von Ereignissen deterministisch zu halten.
             # Damit kann man sich z.B. darauf verlassen, dass Ereignisse "Signalhaltfall" immer vor Ereignissen "Fahrstrasse aufloesen" gefunden werden.
             self._ereignisse[key] = sorted(findall_2(self.xml_knoten, "InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung", "Ereignis"), key = lambda n: int(n.get("Er", 0)))
