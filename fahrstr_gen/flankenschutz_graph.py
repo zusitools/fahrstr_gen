@@ -55,6 +55,8 @@ class FlankenschutzGraphKnoten(Knoten):
         result = []
         for nach_idx, nachfolger in enumerate(self.element.nachfolger(richtung)):
             if nach_idx != idx:
+                # Suche die naechste stumpf befahrene Weiche.
+                # Brich ab nach mehr als 200 Metern (Regeldurchrutschweg) oder bei einem Knoten (Signal/Gleissperre/spitz befahrene Weiche).
                 element_richtung_vorgaenger = self.element.richtung(richtung)
                 element_richtung = nachfolger
                 laenge = 0
@@ -79,12 +81,16 @@ class FlankenschutzGraphKnoten(Knoten):
                     if len(vorgaenger_liste) > 2:
                         logging.warn("Element {} hat mehr als zwei Vorgaenger und wird daher beim Flankenschutz nicht beruecksichtigt.".format(element_richtung))
                     elif len(vorgaenger_liste) > 1:
+                        if element_richtung.element.hat_koppelweiche(gegenrichtung(element_richtung.richtung)):
+                            logging.debug("Element {} hat eine Koppelweiche und wird daher beim Flankenschutz nicht beruecksichtigt.".format(element_richtung))
+                            continue
+
                         try:
                             vorgaenger_index = vorgaenger_liste.index(element_richtung_vorgaenger)
                         except ValueError:
                             logging.warn(("Stellung der stumpf befahrenen Weiche an Element {} von Element {} kommend konnte nicht ermittelt werden. " +
                                     "Die Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung, element_richtung_vorgaenger))
-                            return
+                            continue
 
                         weichen_refpunkt = element_richtung.element.refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
                         if weichen_refpunkt is None:

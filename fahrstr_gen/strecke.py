@@ -89,6 +89,18 @@ class Element:
                 return refpunkt
         return None
 
+    def registernr(self, richtung):
+        for n in self.xml_knoten:
+            if n.tag == ("InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung"):
+                return int(n.get("Reg", 0))
+        return 0
+
+    def hat_koppelweiche(self, richtung):
+        for n in self.xml_knoten:
+            if n.tag == ("InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung"):
+                return int(n.get("KoppelWeicheNr", 0)) != 0
+        return False
+
     def nachfolger(self, richtung):
         key = 1 if richtung == NORM else 0
         if self._nachfolger[key] is None:
@@ -143,10 +155,10 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'
         return self.element.refpunkt(self.richtung, typ)
 
     def registernr(self):
-        for n in self.element.xml_knoten:
-            if n.tag == ("InfoNormRichtung" if self.richtung == NORM else "InfoGegenRichtung"):
-                return int(n.get("Reg", 0))
-        return 0
+        return self.element.registernr(self.richtung)
+
+    def hat_koppelweiche(self):
+        return self.element.hat_koppelweiche(self.richtung)
 
     def ereignisse(self):
         return self.element.ereignisse(self.richtung)
