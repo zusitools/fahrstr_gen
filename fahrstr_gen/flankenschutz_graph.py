@@ -76,7 +76,9 @@ class FlankenschutzGraphKnoten(Knoten):
 
                 if element_richtung is not None:
                     vorgaenger_liste = element_richtung.vorgaenger()
-                    if len(vorgaenger_liste) > 1:
+                    if len(vorgaenger_liste) > 2:
+                        logging.warn("Element {} hat mehr als zwei Vorgaenger und wird daher beim Flankenschutz nicht beruecksichtigt.".format(element_richtung))
+                    elif len(vorgaenger_liste) > 1:
                         try:
                             vorgaenger_index = vorgaenger_liste.index(element_richtung_vorgaenger)
                         except ValueError:
@@ -89,6 +91,6 @@ class FlankenschutzGraphKnoten(Knoten):
                             logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                                     "Diese Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung))
                         else:
-                            result.append(FahrstrFlankenschutzWeichenstellung(weichen_refpunkt, len(vorgaenger_liste) if vorgaenger_index == 0 else 1, laenge))
+                            result.append(FahrstrFlankenschutzWeichenstellung(weichen_refpunkt, 2 if vorgaenger_index == 0 else 1, laenge))
 
         return result
