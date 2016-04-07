@@ -488,7 +488,7 @@ st3_attrib_order = {
 }
 
 def _escape(txt):
-    # TODO: das ist nicht die beste Escape-Funktion, aber Zusi macht auch nicht viel mehr.
+    # Nicht die beste Escape-Funktion, aber Zusi macht auch nicht viel mehr.
     # Zur Performance siehe http://stackoverflow.com/a/27086669/1083696 (die Strings in Zusi-XML-Dateien sind eher kurz)
     if "&" in txt:
         txt = txt.replace("&", "&amp;")
