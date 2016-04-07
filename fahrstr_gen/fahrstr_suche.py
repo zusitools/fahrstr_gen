@@ -229,13 +229,13 @@ class FahrstrassenSuche:
                         else:
                             kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, result.rgl_ggl, result.richtungsanzeiger)
                             if idx != kennlichtsignal_zeile:
-                                logging.info("{}: Kennlichtsignal {} an Element {} (Ref. {}) wuerde vom Zusi-3D-Editor nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.element_richtung, refpunkt.refnr))
+                                logging.info("{}: Kennlichtsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.refnr))
                             result.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
                         break
 
                 if not gefunden:
-                    logging.error("{}: Kennlichtsignal {} an Element {} hat keine Zeile fuer Kennlicht (Typ {}, Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), einzelfahrstrasse.start, str_fahrstr_typ(self.fahrstr_typ)))
+                    logging.error("{}: Kennlichtsignal ({}) hat keine Zeile fuer Kennlicht (Typ {}, Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), str_fahrstr_typ(self.fahrstr_typ)))
                     return None
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
@@ -244,7 +244,7 @@ class FahrstrassenSuche:
                     if zeile.hsig_geschw == -999.0:
                         result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
-                            logging.info("{}: Signal {} an Element {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.element_richtung, result.ziel.refnr))
+                            logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
                         break
 
             for kante in einzelfahrstrasse.kantenliste():
@@ -264,7 +264,7 @@ class FahrstrassenSuche:
                     else:
                         zeile = signal_verkn.refpunkt.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
                         if zeile is None:
-                            logging.warn("{}: Signal {} ({}) hat keine Zeile fuer Typ {}, Geschwindigkeit {} und wird daher nicht in der Fahrstrasse verknuepft.".format(result.name, signal_verkn.refpunkt.signal(), signal_verkn.refpunkt, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
+                            logging.warn("{}: {} hat keine Zeile fuer Typ {}, Geschwindigkeit {} und wird daher nicht in der Fahrstrasse verknuepft.".format(result.name, signal_verkn.refpunkt.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
                         else:
                             zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, result.rgl_ggl, result.richtungsanzeiger)
                             result.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))

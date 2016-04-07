@@ -198,6 +198,10 @@ class Signal:
     def __init__(self, element_richtung, xml_knoten):
         self.element_richtung = element_richtung
         self.xml_knoten = xml_knoten
+
+        self.betrst = self.xml_knoten.get("NameBetriebsstelle", "")
+        self.name = self.xml_knoten.get("Signalname", "")
+
         self.zeilen = []
         self.spalten = []
         self.signalgeschwindigkeit = None
@@ -240,10 +244,13 @@ class Signal:
                                 self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
 
     def __repr__(self):
-        return "{} an Element {}".format(self.signalbeschreibung(), self.element_richtung)
+        if self.betrst == "" and self.name == "":
+            return "Signal an Element {}".format(self.element_richtung)
+        else:
+            return "Signal {} {} an Element {}".format(self.betrst, self.name, self.element_richtung)
 
     def signalbeschreibung(self):
-        return "{} {}".format(self.xml_knoten.get("NameBetriebsstelle", ""), self.xml_knoten.get("Signalname"))
+        return "{} {}".format(self.betrst, self.name)
 
     def hat_zeile_fuer_fahrstr_typ(self, fahrstr_typ):
         return any(z.fahrstr_typ & fahrstr_typ != 0 for z in self.zeilen)

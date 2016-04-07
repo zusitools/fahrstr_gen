@@ -135,25 +135,25 @@ class FahrstrGraphKnoten(Knoten):
                 if signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
                     if zeile is None:
-                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                        logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                     else:
-                        logging.debug("Signal an Element {}: LZB-Hauptsignal bei Nicht-LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(element_richtung, zeile))
+                        logging.debug("{}: LZB-Hauptsignal bei Nicht-LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                         verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER):
                     if signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
                         zeile = signal.get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1)
                         if zeile is None:
-                            logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                            logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                         else:
-                            logging.debug("Signal an Element {}: Rangiersignal bei Zug- oder LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(element_richtung, zeile))
+                            logging.debug("{}: Rangiersignal bei Zug- oder LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                             verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG):
                     if signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
                         zeile = signal.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
                         if zeile is None:
-                            logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                            logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                         else:
-                            logging.debug("Signal an Element {}: Fahrwegsignal (ausser Weichenanimation) bei Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(element_richtung, zeile))
+                            logging.debug("{}: Fahrwegsignal (ausser Weichenanimation) bei Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                             verkn = True
 
                 # Signale, die mehr als eine Zeile haben, stehen potenziell auf der falschen Zeile (z.B. durch Verknuepfung aus anderen Fahrstrassen)
@@ -161,17 +161,18 @@ class FahrstrGraphKnoten(Knoten):
                 # Betrachte aber nur Signale, die zumindest eine Zeile fuer den aktuellen Fahrstrassentyp besitzen.
                 elif len(signal.zeilen) >= 2 and any(zeile.fahrstr_typ & self.graph.fahrstr_typ != 0 for zeile in signal.zeilen):
                     verkn = True
-                    logging.debug("Signal an Element {}: hat mehr als eine Zeile (Zeile noch unbekannt)".format(element_richtung))
+                    logging.debug("{}: hat mehr als eine Zeile (Zeile noch unbekannt)".format(signal))
                     # Zeile muss ermittelt werden
 
                 # Signale, die einen Richtungs- oder Gegengleisanzeiger haben
+                # TODO: eventuell nicht fuer Rangierfahrstrassen?
                 elif signal.gegengleisanzeiger != 0 or len(signal.richtungsanzeiger) > 0:
                     verkn = True
-                    logging.debug("Signal an Element {}: hat Richtungs- oder Gegengleisanzeiger (Zeile noch unbekannt)".format(element_richtung))
+                    logging.debug("{}: hat Richtungs- oder Gegengleisanzeiger (Zeile noch unbekannt)".format(signal))
                     # Zeile muss ermittelt werden
 
                 else:
-                    logging.debug("Signal an Element {}: wird nicht in die Fahrstrasse aufgenommen".format(element_richtung))
+                    logging.debug("{}: wird nicht in die Fahrstrasse aufgenommen".format(signal))
 
                 if verkn:
                     refpunkt = element_richtung.refpunkt(REFTYP_SIGNAL)
@@ -193,7 +194,7 @@ class FahrstrGraphKnoten(Knoten):
                 else:
                     zeile = signal_gegenrichtung.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
                     if zeile is None:
-                        logging.warn("Signal an Element {} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung_gegenrichtung))
+                        logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Fahrweg und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal_gegenrichtung))
                     else:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
 
@@ -281,7 +282,7 @@ class FahrstrGraphKnoten(Knoten):
 
                     try:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, int(ereignis.get("Beschr", "")), False))
-                        logging.debug("Signal an Element {}: wird per \"Signal an Fahrstrasse verknuepfen\" an Element {} in dessen Fahrstrassen aufgenommen".format(refpunkt.element_richtung, element_richtung))
+                        logging.debug("{}: wird per \"Signal an Fahrstrasse verknuepfen\" an Element {} in dessen Fahrstrassen aufgenommen".format(refpunkt.signal(), element_richtung))
                     except ValueError:
                         logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
