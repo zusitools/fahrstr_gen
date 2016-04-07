@@ -117,16 +117,11 @@ class FahrstrassenSuche:
 
         if zielsignal.sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0:
             # Fahrstrasse nur abschliessen, wenn schon ein Signal mit "Kennlichtschaltung Nachfolgersignal" aufgenommen wurde.
+            # Das ist genau dann der Fall, wenn wir mehr als eine Einzelfahrstrasse haben.
             # Ansonsten Fahrstrasse weiterfuehren.
-
-            # Wenn mehr als eine Einzelfahrstrasse vorhanden ist, dann ist auf jeden Fall ein Kennlichtsignal beteiligt.
             if len(einzelfahrstr_liste) == 1:
-                # TODO: Laut Zusi-Dokumentation muesste man jetzt pruefen, ob das Startsignal "Kennlichtschaltung mit Nachfolgesignal" hat.
-                # Zusi verhaelt sich hier aber anders als seine Dokumentation und ueberspringt diesen Check ganz.
-                #startsignal = einzelfahrstr_liste[0].start.signal()
-                #if startsignal is not None and startsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0:
-                    fahrstr_abschliessen = False
-                    fahrstr_weiterfuehren = True
+                fahrstr_abschliessen = False
+                fahrstr_weiterfuehren = True
 
         if zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
             fahrstr_weiterfuehren = True
