@@ -199,21 +199,7 @@ class Modul:
                 logging.debug("Referenzpunkt {} in Modul {} verweist auf ungueltiges Streckenelement {}".format(int(r.get("ReferenzNr", 0)), self.relpath, int(r.get("StrElement", 0))))
 
         self.referenzpunkte_by_nr = dict((r.refnr, r) for rs in self.referenzpunkte.values() for r in rs)  # Nr -> RefPunkt
-        self.signale = dict()  # <Signal>-Knoten -> Signal
-
         self.geaendert = False
-
-    def get_signal(self, element, xml_knoten):
-        if xml_knoten is None:
-            return None
-
-        try:
-            return self.signale[xml_knoten]
-        except KeyError:
-            from .strecke import Signal  # get around circular dependency by deferring the import to here
-            result = Signal(element, xml_knoten)
-            self.signale[xml_knoten] = result
-            return result
 
     def name_kurz(self):
         return os.path.basename(self.relpath.replace('\\', os.sep))

@@ -80,7 +80,8 @@ class Element:
         key = 1 if richtung == NORM else 0
         if not self._signal_gesucht[key]:
             self._signal_gesucht[key] = True
-            self._signal[key] = self.modul.get_signal(self, find_2(self.xml_knoten, "InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung", "Signal"))
+            signal_xml_knoten = find_2(self.xml_knoten, "InfoNormRichtung" if richtung == NORM else "InfoGegenRichtung", "Signal")
+            self._signal[key] = Signal(self.richtung(richtung), signal_xml_knoten) if signal_xml_knoten is not None else None
         return self._signal[key]
 
     def refpunkt(self, richtung, typ):
@@ -194,8 +195,8 @@ SignalZeile = namedtuple('SignalZeile', ['fahrstr_typ', 'hsig_geschw'])
 Ereignis = namedtuple('Ereignis', ['nr', 'wert', 'beschr'])
 
 class Signal:
-    def __init__(self, element, xml_knoten):
-        self.element = element
+    def __init__(self, element_richtung, xml_knoten):
+        self.element_richtung = element_richtung
         self.xml_knoten = xml_knoten
         self.zeilen = []
         self.spalten = []
@@ -239,7 +240,7 @@ class Signal:
                                 self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
 
     def __repr__(self):
-        return self.signalbeschreibung()
+        return "{} an Element {}".format(self.signalbeschreibung(), self.element_richtung)
 
     def signalbeschreibung(self):
         return "{} {}".format(self.xml_knoten.get("NameBetriebsstelle", ""), self.xml_knoten.get("Signalname"))
@@ -338,7 +339,7 @@ class Signal:
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
             kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, -1)
 
-        self.element.modul.geaendert = True
+        self.element_richtung.element.modul.geaendert = True
 
         return len(self.zeilen) - 1
 
@@ -415,7 +416,7 @@ class Signal:
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
             kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, idx * (len(self.spalten) + 1) + (len(self.spalten) - 1))
 
-        self.element.modul.geaendert = True
+        self.element_richtung.element.modul.geaendert = True
 
         self.spalten.append(self.spalten[spaltenidx_original])
         return len(self.spalten) - 1
