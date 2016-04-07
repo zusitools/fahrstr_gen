@@ -174,36 +174,36 @@ def finde_fahrstrassen(args):
                 register_alt = set((int(register_alt.get("Ref", 0)), register_alt.find("./Datei").get("Dateiname", "").upper()) for register_alt in fahrstr_alt.iterfind("./FahrstrRegister"))
                 register_neu = set((register_neu.refnr, register_neu.element_richtung.element.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
 
-                for refpunkt in register_alt - register_neu:
+                for refpunkt in sorted(register_alt - register_neu, key = operator.itemgetter(0)):
                     logging.info("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in register_neu - register_alt:
+                for refpunkt in sorted(register_neu - register_alt, key = operator.itemgetter(0)):
                     logging.info("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Aufloesepunkte
                 aufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrAufloesung"))
                 aufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
 
-                for refpunkt in aufloesepunkte_alt - aufloesepunkte_neu:
+                for refpunkt in sorted(aufloesepunkte_alt - aufloesepunkte_neu, key = operator.itemgetter(0)):
                     logging.info("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in aufloesepunkte_neu - aufloesepunkte_alt:
+                for refpunkt in sorted(aufloesepunkte_neu - aufloesepunkte_alt, key = operator.itemgetter(0)):
                     logging.info("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Signalhaltfallpunkte
                 sighaltfallpunkte_alt = set((int(haltfall.get("Ref", 0)), haltfall.find("./Datei").get("Dateiname", "").upper()) for haltfall in fahrstr_alt.iterfind("./FahrstrSigHaltfall"))
                 sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.element_richtung.element.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
 
-                for refpunkt in sighaltfallpunkte_alt - sighaltfallpunkte_neu:
+                for refpunkt in sorted(sighaltfallpunkte_alt - sighaltfallpunkte_neu, key = operator.itemgetter(0)):
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in sighaltfallpunkte_neu - sighaltfallpunkte_alt:
+                for refpunkt in sorted(sighaltfallpunkte_neu - sighaltfallpunkte_alt, key = operator.itemgetter(0)):
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Teilaufloesepunkte
                 teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
 
-                for refpunkt in teilaufloesepunkte_alt - teilaufloesepunkte_neu:
+                for refpunkt in sorted(teilaufloesepunkte_alt - teilaufloesepunkte_neu, key = operator.itemgetter(0)):
                     logging.info("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in teilaufloesepunkte_neu - teilaufloesepunkte_alt:
+                for refpunkt in sorted(teilaufloesepunkte_neu - teilaufloesepunkte_alt, key = operator.itemgetter(0)):
                     logging.info("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Weichen
