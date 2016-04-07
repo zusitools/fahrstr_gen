@@ -169,7 +169,7 @@ def normalize_zusi_relpath(relpath):
 def get_abspath(zusi_relpath):
     return path_insensitive(os.path.join(get_zusi_datapath(), zusi_relpath.lstrip('\\').strip().replace('\\', os.sep)))
 
-# Modulname -> (Modul oder None, wenn das Modul nicht existiert)
+# Relativer Zusi-Pfad -> (Modul oder None, wenn das Modul nicht existiert)
 module = dict()
 
 dieses_modul = None
