@@ -49,7 +49,7 @@ class VorsignalGraphKnoten(Knoten):
     def get_vorsignal_kanten(self, richtung):
         key = 0 if richtung == NORM else 1
         if self.vorsignal_kanten[key] is None:
-            # TODO: Vorher keine Vsig-Verknuepfung im Element selbst?
+            # "Vorher keine Vsig-Verknuepfung" im Element selbst hat keine Auswirkung.
             logging.debug("Suche Vorsignal-Kanten ab {}".format(self.richtung(richtung)))
             self.vorsignal_kanten[key] = []
             for v in self.element.richtung(richtung).vorgaenger():
