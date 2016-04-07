@@ -175,6 +175,13 @@ class FahrstrassenSuche:
                 if kante.richtungsanzeiger != "":
                     result.richtungsanzeiger = kante.richtungsanzeiger
 
+        if result.start is None:
+            logging.error("{}: Startelement {} hat keinen Referenzpunkt mit Typ Signal. Die Fahrstrasse wird nicht eingerichtet.")
+            return None
+        if result.ziel is None:
+            logging.error("{}: Zielelement {} hat keinen Referenzpunkt mit Typ Signal. Die Fahrstrasse wird nicht eingerichtet.")
+            return None
+
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         if result.ziel.signal().signalgeschwindigkeit is not None:
             result.signalgeschwindigkeit = result.ziel.signal().signalgeschwindigkeit
