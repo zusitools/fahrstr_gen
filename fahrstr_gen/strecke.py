@@ -508,13 +508,12 @@ def writeuglyxml(fp, elem):
     do_writeuglyxml(fp, elem, True, [])
 
 def do_writeuglyxml(fp, elem, start=True, buf=[]):
-    tag = elem.tag
     try:
-        attrib_order = st3_attrib_order[tag]
+        attrib_order = st3_attrib_order[elem.tag]
     except KeyError:
         attrib_order = []
 
-    buf.append(u"<{}".format(tag))
+    buf.append(u"<{}".format(elem.tag))
 
     for k, v in sorted(elem.attrib.items(), key = lambda i: 9999 if i[0] not in attrib_order else attrib_order.index(i[0])):
       buf.append(u" {}=\"{}\"".format(k, _escape(v)))
@@ -523,7 +522,7 @@ def do_writeuglyxml(fp, elem, start=True, buf=[]):
       buf.append(u">\r\n")
       for child in elem:
         do_writeuglyxml(fp, child, False, buf)
-      buf.append(u"</{}>\r\n".format(tag))
+      buf.append(u"</{}>\r\n".format(elem.tag))
     else:
       buf.append(u"/>\r\n")
 
