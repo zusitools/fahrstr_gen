@@ -515,7 +515,7 @@ def do_writeuglyxml(fp, elem, start=True, buf=[]):
 
     buf.append(u"<{}".format(elem.tag))
 
-    for k, v in sorted(elem.attrib.items(), key = lambda i: 9999 if i[0] not in attrib_order else attrib_order.index(i[0])):
+    for k, v in sorted(elem.items(), key = lambda i: 9999 if i[0] not in attrib_order else attrib_order.index(i[0])):
       buf.append(u" {}=\"{}\"".format(k, _escape(v)))
 
     if len(elem):
