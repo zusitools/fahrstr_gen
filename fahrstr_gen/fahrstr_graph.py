@@ -25,7 +25,7 @@ class FahrstrGraph(Streckengraph):
                 super()._ist_knoten(element) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(NORM), self.fahrstr_typ) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), self.fahrstr_typ) or
-                (self.fahrstr_typ == FAHRSTR_TYP_ZUG and any(refpunkt.reftyp == REFTYP_AUFGLEISPUNKT for refpunkt in element.modul.referenzpunkte[element])))
+                (self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_RANGIER] and any(refpunkt.reftyp == REFTYP_AUFGLEISPUNKT for refpunkt in element.modul.referenzpunkte[element])))
 
 # Eine Kante zwischen zwei Knoten im Streckengraphen. Sie enthaelt alle fahrstrassenrelevanten Daten (Signale, Weichen, Aufloesepunkte etc.)
 # einer Folge von gerichteten Streckenelementen zwischen den beiden Knoten (exklusive Start, inklusive Ziel, inklusive Start-Weichenstellung).

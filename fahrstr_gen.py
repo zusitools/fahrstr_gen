@@ -80,7 +80,7 @@ def finde_fahrstrassen(args):
             if str_element in modulverwaltung.dieses_modul.referenzpunkte:
                 for richtung in [NORM, GEGEN]:
                     if any(
-                            (fahrstr_typ == FAHRSTR_TYP_ZUG and r.reftyp == REFTYP_AUFGLEISPUNKT)
+                            (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_RANGIER] and r.reftyp == REFTYP_AUFGLEISPUNKT)
                             or (r.reftyp == REFTYP_SIGNAL and ist_hsig_fuer_fahrstr_typ(r.signal(), fahrstr_typ))
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.element_richtung.richtung == richtung
                         ):
