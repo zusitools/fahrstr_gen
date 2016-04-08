@@ -115,20 +115,25 @@ def finde_fahrstrassen(args):
 
             alt_vs_neu = defaultdict(dict)
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
-                alt_vs_neu[fahrstrasse_alt.attrib["FahrstrName"]]["alt"] = fahrstrasse_alt
+                alt_vs_neu[(fahrstrasse_alt.get("FahrstrTyp", ""), fahrstrasse_alt.get("FahrstrName", ""))]["alt"] = fahrstrasse_alt
             for fahrstrasse_neu in fahrstrassen:
-                alt_vs_neu[fahrstrasse_neu.name]["neu"] = fahrstrasse_neu
+                if fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_RANGIER:
+                    alt_vs_neu[("TypRangier", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
+                elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_ZUG:
+                    alt_vs_neu[("TypZug", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
+                elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_LZB:
+                    alt_vs_neu[("TypLZB", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
 
-            for name, fahrstrassen in sorted(alt_vs_neu.items(), key = operator.itemgetter(0)):
+            for (typ, name), fahrstrasse in sorted(alt_vs_neu.items(), key = operator.itemgetter(0)):
                 try:
-                    fahrstr_alt = fahrstrassen["alt"]
+                    fahrstr_alt = fahrstrasse["alt"]
                 except KeyError:
-                    logging.info("{} existiert in Zusi nicht".format(name))
+                    logging.info("Fahrstrasse {} ({}) existiert in Zusi nicht".format(name, typ))
                     continue
                 try:
-                    fahrstr_neu = fahrstrassen["neu"]
+                    fahrstr_neu = fahrstrasse["neu"]
                 except KeyError:
-                    logging.info("{} existiert in Zusi, wurde aber nicht erzeugt".format(name))
+                    logging.info("Fahrstrasse {} ({}) existiert in Zusi, wurde aber nicht erzeugt".format(name, typ))
                     continue
 
                 laenge_alt = float(fahrstr_alt.get("Laenge", 0))
@@ -137,14 +142,6 @@ def finde_fahrstrassen(args):
                     # Wir berechnen exklusive Start, inklusive Ziel, was richtiger scheint.
                     # logging.info("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
                     pass
-
-                fahrstr_typ = fahrstr_alt.get("FahrstrTyp", "")
-                if fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_RANGIER and fahrstr_typ != "TypRangier":
-                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypRangier".format(name, fahrstr_typ))
-                elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_ZUG and fahrstr_typ != "TypZug":
-                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypZug".format(name, fahrstr_typ))
-                elif fahrstr_neu.fahrstr_typ == FAHRSTR_TYP_LZB and fahrstr_typ != "TypLZB":
-                    logging.info("{}: unterschiedlicher Fahrstrassentyp: {} vs TypLZB".format(name, fahrstr_typ))
 
                 rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
                 if fahrstr_neu.rgl_ggl != rgl_ggl_alt:
