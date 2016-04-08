@@ -192,7 +192,6 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
 SignalZeile = namedtuple('SignalZeile', ['fahrstr_typ', 'hsig_geschw'])
-Ereignis = namedtuple('Ereignis', ['nr', 'wert', 'beschr'])
 
 class Signal:
     def __init__(self, element_richtung, xml_knoten):
