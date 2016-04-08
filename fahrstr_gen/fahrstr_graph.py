@@ -366,7 +366,7 @@ class FahrstrGraphKnoten(Knoten):
             kante.ziel.knoten.markiere_besucht()
             if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG):
                 if not aufloesepunkt_gefunden:
-                    logging.warn("Es gibt einen Fahrweg zwischen den Signalen {} ({}) und {} ({}), der keinen Aufloesepunkt (fuer am ersten Signal endende Fahrstrassen) enthaelt.".format(self.signal(startrichtung), self.richtung(startrichtung), kante.ziel.signal(), kante.ziel))
+                    logging.warn("Es gibt einen Fahrweg zwischen {} und {}, der keinen Aufloesepunkt (fuer am ersten Signal endende Fahrstrassen) enthaelt.".format(self.signal(startrichtung), kante.ziel.signal()))
             else:
                 for kante in kante.ziel.knoten.get_nachfolger_kanten(kante.ziel.richtung):
                     self._get_aufloesepunkte_rek(startrichtung, kante, result_liste)
