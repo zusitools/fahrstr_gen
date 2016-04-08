@@ -261,7 +261,7 @@ class FahrstrassenSuche:
                         zielsignal_angesteuert = True
                         break
 
-            if not zielsignal_angesteuert and self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and result.ziel.signal().sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
+            if not zielsignal_angesteuert and self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and result.ziel.signal().sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and result.ziel.signal().get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1) is not None:
                 logging.info("{}: Zielsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
 
             for kante in einzelfahrstrasse.kantenliste():
