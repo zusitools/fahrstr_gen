@@ -246,13 +246,18 @@ class FahrstrassenSuche:
                     return None
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
+            zielsignal_angesteuert = False
             if idx == len(einzelfahrstrassen) - 1:
                 for idx, zeile in enumerate(result.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
                         result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
                             logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
+                        zielsignal_angesteuert = True
                         break
+
+            if not zielsignal_angesteuert and self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and result.ziel.signal().sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
+                logging.info("{}: Zielsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
 
             for kante in einzelfahrstrasse.kantenliste():
                 result.register.extend(kante.register)
