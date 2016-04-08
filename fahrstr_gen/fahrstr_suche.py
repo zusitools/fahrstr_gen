@@ -11,12 +11,13 @@ from . import modulverwaltung
 import logging
 
 class FahrstrassenSuche:
-    def __init__(self, fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph):
+    def __init__(self, fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph, loeschfahrstr_namen):
         self.einzelfahrstrassen = dict()  # KnotenUndRichtung -> [EinzelFahrstrasse]
         self.fahrstr_typ = fahrstr_typ
         self.bedingungen = bedingungen
         self.vorsignal_graph = vorsignal_graph
         self.flankenschutz_graph = flankenschutz_graph
+        self.loeschfahrstr_namen = loeschfahrstr_namen
 
     # Gibt alle vom angegebenen Knoten ausgehenden (kombinierten) Fahrstrassen in der angegebenen Richtung zurueck.
     def get_fahrstrassen(self, knoten, richtung):
@@ -174,6 +175,10 @@ class FahrstrassenSuche:
                     result.streckenname = kante.streckenname
                 if kante.richtungsanzeiger != "":
                     result.richtungsanzeiger = kante.richtungsanzeiger
+
+        if result.name in self.loeschfahrstr_namen:
+            logging.info("Loesche Fahrstrasse {}".format(result.name))
+            return None
 
         if result.start is None:
             logging.error("{}: Startelement {} hat keinen Referenzpunkt mit Typ Signal. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrassen[0].start))

@@ -72,7 +72,8 @@ def finde_fahrstrassen(args):
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(str_fahrstr_typ(fahrstr_typ)))
         fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen,
                 vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
-                flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None)
+                flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None,
+                loeschfahrstrassen_namen)
         graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
@@ -85,15 +86,12 @@ def finde_fahrstrassen(args):
                         ):
 
                         for f in fahrstr_suche.get_fahrstrassen(graph.get_knoten(str_element), richtung):
-                            if f.name in loeschfahrstrassen_namen:
-                                logging.info("Loesche Fahrstrasse: {}".format(f.name))
-                            else:
-                                if args.nummerieren:
-                                    idx = len(fahrstrassen_nummerierung[(f.start, f.ziel)])
-                                    if idx != 0:
-                                        f.name += " ({})".format(idx)
-                                    fahrstrassen_nummerierung[(f.start, f.ziel)].append(f)
-                                fahrstrassen.append(f)
+                            if args.nummerieren:
+                                idx = len(fahrstrassen_nummerierung[(f.start, f.ziel)])
+                                if idx != 0:
+                                    f.name += " ({})".format(idx)
+                                fahrstrassen_nummerierung[(f.start, f.ziel)].append(f)
+                            fahrstrassen.append(f)
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
     if strecke is not None:
