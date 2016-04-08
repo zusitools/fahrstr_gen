@@ -11,7 +11,7 @@ from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenste
 import logging
 
 # Ein Streckengraph, der zum Aufbau von Fahrstrassen eines bestimmten Typs benutzt wird.
-# Knoten sind zusaetzlich Hauptsignale fuer den gewuenschten Typ sowie, im Falle von Zugfahrstrassen, Aufgleispunkte.
+# Knoten sind zusaetzlich Hauptsignale fuer den gewuenschten Typ sowie Aufgleispunkte.
 class FahrstrGraph(Streckengraph):
     def __init__(self, fahrstr_typ):
         super().__init__()
