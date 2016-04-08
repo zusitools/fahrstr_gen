@@ -300,7 +300,7 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
         self.logging_handler.setLevel(level)
 
 def gui():
-    def btn_start_callback():
+    def btn_start_callback(vergleiche):
         ent_log.logging_handler.setLevel(logging.DEBUG if var_debug.get() else logging.INFO)
         ent_log.clear()
 
@@ -311,7 +311,7 @@ def gui():
                 "r" if var_typ_rangier.get() else "",
                 "z" if var_typ_zug.get() else "",
                 "l" if var_typ_lzb.get() else ""])
-            args.modus = 'vergleiche' if var_vergleiche.get() else 'schreibe'
+            args.modus = 'vergleiche' if vergleiche else 'schreibe'
             args.nummerieren = var_nummerieren.get()
             args.flankenschutz = var_flankenschutz.get()
             args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
@@ -385,12 +385,15 @@ def gui():
     chk_debug = tkinter.Checkbutton(frame, text="Debug-Ausgaben anzeigen", variable=var_debug)
     chk_debug.grid(row=30, column=1, columnspan=2, sticky=tkinter.W)
 
-    var_vergleiche = tkinter.BooleanVar()
-    chk_vergleiche = tkinter.Checkbutton(frame, text="Nichts schreiben, stattdessen erzeugte Fahrstrassen mit existierenden vergleichen", variable=var_vergleiche)
-    chk_vergleiche.grid(row=40, column=1, columnspan=2, sticky=tkinter.W)
+    frame_start = tkinter.Frame(frame)
+    frame_start.grid(row=98, columnspan=3, sticky='we')
+    frame_start.columnconfigure(0, weight=1)
+    frame_start.columnconfigure(1, weight=1)
 
-    btn_start = tkinter.Button(frame, text="Start", command=btn_start_callback)
-    btn_start.grid(row=98, columnspan=3, sticky='we')
+    btn_start_vergleiche = tkinter.Button(frame_start, text="Fahrstr. erzeugen + mit existierenden vergleichen", command=lambda : btn_start_callback(True))
+    btn_start_vergleiche.grid(row=0, column=0, sticky='we')
+    btn_start_schreibe = tkinter.Button(frame_start, text="Fahrstr. erzeugen + ST3-Datei schreiben", command=lambda : btn_start_callback(False))
+    btn_start_schreibe.grid(row=0, column=1, sticky='we')
 
     ent_log = LoggingHandlerFrame(frame)
     ent_log.grid(row=99, columnspan=3, sticky='wens')
