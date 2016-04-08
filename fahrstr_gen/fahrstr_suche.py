@@ -140,6 +140,11 @@ class FahrstrassenSuche:
             for einzelfahrstrasse in self._get_einzelfahrstrassen(zielknoten, zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
 
+    # Gibt zurueck, ob fuer das angegebene Signal die Warnung ausgegeben werden soll,
+    # dass es vom Zusi-3D-Editor auf einen Rangier-Fahrtbegriff gestellt werden wuerde.
+    def _rangiersignal_in_zugfahrstr_warnung(self, signal):
+        return self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and any(z.fahrstr_typ & FAHRSTR_TYP_RANGIER != 0 and z.hsig_geschw not in [0, -2, -999] for z in signal.zeilen)
+
     # Baut eine neue Fahrstrasse aus den angegebenen Einzelfahrstrassen zusammen.
     def _neue_fahrstrasse(self, einzelfahrstrassen):
         result = Fahrstrasse(self.fahrstr_typ)
@@ -250,19 +255,20 @@ class FahrstrassenSuche:
                     logging.error("{}: Kennlichtsignal ({}) hat keine Zeile fuer Kennlicht (Typ {}, Geschwindigkeit -2). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start.signal(), str_fahrstr_typ(self.fahrstr_typ)))
                     return None
 
+                if self._rangiersignal_in_zugfahrstr_warnung(einzelfahrstrasse.start.signal()):
+                    logging.warn("{}: Kennlichtsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Rangierfahrt-Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
+
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
-            zielsignal_angesteuert = False
             if idx == len(einzelfahrstrassen) - 1:
                 for idx, zeile in enumerate(result.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
                         result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
                             logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
-                        zielsignal_angesteuert = True
                         break
 
-            if not zielsignal_angesteuert and self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and result.ziel.signal().sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and result.ziel.signal().get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1) is not None:
-                logging.info("{}: Zielsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
+            if self._rangiersignal_in_zugfahrstr_warnung(result.ziel.signal()):
+                logging.warn("{}: Zielsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
 
             for kante in einzelfahrstrasse.kantenliste():
                 result.register.extend(kante.register)
