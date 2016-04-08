@@ -256,6 +256,7 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
     class Handler(logging.Handler):
         def __init__(self, widget):
             logging.Handler.__init__(self)
+            self.setFormatter(logging.Formatter("%(message)s"))
             self.widget = widget
 
             self.widget.tag_config("error", foreground="red")
@@ -274,7 +275,7 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
                 self.widget.insert(tkinter.END, "Debug: ", "debug")
             else:
                 self.widget.insert(tkinter.END, record.levelname + ": ")
-            self.widget.insert(tkinter.END, record.getMessage() + "\n")
+            self.widget.insert(tkinter.END, self.format(record) + "\n")
             self.widget.see(tkinter.END)
 
     def __init__(self, *args, **kwargs):
