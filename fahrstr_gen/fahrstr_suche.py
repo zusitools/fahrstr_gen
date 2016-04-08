@@ -199,7 +199,7 @@ class FahrstrassenSuche:
             for einzelfahrstrasse in einzelfahrstrassen:
                 result.signalgeschwindigkeit = geschw_min(result.signalgeschwindigkeit, einzelfahrstrasse.signalgeschwindigkeit)
 
-        logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\"".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger))
+        logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\", RglGgl {}".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger, result.rgl_ggl))
 
         flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
 
