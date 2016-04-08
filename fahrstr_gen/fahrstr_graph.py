@@ -326,7 +326,7 @@ class FahrstrGraphKnoten(Knoten):
             if len(ziel_vorgaenger) > 1:
                 weichen_refpunkt = self.graph.get_knoten(element_richtung.element).refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
                 if weichen_refpunkt is None:
-                    logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
+                    logging.warn(("Element {} hat mehr als einen Vorgaenger, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                             "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(element_richtung))
                     return None
 
