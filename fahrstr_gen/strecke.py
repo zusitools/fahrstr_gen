@@ -49,19 +49,18 @@ class Element:
 
     def laenge(self):
         if self._laenge is None:
-            p1 = [0, 0, 0]
-            p2 = [0, 0, 0]
-
-            for n in self.xml_knoten:
-                if n.tag == "b":
-                    p1[0] = float(n.get("X", 0))
-                    p1[1] = float(n.get("Y", 0))
-                    p1[2] = float(n.get("Z", 0))
-                elif n.tag == "g":
-                    p2[0] = float(n.get("X", 0))
-                    p2[1] = float(n.get("Y", 0))
-                    p2[2] = float(n.get("Z", 0))
-
+            b_knoten = self.xml_knoten.find("b")
+            g_knoten = self.xml_knoten.find("g")
+            try:
+                p1 = [float(b_knoten.get("X", 0)), float(b_knoten.get("Y", 0)), float(b_knoten.get("Z", 0))]
+                p2 = [float(g_knoten.get("X", 0)), float(g_knoten.get("Y", 0)), float(g_knoten.get("Z", 0))]
+            except AttributeError:
+                p1 = [0, 0, 0]
+                p2 = [0, 0, 0]
+                if b_knoten is not None:
+                    p1 = [float(b_knoten.get("X", 0)), float(b_knoten.get("Y", 0)), float(b_knoten.get("Z", 0))]
+                if g_knoten is not None:
+                    p2 = [float(g_knoten.get("X", 0)), float(g_knoten.get("Y", 0)), float(g_knoten.get("Z", 0))]
             self._laenge = math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2 + (p1[2]-p2[2])**2)
         return self._laenge
 
