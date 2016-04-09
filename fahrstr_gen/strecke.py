@@ -213,12 +213,17 @@ class Signal:
         self.hat_sigframes = False # Hat das Signal ueberhaupt Landschaftsdateien?
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
+        self.hsig_fuer = 0  # Fahrstrassentypen, fuer die dies ein Hauptsignal ist
 
         self.vsig_verkn_warnung = False # Wurde Warnung ausgegeben?
 
         for n in self.xml_knoten:
             if n.tag == "HsigBegriff":
-                self.zeilen.append(SignalZeile(int(n.get("FahrstrTyp", 0)), float(n.attrib.get("HsigGeschw", 0))))
+                fahrstr_typ = int(n.get("FahrstrTyp", 0))
+                hsig_geschw = float(n.get("HsigGeschw", 0))
+                if hsig_geschw == 0:
+                    self.hsig_fuer |= fahrstr_typ
+                self.zeilen.append(SignalZeile(fahrstr_typ, hsig_geschw))
             elif n.tag == "VsigBegriff":
                 self.spalten.append(float(n.attrib.get("VsigGeschw", 0)))
             elif n.tag == "SignalFrame":
@@ -251,11 +256,8 @@ class Signal:
     def signalbeschreibung(self):
         return "{} {}".format(self.betrst, self.name)
 
-    def hat_zeile_fuer_fahrstr_typ(self, fahrstr_typ):
-        return any(z.fahrstr_typ & fahrstr_typ != 0 for z in self.zeilen)
-
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
-        return any(z.hsig_geschw == 0 and (z.fahrstr_typ & fahrstr_typ != 0) for z in self.zeilen)
+        return self.hsig_fuer & fahrstr_typ != 0
 
     def ist_vsig(self):
         # Anders als in der Doku angegeben, ist fuer Zusi anscheinend nur relevant, ob das Signal eine
