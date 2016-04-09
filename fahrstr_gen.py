@@ -108,6 +108,12 @@ def finde_fahrstrassen(args):
                     if abfrage_janein("Modul {} wurde bei der Fahrstrassenerzeugung ebenfalls geaendert. Aenderungen speichern?".format(modul.dateiname)):
                         modul.schreibe_moduldatei()
 
+        elif args.modus == 'profile':
+            anzahl_elemente = 0
+            for modul in modulverwaltung.module.values():
+                anzahl_elemente += len(modul.streckenelemente)
+            logging.info("{} Streckenelemente in {} Modulen".format(anzahl_elemente, len(modulverwaltung.module)))
+
         elif args.modus == 'vergleiche':
             logging.info("Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.")
 
@@ -416,7 +422,7 @@ if __name__ == '__main__':
     else:
         parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
         parser.add_argument('dateiname')
-        parser.add_argument('--modus', choices=['schreibe', 'vergleiche'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
+        parser.add_argument('--modus', choices=['schreibe', 'vergleiche', 'profile'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
         parser.add_argument('--fahrstr_typen', default="zug,lzb", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, lzb)")
         parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
         parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
