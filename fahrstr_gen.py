@@ -331,7 +331,7 @@ def gui():
         ent_dateiname.insert(0, filename)
 
     def btn_bedingungen_callback():
-        filename = tkinter.filedialog.askopenfilename()
+        filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'))
         ent_bedingungen.delete(0, tkinter.END)
         ent_bedingungen.insert(0, filename)
 
