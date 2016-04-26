@@ -147,6 +147,7 @@ class FahrstrassenSuche:
 
     # Baut eine neue Fahrstrasse aus den angegebenen Einzelfahrstrassen zusammen.
     def _neue_fahrstrasse(self, einzelfahrstrassen):
+        assert(len(einzelfahrstrassen) > 0)
         result = Fahrstrasse(self.fahrstr_typ)
 
         # Setze Start und Ziel
@@ -203,6 +204,11 @@ class FahrstrassenSuche:
 
         flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
 
+        # Workaround fuer Bug/undokumentierte Beschraenkung in Zusi: Das Startsignal muss immer das letzte Signal in der Fahrstrasse sein.
+        # Ansonsten werden Ersatzsignale nicht korrekt angesteuert.
+        # Speichere es hier zwischen und fuege es am Ende hinzu.
+        startsignal_verkn = None
+
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             if idx == 0:
                 # Startsignal ansteuern
@@ -226,14 +232,14 @@ class FahrstrassenSuche:
                                 logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile ohne Ereignis \"Gegengleis kennzeichnen\" (fuer RglGgl-Angabe {}). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, result.rgl_ggl))
                             return None
                         else:
-                            result.signale.append(FahrstrHauptsignal(result.start, zeile_ersatzsignal, True))
+                            startsignal_verkn = FahrstrHauptsignal(result.start, zeile_ersatzsignal, True)
                     else:
                         if zeile_regulaer is None:
                             logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
                             return None
                         else:
                             zeile_regulaer = result.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, result.rgl_ggl, result.richtungsanzeiger)
-                            result.signale.append(FahrstrHauptsignal(result.start, zeile_regulaer, False))
+                            startsignal_verkn = FahrstrHauptsignal(result.start, zeile_regulaer, False)
             else:
                 # Kennlichtsignal ansteuern
                 gefunden = False
@@ -341,5 +347,8 @@ class FahrstrassenSuche:
                             logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(result.name, vsig.signal(), vsig.element_richtung, str_geschw(result.signalgeschwindigkeit)))
                         else:
                             result.vorsignale.append(FahrstrVorsignal(vsig, spalte))
+
+        if startsignal_verkn is not None:
+            result.signale.append(startsignal_verkn)
 
         return result
