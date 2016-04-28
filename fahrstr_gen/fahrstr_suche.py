@@ -324,7 +324,7 @@ class FahrstrassenSuche:
                     result.aufloesepunkte.append(aufl)
 
         # Vorsignale ansteuern. Erst *nach* Abarbeiten aller Einzelfahrstrassen, da deren Ereignisse "Vorsignal in Fahrstrasse verknuepfen" Prioritaet haben!
-        if self.vorsignal_graph is not None and result.start.reftyp == REFTYP_SIGNAL and len(result.signale) > 0 and not result.signale[0].ist_ersatzsignal:
+        if startsignal_verkn is not None and not startsignal_verkn.ist_ersatzsignal and self.vorsignal_graph is not None:
             vorsignal_knoten = self.vorsignal_graph.get_knoten(einzelfahrstrassen[0].start.knoten.element)
             if vorsignal_knoten is not None:
                 for vsig in vorsignal_knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
