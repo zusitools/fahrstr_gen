@@ -2,7 +2,7 @@
 
 from fahrstr_gen import modulverwaltung
 from fahrstr_gen.konstanten import *
-from fahrstr_gen.strecke import ist_hsig_fuer_fahrstr_typ, Element
+from fahrstr_gen.strecke import ist_fahrstr_start_sig, Element
 from fahrstr_gen.fahrstr_suche import FahrstrassenSuche
 from fahrstr_gen.fahrstr_graph import FahrstrGraph
 from fahrstr_gen.vorsignal_graph import VorsignalGraph
@@ -81,7 +81,7 @@ def finde_fahrstrassen(args):
                 for richtung in [NORM, GEGEN]:
                     if any(
                             (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_RANGIER] and r.reftyp == REFTYP_AUFGLEISPUNKT)
-                            or (r.reftyp == REFTYP_SIGNAL and ist_hsig_fuer_fahrstr_typ(r.signal(), fahrstr_typ))
+                            or (r.reftyp == REFTYP_SIGNAL and ist_fahrstr_start_sig(r.signal(), fahrstr_typ))
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.element_richtung.richtung == richtung
                         ):
 

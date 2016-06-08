@@ -258,6 +258,9 @@ class Signal:
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return self.hsig_fuer & fahrstr_typ != 0
 
+    def ist_fahrstr_start_sig(self, fahrstr_typ):
+        return self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ) and any(zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw != 0 for zeile in self.zeilen)
+
     def ist_vsig(self):
         # Anders als in der Doku angegeben, ist fuer Zusi anscheinend nur relevant, ob das Signal eine
         # Spalte fuer Geschwindigkeit != -1 hat, also auf die Geschwindigkeit des naechsten Hauptsignals
@@ -430,6 +433,9 @@ class Signal:
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
+
+def ist_fahrstr_start_sig(signal, fahrstr_typ):
+    return signal is not None and signal.ist_fahrstr_start_sig(fahrstr_typ)
 
 def ist_vsig(signal):
     return signal is not None and signal.ist_vsig()
