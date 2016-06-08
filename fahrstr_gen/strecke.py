@@ -443,6 +443,8 @@ def ist_vsig(signal):
 def gegenrichtung(richtung):
     return GEGEN if richtung == NORM else NORM
 
+str_rgl_ggl = lambda x : { GLEIS_REGELGLEIS: "Regelgleis", GLEIS_GEGENGLEIS: "Gegengleis", GLEIS_EINGLEISIG: "Eingleisige Strecke", GLEIS_BAHNHOF: "Innerhalb Bahnhof" }[x]
+
 st3_attrib_order = {
     "AutorEintrag": ["AutorID", "AutorName", "AutorEmail", "AutorAufwand", "AutorLizenz", "AutorBeschreibung"],
     "BefehlsKonfiguration": ["Dateiname", "NurInfo"],

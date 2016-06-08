@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
-from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_min, str_geschw, gegenrichtung
+from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
 from . import modulverwaltung
 
 import logging
@@ -218,7 +218,7 @@ class FahrstrassenSuche:
                     nutze_ersatzsignal = result.ziel.signal().ist_hilfshauptsignal
 
                     if nutze_ersatzsignal and zeile_ersatzsignal is None:
-                        logging.warn("{}: Startsignal hat keine Ersatzsignal-Zeile fuer RglGgl-Angabe {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.rgl_ggl))
+                        logging.warn("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
                         nutze_ersatzsignal = False
                     elif not nutze_ersatzsignal and zeile_regulaer is None:
                         logging.warn("{}: Startsignal hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
@@ -226,10 +226,7 @@ class FahrstrassenSuche:
 
                     if nutze_ersatzsignal:
                         if zeile_ersatzsignal is None:
-                            if result.rgl_ggl == GLEIS_GEGENGLEIS:
-                                logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile mit Ereignis \"Gegengleis kennzeichnen\" (fuer RglGgl-Angabe {}). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, result.rgl_ggl))
-                            else:
-                                logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile ohne Ereignis \"Gegengleis kennzeichnen\" (fuer RglGgl-Angabe {}). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, result.rgl_ggl))
+                            logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
                             return None
                         else:
                             startsignal_verkn = FahrstrHauptsignal(result.start, zeile_ersatzsignal, True)
@@ -337,7 +334,10 @@ class FahrstrassenSuche:
                                     break
                             if spalte is None:
                                 # Das ist ziemlich normal, etwa bei 500-Hz-Magneten.
-                                logging.debug("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(result.name, vsig.signal(), vsig.element_richtung, result.signalgeschwindigkeit))
+                                logging.debug("{}: An Signal {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(result.name, vsig.signal(), vsig.refnr, result.signalgeschwindigkeit))
+                                if vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) != vsig.signal().get_vsig_spalte(-1):
+                                    logging.warn("{}: An Signal {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Im Zusi-3D-Editor wuerde die Spalte mit der hoechsten Signalgeschwindigkeit angesteuert.".format(result.name, vsig.signal(), vsig.refnr))
+
                         if spalte is None:
                             spalte = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit)
 
