@@ -217,7 +217,8 @@ class FahrstrGraphKnoten(Knoten):
                         signalgeschwindigkeit = float(ereignis.get("Wert", 0))
                         if signalgeschwindigkeit <= 0:
                             logging.warn("Element {}: Ignoriere Ereignis \"Signalgeschwindigkeit\" mit Wert <= 0".format(element_richtung))
-                        kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, signalgeschwindigkeit)
+                        else:
+                            kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, signalgeschwindigkeit)
 
                 elif ereignis_nr == EREIGNIS_ENDE_WEICHENBEREICH:
                     hat_ende_weichenbereich = True # wird erst am Element danach wirksam
