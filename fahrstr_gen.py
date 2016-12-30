@@ -380,7 +380,7 @@ def gui():
     frame_fahrstr_typen.grid(row=15, column=1, sticky=(tkinter.W,tkinter.E))
 
     var_nummerieren = tkinter.BooleanVar()
-    chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (3D-Editor 3.1.0.4+)", variable=var_nummerieren)
+    chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (normalerweise nicht notwendig)", variable=var_nummerieren)
     chk_nummerieren.grid(row=20, column=1, columnspan=2, sticky=tkinter.W)
 
     var_flankenschutz = tkinter.BooleanVar()
