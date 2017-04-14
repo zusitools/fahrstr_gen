@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import argparse
 import operator
 import os
+import re
 import sys
 from collections import defaultdict, namedtuple
 
@@ -38,6 +39,12 @@ def abfrage_janein_gui(frage):
 
 abfrage_janein = abfrage_janein_cli
 
+nat_sort_regex = re.compile('(\d+)')
+
+def nat_sort_key(s):
+    # http://stackoverflow.com/a/5967539
+    return [(int(s) if s.isdigit() else s) for s in nat_sort_regex.split(s)]
+
 def fahrstr_sort_key(fahrstrasse):
     # Sortiere Aufgleisfahrstrassen an den Anfang, sortiert nach Zielsignal-Name
     # Sortiere restliche Fahrstrassen danach ein, sortiert nach Startsignal-Name.
@@ -45,9 +52,9 @@ def fahrstr_sort_key(fahrstrasse):
     #   mittels Tiefensuche ermittelt werden kann. Eine Tiefensuche, die dem Vorrangstrang der Weichen zuerst folgt,
     #   erfuellt dieses Kriterium in der Regel.
     if fahrstrasse.start.reftyp == REFTYP_AUFGLEISPUNKT:
-        return ("", fahrstrasse.ziel.signal().signalbeschreibung())
+        return ([], nat_sort_key(fahrstrasse.ziel.signal().signalbeschreibung()))
     else:
-        return (fahrstrasse.start.signal().signalbeschreibung(), "")
+        return (nat_sort_key(fahrstrasse.start.signal().signalbeschreibung()), [])
 
 def finde_fahrstrassen(args):
     modulverwaltung.module = dict()
