@@ -38,6 +38,17 @@ def abfrage_janein_gui(frage):
 
 abfrage_janein = abfrage_janein_cli
 
+def fahrstr_sort_key(fahrstrasse):
+    # Sortiere Aufgleisfahrstrassen an den Anfang, sortiert nach Zielsignal-Name
+    # Sortiere restliche Fahrstrassen danach ein, sortiert nach Startsignal-Name.
+    #   Fahrstrassen mit demselben Startsignal sollen so sortiert sein, dass der beste Fahrweg zu einem gegebenen Signal
+    #   mittels Tiefensuche ermittelt werden kann. Eine Tiefensuche, die dem Vorrangstrang der Weichen zuerst folgt,
+    #   erfuellt dieses Kriterium in der Regel.
+    if fahrstrasse.start.reftyp == REFTYP_AUFGLEISPUNKT:
+        return ("", fahrstrasse.ziel.signal().signalbeschreibung())
+    else:
+        return (fahrstrasse.start.signal().signalbeschreibung(), "")
+
 def finde_fahrstrassen(args):
     modulverwaltung.module = dict()
     modulverwaltung.dieses_modul = None
@@ -98,7 +109,9 @@ def finde_fahrstrassen(args):
         if args.modus == 'schreibe':
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
                 strecke.remove(fahrstrasse_alt)
-            for fahrstrasse_neu in sorted(fahrstrassen, key = lambda f: f.name):
+            # N.B. sort() und sorted() sind stabile Sortierverfahren.
+            # Das ist hier notwendig, da die Information ueber den Vorrangstrang nur implizit (ueber die Reihenfolge) in der Fahrstrassenliste enthalten ist.
+            for fahrstrasse_neu in sorted(fahrstrassen, key = fahrstr_sort_key):
                 logging.info("Fahrstrasse erzeugt: {}".format(fahrstrasse_neu.name))
                 strecke.append(fahrstrasse_neu.to_xml())
             modulverwaltung.dieses_modul.schreibe_moduldatei()
