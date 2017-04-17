@@ -355,7 +355,7 @@ class Signal:
 
     def get_hsig_ersatzsignal_zeile(self, rgl_ggl):
         for zeile, begriff in enumerate(self.xml_knoten.iterfind("./Ersatzsignal")):
-            if (rgl_ggl == GLEIS_GEGENGLEIS) ^ (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
+            if (rgl_ggl == GLEIS_GEGENGLEIS) != (begriff.find("./MatrixEintrag/Ereignis[@Er='28']") is None): \
                 return zeile
 
         return None
