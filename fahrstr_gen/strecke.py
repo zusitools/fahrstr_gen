@@ -101,6 +101,13 @@ class Element:
                 return int(n.get("KoppelWeicheNr", 0)) != 0
         return False
 
+    def pos_xy(self, richtung):
+        tag = "b" if richtung == NORM else "g"
+        for n in self.xml_knoten:
+            if n.tag == tag:
+                return (float(n.get("X", 0)), float(n.get("Y", 0)))
+        return (0, 0)
+
     def nachfolger(self, richtung):
         key = 1 if richtung == NORM else 0
         if self._nachfolger[key] is None:
@@ -202,6 +209,7 @@ class Signal:
 
         self.zeilen = []
         self.spalten = []
+        self.matrix = []
         self.signalgeschwindigkeit = None
         self.ist_hilfshauptsignal = False
         self.ist_gleissperre = False
@@ -228,6 +236,7 @@ class Signal:
             elif n.tag == "SignalFrame":
                 self.hat_sigframes = True
             elif n.tag == "MatrixEintrag":
+                self.matrix.append(n)
                 for ereignis in n:
                     if ereignis.tag == "Ereignis":
                         ereignisnr = int(ereignis.get("Er", 0))
@@ -256,6 +265,9 @@ class Signal:
 
     def signalbeschreibung(self):
         return "{} {}".format(self.betrst, self.name)
+
+    def matrix_geschw(self, zeile, spalte):
+        return float(self.matrix[zeile * len(self.spalten) + spalte].get("MatrixGeschw", 0))
 
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return self.hsig_fuer & fahrstr_typ != 0
@@ -317,10 +329,8 @@ class Signal:
         if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
             return zeilenidx_original
 
-        matrix = self.xml_knoten.findall("./MatrixEintrag")
-
         # Erweitere Signalbild der ersten Spalte der Originalzeile um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(matrix[zeilenidx_original * len(self.spalten)].get("Signalbild", 0))
+        zielsignalbild = int(self.matrix[zeilenidx_original * len(self.spalten)].get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
@@ -331,7 +341,7 @@ class Signal:
         # Suche existierende Zeile mit dem neuen Signalbild.
         zeile_original = self.zeilen[zeilenidx_original]
         for idx, zeile in enumerate(self.zeilen):
-            if zeile.fahrstr_typ == zeile_original.fahrstr_typ and zeile.hsig_geschw == zeile_original.hsig_geschw and int(matrix[idx * len(self.spalten)].get("Signalbild", 0)) == zielsignalbild:
+            if zeile.fahrstr_typ == zeile_original.fahrstr_typ and zeile.hsig_geschw == zeile_original.hsig_geschw and int(self.matrix[idx * len(self.spalten)].get("Signalbild", 0)) == zielsignalbild:
                 return idx
 
         # Nicht gefunden, Matrix erweitern.
@@ -346,10 +356,11 @@ class Signal:
         kindknoten_einfuegen(self.xml_knoten, hsig_begriff_knoten, -1)
 
         # Neue <MatrixEintrag>-Knoten
-        for eintrag in matrix[zeilenidx_original * len(self.spalten) : (zeilenidx_original+1) * len(self.spalten)]:
+        for eintrag in self.matrix[zeilenidx_original * len(self.spalten) : (zeilenidx_original+1) * len(self.spalten)]:
             neuer_eintrag = deepcopy(eintrag)
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
             kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, -1)
+            self.matrix.append(neuer_eintrag)
 
         self.element_richtung.element.modul.geaendert = True
 
@@ -362,15 +373,22 @@ class Signal:
 
         return None
 
-    # Gibt die Matrixspalte zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit != 0 angesteuert werden soll.
+    # Gibt die Matrixspalte zurueck, die in diesem Signal fuer die gegebene Geschwindigkeit angesteuert werden soll.
     # Das ist die Zeile mit der passenden oder naechstkleineren Geschwindigkeit.
     def get_vsig_spalte(self, zielgeschwindigkeit):
-        assert(zielgeschwindigkeit != 0)
+        if zielgeschwindigkeit == 0:
+            try:
+                return self.spalten.index(0)
+            except ValueError:
+                return None
+
         spalte_kleinergleich, geschw_kleinergleich = None, 0
 
         for idx, vsig_geschw in enumerate(self.spalten):
-            # Spalten fuer Spezialgeschwindigkeiten werden nicht betrachtet.
+            # Spalten fuer die Spezialgeschwindigkeit -2 werden nur betrachtet, wenn tatsaechlich nach dieser Geschwindigkeit gesucht wird.
             if vsig_geschw == -2.0:
+                if zielgeschwindigkeit == -2.0:
+                    return idx
                 continue
 
             if (geschw_kleiner(geschw_kleinergleich, vsig_geschw) and not geschw_kleiner(zielgeschwindigkeit, vsig_geschw)) or \
@@ -397,10 +415,8 @@ class Signal:
         if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
             return spaltenidx_original
 
-        matrix = self.xml_knoten.findall("./MatrixEintrag")
-
         # Erweitere Signalbild der ersten Zeile der Originalspalte um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(matrix[spaltenidx_original].get("Signalbild", 0))
+        zielsignalbild = int(self.matrix[spaltenidx_original].get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
@@ -410,11 +426,11 @@ class Signal:
 
         # Suche existierende Spalte mit dem neuen Signalbild.
         for idx, vsig_geschw in enumerate(self.spalten):
-            if vsig_geschw == self.spalten[spaltenidx_original] and int(matrix[idx].get("Signalbild", 0)) == zielsignalbild:
+            if vsig_geschw == self.spalten[spaltenidx_original] and int(self.matrix[idx].get("Signalbild", 0)) == zielsignalbild:
                 return idx
 
         # Nicht gefunden. Matrix erweitern.
-        assert(len(matrix) == len(self.zeilen) * len(self.spalten))
+        assert(len(self.matrix) == len(self.zeilen) * len(self.spalten))
 
         # Neuer <VsigBegriff>-Knoten
         vsig_begriff_knoten = ET.Element("VsigBegriff")
@@ -424,9 +440,11 @@ class Signal:
 
         # Neue <MatrixEintrag>-Knoten
         for idx in range(0, len(self.zeilen)):
-            neuer_eintrag = deepcopy(matrix[idx * len(self.spalten) + spaltenidx_original])
+            neuer_eintrag = deepcopy(self.matrix[idx * len(self.spalten) + spaltenidx_original])
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
-            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, idx * (len(self.spalten) + 1) + (len(self.spalten) - 1))
+            neuer_eintrag_idx = idx * (len(self.spalten) + 1) + (len(self.spalten) - 1)
+            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, neuer_eintrag_idx)
+            self.matrix.insert(neuer_eintrag_idx + 1, neuer_eintrag)
 
         self.element_richtung.element.modul.geaendert = True
 

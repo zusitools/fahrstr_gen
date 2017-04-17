@@ -2,7 +2,7 @@
 
 from .konstanten import *
 from .streckengraph import Streckengraph, Knoten
-from .strecke import ist_hsig_fuer_fahrstr_typ, ist_vsig
+from .strecke import ist_hsig_fuer_fahrstr_typ, ist_vsig, geschw_min
 
 import logging
 
@@ -29,6 +29,9 @@ class VorsignalGraphKante:
         self.ziel = None  # KnotenUndRichtung
         self.vorsignale = []
         self.vorher_keine_vsig_verknuepfung = False
+
+        self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
+        self.hat_ende_weichenbereich = False
 
 class VorsignalGraphKnoten(Knoten):
     def __init__(self, graph, element):
@@ -67,8 +70,11 @@ class VorsignalGraphKnoten(Knoten):
                 if refpunkt is None:
                     logging.warn("Element {} enthaelt ein Vorsignal, aber es existiert kein passender Referenzpunkt. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                 else:
-                    logging.debug("Vorsignal an {}".format(refpunkt))
                     kante.vorsignale.append(refpunkt)
+
+            if any(int(ereignis.get("Er", 0) == EREIGNIS_ENDE_WEICHENBEREICH) for ereignis in element_richtung.ereignisse()):
+                kante.hat_ende_weichenbereich = True
+                kante.signalgeschwindigkeit = -1
 
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
@@ -78,13 +84,16 @@ class VorsignalGraphKnoten(Knoten):
                 elif ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE:
                     kante.vorher_keine_vsig_verknuepfung = True
                     break
+                elif ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
+                    signalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                    if signalgeschwindigkeit > 0:
+                        kante.signalgeschwindigkeit = geschw_min(kante.signalgeschwindigkeit, signalgeschwindigkeit)
 
             knoten = self.graph.get_knoten(element_richtung.element)
             if knoten is not None:
                 kante.ziel = knoten.richtung(element_richtung.richtung)
                 if ist_hsig_fuer_fahrstr_typ(element_richtung.signal(), FAHRSTR_TYP_ZUG) and \
-                        element_richtung.signal().sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL == 0 and \
-                        element_richtung.signal().sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL == 0:
+                        element_richtung.signal().sigflags & (SIGFLAG_KENNLICHT_NACHFOLGESIGNAL | SIGFLAG_KENNLICHT_VORGAENGERSIGNAL | SIGFLAG_HOCHSIGNALISIERUNG) == 0:
                     kante.vorher_keine_vsig_verknuepfung = True
                 break
 
@@ -100,18 +109,3 @@ class VorsignalGraphKnoten(Knoten):
             element_richtung = vorgaenger[0]
 
         return kante
-
-    def _get_vorsignale(self, richtung):
-        self.graph.markiere_unbesucht()
-        result = []
-        for kante in self.get_vorsignal_kanten(richtung):
-            self._get_vorsignale_rek(kante, result)
-        return result
-
-    def _get_vorsignale_rek(self, kante, result_liste):
-        result_liste.extend(kante.vorsignale)
-
-        if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
-            kante.ziel.knoten.markiere_besucht()
-            for kante2 in kante.ziel.knoten.get_vorsignal_kanten(kante.ziel.richtung):
-                self._get_vorsignale_rek(kante2, result_liste)

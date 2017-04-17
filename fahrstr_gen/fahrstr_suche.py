@@ -324,29 +324,92 @@ class FahrstrassenSuche:
         if startsignal_verkn is not None and not startsignal_verkn.ist_ersatzsignal and self.vorsignal_graph is not None:
             vorsignal_knoten = self.vorsignal_graph.get_knoten(einzelfahrstrassen[0].start.knoten.element)
             if vorsignal_knoten is not None:
-                for vsig in vorsignal_knoten.get_vorsignale(einzelfahrstrassen[0].start.richtung):
-                    if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in result.vorsignale):
-                        spalte = None
-                        if self.fahrstr_typ == FAHRSTR_TYP_LZB:
-                            for idx, spalten_geschw in enumerate(vsig.signal().spalten):
-                                if spalten_geschw == -2.0:
-                                    spalte = idx
-                                    break
-                            if spalte is None:
-                                # Das ist ziemlich normal, etwa bei 500-Hz-Magneten.
-                                logging.debug("{}: An Signal {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(result.name, vsig.signal(), vsig.refnr, result.signalgeschwindigkeit))
-                                if vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) != vsig.signal().get_vsig_spalte(-1):
-                                    logging.warn("{}: An Signal {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Im Zusi-3D-Editor wuerde die Spalte mit der hoechsten Signalgeschwindigkeit angesteuert.".format(result.name, vsig.signal(), vsig.refnr))
 
-                        if spalte is None:
-                            spalte = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit)
-
-                        if len(vsig.signal().richtungsvoranzeiger) > 0:
-                            spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
-                        if spalte is None:
-                            logging.warn("{}: An Signal {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(result.name, vsig.signal(), vsig.element_richtung, str_geschw(result.signalgeschwindigkeit)))
+                # hochsignalisierung: True, wenn die Suche ueber ein Hauptsignal mit Hochsignalisierungs-Flag hinaus fortgesetzt wurde.
+                def finde_vsig_rek(vorsignal_knoten, richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung):
+                    for kante in vorsignal_knoten.get_vorsignal_kanten(richtung):
+                        # TODO: Ziel ist hier, die Zeile zu bestimmen, auf der das vorherige Hauptsignal steht.
+                        # Eigentlich muesste man Signalgeschwindigkeit-Ereignisse im Startsignal ebenfalls beruecksichtigen.
+                        if kante.hat_ende_weichenbereich:
+                            signalgeschwindigkeit = kante.signalgeschwindigkeit
                         else:
-                            result.vorsignale.append(FahrstrVorsignal(vsig, spalte))
+                            signalgeschwindigkeit = geschw_min(signalgeschwindigkeit, kante.signalgeschwindigkeit)
+
+                        for vsig in kante.vorsignale:
+                            if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in result.vorsignale):
+                                logging.debug("Vorsignal an {}".format(vsig))
+                                spalte = None
+                                spalte_startsignal_halt = None
+                                if geschw_naechstes_hsig == -2.0:
+                                    try:
+                                        spalte = vsig.signal().spalten.index(-2.0)
+                                    except ValueError:
+                                        # Das ist ziemlich normal, etwa bei 500-Hz-Magneten.
+                                        logging.debug("{}: An {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Suche Vorsignalspalte gemaess Signalgeschwindigkeit {}".format(result.name, vsig.signal(), vsig.refnr, geschw_naechstes_hsig))
+                                        if vsig.signal().get_vsig_spalte(geschw_naechstes_hsig) != vsig.signal().get_vsig_spalte(-1):
+                                            logging.warn("{}: An {} (Ref. {}) wurde keine Vorsignalspalte fuer Geschwindigkeit -2 (Dunkelschaltung) gefunden. Im Zusi-3D-Editor wuerde die Spalte mit der hoechsten Signalgeschwindigkeit angesteuert.".format(result.name, vsig.signal(), vsig.refnr))
+
+                                if spalte is None:
+                                    spalte = vsig.signal().get_vsig_spalte(geschw_naechstes_hsig)
+                                    if not hochsignalisierung:
+                                        spalte_alt = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) # mit dem alten Algorithmus
+                                        if spalte != spalte_alt:
+                                            logging.log(logging.COMPAT, "{}: Vorsignal {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal().signalbeschreibung(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
+                                    if len(vsig.signal().richtungsvoranzeiger) > 0:
+                                        spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
+
+                                    spalte_startsignal_halt = vsig.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
+
+                                # Erzeuge Vsig-Verknuepfung nur, wenn die Stellung des Fahrstrassen-Startsignals einen Einfluss auf die gewaehlte Vsig-Spalte hat.
+                                if spalte != spalte_startsignal_halt:
+                                    if spalte is None:
+                                        logging.warn("{}: An {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(result.name, vsig.signal(), vsig.element_richtung, str_geschw(result.signalgeschwindigkeit)))
+                                    else:
+                                        result.vorsignale.append(FahrstrVorsignal(vsig, spalte))
+                                else:
+                                    logging.log(logging.COMPAT, "{}: Vorsignal {} wird vom Startsignal der Fahrstrasse nicht beeinflusst (gleiche Spalte {} fuer Geschwindigkeiten {} und {}) und daher nicht verknuepft".format(result.name, vsig.signal().signalbeschreibung(), spalte, str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
+
+                        if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
+                            kante.ziel.knoten.markiere_besucht()
+
+                            if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG) and \
+                                    kante.ziel.signal().sigflags & SIGFLAG_HOCHSIGNALISIERUNG != 0:
+                                zeile = kante.ziel.signal().get_hsig_zeile(self.fahrstr_typ, signalgeschwindigkeit) # TODO: Richtungsanzeiger beachten?
+                                if spalte is None:
+                                    logging.warn("{}: {} hat Hochsignalisierung aktiviert, aber keine Zeile fuer Typ {}, Geschwindigkeit {}. Es werden keine weiteren Vorsignale gesucht.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit)))
+                                    return
+
+                                spalte = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig)
+                                if spalte is None:
+                                    spalte = 0
+                                if spalte >= len(kante.ziel.signal().spalten):
+                                    return
+
+                                spalte_startsignal_halt = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
+                                if spalte_startsignal_halt is None:
+                                    spalte_startsignal_halt = 0
+                                if spalte_startsignal_halt >= len(kante.ziel.signal().spalten):
+                                    return
+
+                                geschw_naechstes_hsig = kante.ziel.signal().matrix_geschw(zeile, spalte)
+                                geschw_naechstes_hsig_startsignal_halt = kante.ziel.signal().matrix_geschw(zeile, spalte_startsignal_halt)
+                                if geschw_naechstes_hsig != geschw_naechstes_hsig_startsignal_halt:
+                                    logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
+                                    finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, True)
+                                else:
+                                    logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst die Vorsignalstellung nicht. Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit)))
+                            else:
+                                finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung)
+
+                spalte = result.start.signal().get_vsig_spalte(0)
+                if spalte is None:
+                    spalte = 0
+
+                self.vorsignal_graph.markiere_unbesucht()
+                geschw_naechstes_hsig = result.start.signal().matrix_geschw(startsignal_verkn.zeile, spalte)
+                geschw_naechstes_hsig_startsignal_halt = 0
+                logging.debug("{}: Suche Vorsignale ab {}, Vsig-Geschwindigkeit {}/{}".format(result.name, vorsignal_knoten.signal(result.start.element_richtung.richtung), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
+                finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, -2.0 if self.fahrstr_typ == FAHRSTR_TYP_LZB else geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, False)
 
         if startsignal_verkn is not None:
             result.signale.append(startsignal_verkn)

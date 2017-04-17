@@ -204,6 +204,13 @@ class Modul:
     def name_kurz(self):
         return os.path.basename(self.relpath.replace('\\', os.sep))
 
+    # (utm_we, utm_ns)
+    def utm(self):
+        utm_knoten = self.root.find("./Strecke/UTM")
+        if utm_knoten is None:
+            return (0, 0)
+        return (float(utm_knoten.get("UTM_WE", 0)), float(utm_knoten.get("UTM_NS", 0)))
+
     def schreibe_moduldatei(self):
         from .strecke import writeuglyxml
 
