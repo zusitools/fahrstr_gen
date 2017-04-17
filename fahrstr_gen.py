@@ -352,7 +352,7 @@ def gui():
 
         (bedingungen_filename, ext) = os.path.splitext(filename)
         bedingungen_filename += ".fahrstr_gen.xml"
-        if os.path.exists(bedingungen_filename) and len(ent_bedingungen.get()) == 0:
+        if os.path.exists(bedingungen_filename):
             ent_bedingungen.delete(0, tkinter.END)
             ent_bedingungen.insert(0, bedingungen_filename)
 
