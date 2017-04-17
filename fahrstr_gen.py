@@ -350,6 +350,12 @@ def gui():
         ent_dateiname.delete(0, tkinter.END)
         ent_dateiname.insert(0, filename)
 
+        (bedingungen_filename, ext) = os.path.splitext(filename)
+        bedingungen_filename += ".fahrstr_gen.xml"
+        if os.path.exists(bedingungen_filename) and len(ent_bedingungen.get()) == 0:
+            ent_bedingungen.delete(0, tkinter.END)
+            ent_bedingungen.insert(0, bedingungen_filename)
+
     def btn_bedingungen_callback():
         filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'))
         ent_bedingungen.delete(0, tkinter.END)
