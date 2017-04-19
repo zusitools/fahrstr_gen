@@ -354,7 +354,7 @@ class FahrstrassenSuche:
                                     if not hochsignalisierung:
                                         spalte_alt = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) # mit dem alten Algorithmus
                                         if spalte != spalte_alt:
-                                            logging.log(logging.COMPAT, "{}: Vorsignal {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal().signalbeschreibung(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
+                                            logging.log(logging.COMPAT, "{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
                                     if len(vsig.signal().richtungsvoranzeiger) > 0:
                                         spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
 
@@ -367,7 +367,7 @@ class FahrstrassenSuche:
                                     else:
                                         result.vorsignale.append(FahrstrVorsignal(vsig, spalte))
                                 else:
-                                    logging.log(logging.COMPAT, "{}: Vorsignal {} wird vom Startsignal der Fahrstrasse nicht beeinflusst (gleiche Spalte {} fuer Geschwindigkeiten {} und {}) und daher nicht verknuepft".format(result.name, vsig.signal().signalbeschreibung(), spalte, str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
+                                    logging.log(logging.COMPAT, "{}: Vorsignalsuche: {} wird vom Startsignal der Fahrstrasse nicht beeinflusst (gleiche Spalte {} fuer Geschwindigkeiten {} und {}) und daher nicht verknuepft".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
 
                         if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
                             kante.ziel.knoten.markiere_besucht()
