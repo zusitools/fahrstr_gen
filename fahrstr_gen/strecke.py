@@ -236,7 +236,9 @@ class Signal:
                         elif ereignisnr == EREIGNIS_ENTGLEISEN and float(ereignis.get("Wert", 0)) == 0:
                             self.ist_gleissperre = True
                         elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None:
-                            self.signalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                            signalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                            if signalgeschwindigkeit != 0:
+                                self.signalgeschwindigkeit = signalgeschwindigkeit
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
                             self.gegengleisanzeiger |= 1 << int(float(ereignis.get("Wert", 0)))
                         elif ereignisnr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
