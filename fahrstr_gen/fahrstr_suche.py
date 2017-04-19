@@ -215,7 +215,7 @@ class FahrstrassenSuche:
                 if ist_hsig_fuer_fahrstr_typ(result.start.signal(), self.fahrstr_typ):
                     zeile_ersatzsignal = result.start.signal().get_hsig_ersatzsignal_zeile(result.rgl_ggl)
                     zeile_regulaer = result.start.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
-                    nutze_ersatzsignal = result.ziel.signal().ist_hilfshauptsignal
+                    nutze_ersatzsignal = any(einzelfahrstrasse.ziel.signal().ist_hilfshauptsignal for einzelfahrstrasse in einzelfahrstrassen)
 
                     if nutze_ersatzsignal and zeile_ersatzsignal is None:
                         logging.warn("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
