@@ -22,6 +22,9 @@ import tkinter.filedialog
 import tkinter.messagebox
 import tkinter.ttk
 
+logging.COMPAT = 15
+logging.addLevelName(logging.COMPAT, 'COMPAT')
+
 def refpunkt_fmt(refpunkt):
     pfad = refpunkt[1]
     if pfad.rfind('\\') != -1:
@@ -286,6 +289,7 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
             self.widget.tag_config("error", foreground="red")
             self.widget.tag_config("warning", foreground="orange")
             self.widget.tag_config("info", foreground="blue")
+            self.widget.tag_config("compat", foreground="purple")
             self.widget.tag_config("debug", foreground="gray")
 
         def emit(self, record):
@@ -295,6 +299,8 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
                 self.widget.insert(tkinter.END, "Warnung: ", "warning")
             elif record.levelno == logging.INFO:
                 self.widget.insert(tkinter.END, "Info: ", "info")
+            elif record.levelno == logging.COMPAT:
+                self.widget.insert(tkinter.END, "Kompatibilitaet: ", "compat")
             elif record.levelno == logging.DEBUG:
                 self.widget.insert(tkinter.END, "Debug: ", "debug")
             else:
@@ -327,7 +333,7 @@ class LoggingHandlerFrame(tkinter.ttk.Frame):
 
 def gui():
     def btn_start_callback(vergleiche):
-        ent_log.logging_handler.setLevel(logging.DEBUG if var_debug.get() else logging.INFO)
+        ent_log.logging_handler.setLevel(var_debug_level.get())
         ent_log.clear()
 
         try:
@@ -413,9 +419,22 @@ def gui():
     chk_flankenschutz = tkinter.Checkbutton(frame, text="Weichen in Flankenschutz-Stellung verknuepfen", variable=var_flankenschutz)
     chk_flankenschutz.grid(row=25, column=1, columnspan=2, sticky=tkinter.W)
 
-    var_debug = tkinter.BooleanVar()
-    chk_debug = tkinter.Checkbutton(frame, text="Debug-Ausgaben anzeigen", variable=var_debug)
-    chk_debug.grid(row=30, column=1, columnspan=2, sticky=tkinter.W)
+    lbl_debug = tkinter.Label(frame, text="Debug-Ausgaben: ")
+    lbl_debug.grid(row=30, column=0, sticky=tkinter.W)
+
+    frame_debug_level = tkinter.Frame(frame)
+
+    var_debug_level = tkinter.IntVar()
+    var_debug_level.set(logging.COMPAT)
+
+    rad_debug_level_info = tkinter.Radiobutton(frame_debug_level, text="Keine", variable=var_debug_level, value=logging.INFO)
+    rad_debug_level_info.grid(row=0, column=1, sticky=tkinter.W)
+    rad_debug_level_compat = tkinter.Radiobutton(frame_debug_level, text="Kompatibilitaetsmeldungen", variable=var_debug_level, value=logging.COMPAT)
+    rad_debug_level_compat.grid(row=0, column=2, sticky=tkinter.W)
+    rad_debug_level_debug = tkinter.Radiobutton(frame_debug_level, text="Kompatibilitaets- und Debug-Meldungen", variable=var_debug_level, value=logging.DEBUG)
+    rad_debug_level_debug.grid(row=0, column=3, sticky=tkinter.W)
+
+    frame_debug_level.grid(row=30, column=1, sticky=(tkinter.W,tkinter.E))
 
     frame_start = tkinter.Frame(frame)
     frame_start.grid(row=98, columnspan=3, sticky='we')
@@ -451,13 +470,14 @@ if __name__ == '__main__':
         parser.add_argument('--modus', choices=['schreibe', 'vergleiche', 'profile'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
         parser.add_argument('--fahrstr_typen', default="zug,lzb", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, lzb)")
         parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
-        parser.add_argument('--debug', action='store_true', help="Debug-Ausgaben anzeigen")
+        parser.add_argument('--kompat', action='store_true', help="Kompatibilitaetsmeldungen anzeigen")
+        parser.add_argument('--debug', action='store_true', help="Kompatibilitaetsmeldungen und Debug-Ausgaben anzeigen")
         parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
         parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
         parser.add_argument('--flankenschutz', action='store_true', help="Weichen in Flankenschutzstellung in Fahrstrassen verknuepfen")
         args = parser.parse_args()
 
-        logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.INFO))
+        logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.COMPAT if args.kompat else logging.INFO))
 
         if args.profile == 'profile':
             import cProfile as profile, pstats
