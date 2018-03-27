@@ -51,6 +51,7 @@ class FahrstrGraphKante:
         self.richtungsanzeiger = ""  # Richtungsanzeiger-Ziel dieses Abschnitts
 
         self.hat_ende_weichenbereich = False  # Liegt im Verlauf dieser Kante ein Ereignis "Ende Weichenbereich"?
+        self.keine_fahrstr_einrichten = None  # Das erste Ereignis "Keine Fahrstrasse einrichten" fuer den Fahrstrassentyp des Graphen im Verlauf dieser Kante
 
 class FahrstrGraphKnoten(Knoten):
     def __init__(self, graph, element):
@@ -111,17 +112,16 @@ class FahrstrGraphKnoten(Knoten):
 
         while element_richtung is not None:
             # Bei Ereignis "Keine Fahrstrasse einrichten" sofort abbrechen (keine weiteren Ereignisse/Signale an diesem Element betrachten)
-            keine_fahrstr_einrichten = False
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr in [EREIGNIS_KEINE_LZB_FAHRSTRASSE, EREIGNIS_LZB_ENDE] and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB \
                         or ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] \
                         or ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
-                    keine_fahrstr_einrichten = True
+                    logging.debug("{}: Keine Fahrstrasse einrichten (Ereignis Nr. {})".format(element_richtung, ereignis_nr))
+                    kante.keine_fahrstr_einrichten = element_richtung
                     break
 
-            if keine_fahrstr_einrichten:
-                logging.debug("{}: Keine Fahrstrasse einrichten".format(element_richtung))
+            if kante.keine_fahrstr_einrichten is not None:
                 element_richtung = None
                 break
 
@@ -363,7 +363,10 @@ class FahrstrGraphKnoten(Knoten):
         if aufloesepunkt_gefunden:
             return
 
-        if kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
+        if kante.ziel is None:
+            if kante.keine_fahrstr_einrichten is not None and not aufloesepunkt_gefunden:
+                logging.warn("Es gibt einen Fahrweg zwischen {} und \"Keine Fahrstrasse einrichten\"/LZB-Ende an Element {}, der keinen Aufloesepunkt (fuer an diesem Signal endende Fahrstrassen vom Typ {}) enthaelt.".format(self.signal(startrichtung), kante.keine_fahrstr_einrichten, str_fahrstr_typ(self.graph.fahrstr_typ)))
+        elif not kante.ziel.knoten.ist_besucht():
             kante.ziel.knoten.markiere_besucht()
             if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG):
                 if not aufloesepunkt_gefunden:
