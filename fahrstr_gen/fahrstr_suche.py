@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
-from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
+from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_kleiner, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
 from . import modulverwaltung
 
 import logging
@@ -127,7 +127,7 @@ class FahrstrassenSuche:
         if zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0:
             fahrstr_weiterfuehren = True
 
-        logging.debug("Fahrstrassensuche: an {}, Kennlicht Vorgaenger={}, Kennlicht Nachfolger={}, abschl={}, weiter={}".format(
+        logging.debug("Fahrstrassensuche: an {} (Kennlicht Vorgaenger={}, Kennlicht Nachfolger={}). Fahrstrasse abschliessen={}, Fahrstrasse weiterfuehren={}".format(
             zielsignal,
             zielsignal.sigflags & SIGFLAG_KENNLICHT_VORGAENGERSIGNAL != 0, zielsignal.sigflags & SIGFLAG_KENNLICHT_NACHFOLGESIGNAL != 0,
             fahrstr_abschliessen, fahrstr_weiterfuehren))
@@ -196,11 +196,12 @@ class FahrstrassenSuche:
         # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
         if result.ziel.signal().signalgeschwindigkeit is not None:
             result.signalgeschwindigkeit = result.ziel.signal().signalgeschwindigkeit
+            logging.debug("{}: Ereignis \"Signalgeschwindigkeit\" in der Signalmatrix des Zielsignals bestimmt die Signalgeschwindigkeit in der Fahrstrasse".format(result.name))
         else:
             for einzelfahrstrasse in einzelfahrstrassen:
                 result.signalgeschwindigkeit = geschw_min(result.signalgeschwindigkeit, einzelfahrstrasse.signalgeschwindigkeit)
 
-        logging.debug("{}: Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\", RglGgl {}".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger, result.rgl_ggl))
+        logging.debug("{}: Steuere Hauptsignale an mit Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\", Gleistyp {} ({})".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger, result.rgl_ggl, str_rgl_ggl(result.rgl_ggl)))
 
         flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
 
@@ -265,6 +266,7 @@ class FahrstrassenSuche:
             if idx == len(einzelfahrstrassen) - 1:
                 for idx, zeile in enumerate(result.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
+                        logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
                         result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
                             logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
@@ -394,6 +396,8 @@ class FahrstrassenSuche:
                                 geschw_naechstes_hsig = kante.ziel.signal().matrix_geschw(zeile, spalte)
                                 geschw_naechstes_hsig_startsignal_halt = kante.ziel.signal().matrix_geschw(zeile, spalte_startsignal_halt)
                                 if geschw_naechstes_hsig != geschw_naechstes_hsig_startsignal_halt:
+                                    if geschw_kleiner(geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt):
+                                        logging.warn("{}: {} hat Hochsignalisierung aktiviert und wechselt beim Stellen der Fahrstrasse auf eine niedrigere Geschwindigkeit (von {} auf {})".format(result.name, kante.ziel.signal(), str_geschw(geschw_naechstes_hsig_startsignal_halt), str_geschw(geschw_naechstes_hsig)))
                                     logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
                                     finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, True)
                                 else:
