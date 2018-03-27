@@ -218,6 +218,7 @@ class Signal:
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
         self.richtungsvoranzeiger = defaultdict(int) # Ziel -> Signalbild-ID
         self.hat_sigframes = False # Hat das Signal ueberhaupt Landschaftsdateien?
+        self.hat_ersatzsignal = False
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
         self.hsig_fuer = 0  # Fahrstrassentypen, fuer die dies ein Hauptsignal ist
@@ -256,6 +257,8 @@ class Signal:
                         elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
                             if ereignis.get("Beschr") is not None:
                                 self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
+            elif n.tag == "Ersatzsignal":
+                self.hat_ersatzsignal = True
 
     def __repr__(self):
         if self.betrst == "" and self.name == "":
@@ -273,7 +276,8 @@ class Signal:
         return self.hsig_fuer & fahrstr_typ != 0
 
     def ist_fahrstr_start_sig(self, fahrstr_typ):
-        return self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ) and any(zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw != 0 for zeile in self.zeilen)
+        return self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ) and (
+            self.hat_ersatzsignal or any(zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw != 0 for zeile in self.zeilen))
 
     def ist_vsig(self):
         # Anders als in der Doku angegeben, ist fuer Zusi anscheinend nur relevant, ob das Signal eine
