@@ -10,6 +10,9 @@ from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenste
 
 import logging
 
+import re
+bedingtes_register_re = re.compile("Bedingtes Register: ?(.*)")
+
 # Ein Streckengraph, der zum Aufbau von Fahrstrassen eines bestimmten Typs benutzt wird.
 # Knoten sind zusaetzlich Hauptsignale fuer den gewuenschten Typ sowie Aufgleispunkte.
 class FahrstrGraph(Streckengraph):
@@ -41,6 +44,7 @@ class FahrstrGraphKante:
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
 
         self.register = []  # [RefPunkt]
+        self.bedingte_register = []  # [(RefPunkt, Beschreibung)]
         self.weichen = []  # [FahrstrWeichenstellung]
         self.signale = []  # [FahrstrHauptsignal] -- alle Signale, die nicht eine Fahrstrasse beenden, also z.B. Rangiersignale, sowie "Signal in Fahrstrasse verknuepfen". Wenn die Signalzeile den Wert -1 hat, ist die zu waehlende Zeile fahrstrassenabhaengig.
         self.vorsignale = []  # [FahrstrVorsignal] -- nur Vorsignale, die mit "Vorsignal in Fahrstrasse verknuepfen" in einem Streckenelement dieser Kante verknuepft sind
@@ -198,18 +202,11 @@ class FahrstrGraphKnoten(Knoten):
                     else:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
 
-            # Register am aktuellen Element in die Registerliste einfuegen
-            regnr = element_richtung.registernr()
-            if regnr != 0:
-                refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
-                if refpunkt is None:
-                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung))
-                else:
-                    kante.register.append(refpunkt)
-
             # Ereignisse am aktuellen Element verarbeiten
             hat_ende_weichenbereich = False
             hat_aufloesepunkt = False
+            hat_bedingtes_register = False
+            bedingtes_register_beschreibung = ""
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
@@ -301,6 +298,25 @@ class FahrstrGraphKnoten(Knoten):
                         kante.vorsignale.append(FahrstrVorsignal(refpunkt, int(ereignis.get("Beschr", ""))))
                     except ValueError:
                         logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Spaltennummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
+
+                elif ereignis_nr == EREIGNIS_BESCHREIBUNG:
+                    m = bedingtes_register_re.match(ereignis.get("Beschr", ""))
+                    if m:
+                        hat_bedingtes_register = True
+                        bedingtes_register_beschreibung = m.group(1)
+                        if not len(bedingtes_register_beschreibung):
+                            logging.warn("Ereignis \"Register bedingt in Fahrstrasse verknuepfen\" an Element {} hat keine Beschreibung.".format(element_richtung))
+
+            # Register am aktuellen Element in die Registerliste einfuegen
+            if element_richtung.registernr() != 0:
+                refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
+                if refpunkt is None:
+                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                else:
+                    if hat_bedingtes_register:
+                        kante.bedingte_register.append((refpunkt, bedingtes_register_beschreibung))
+                    else:
+                        kante.register.append(refpunkt)
 
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
             kante.laenge += element_richtung.element.laenge()
