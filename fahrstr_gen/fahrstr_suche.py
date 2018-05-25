@@ -311,7 +311,6 @@ class FahrstrassenSuche:
 
             for kante in einzelfahrstrasse.kantenliste():
                 result.register.extend(kante.register)
-                result.register.extend(reg[0] for reg in bedingte_register[idx])
                 result.weichen.extend(kante.weichen)
                 for refpunkt in kante.aufloesepunkte:
                     if refpunkt.reftyp == REFTYP_AUFLOESEPUNKT:
@@ -343,6 +342,8 @@ class FahrstrassenSuche:
                             flankenschutz_neu = knoten.get_flankenschutz_stellungen(richtung, nachfolger_idx)
                             flankenschutz_stellungen = [w for w in flankenschutz_stellungen if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_neu)]
                             flankenschutz_stellungen.extend([w for w in flankenschutz_neu if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_stellungen)])
+
+            result.register.extend(reg[0] for reg in bedingte_register[idx])
 
         for weichenstellung in flankenschutz_stellungen:
             if weichenstellung.weichenlage != 1 and weichenstellung not in result.weichen:
