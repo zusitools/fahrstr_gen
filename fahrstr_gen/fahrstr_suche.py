@@ -207,7 +207,7 @@ class FahrstrassenSuche:
             result.name += " -> {}".format(zielkante.ziel.signal().signalbeschreibung())
 
             if len(bedingte_register[idx]):
-                result.name += " (" + ", ".join(reg[1] for reg in bedingte_register[idx]) + ")"
+                result.name += " (" + ", ".join(list(OrderedDict.fromkeys(reg[1] for reg in bedingte_register[idx]))) + ")"
 
             for kante in einzelfahrstrasse.kantenliste():
                 if kante.rgl_ggl != GLEIS_BAHNHOF:
