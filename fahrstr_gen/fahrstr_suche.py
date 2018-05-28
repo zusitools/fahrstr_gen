@@ -275,15 +275,15 @@ class FahrstrassenSuche:
             else:
                 # Kennlichtsignal ansteuern
                 gefunden = False
-                for idx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
+                for zeilenidx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
                     if zeile.hsig_geschw == -2.0:
                         refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
                         if refpunkt is None:
                             logging.error("{}: Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start))
                             return None
                         else:
-                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, result.rgl_ggl, result.richtungsanzeiger)
-                            if idx != kennlichtsignal_zeile:
+                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(zeilenidx, result.rgl_ggl, result.richtungsanzeiger)
+                            if zeilenidx != kennlichtsignal_zeile:
                                 logging.info("{}: Kennlichtsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.refnr))
                             result.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
@@ -298,10 +298,10 @@ class FahrstrassenSuche:
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
             if idx == len(einzelfahrstrassen) - 1:
-                for idx2, zeile in enumerate(result.ziel.signal().zeilen):
+                for zeilenidx, zeile in enumerate(result.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
                         logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
-                        result.signale.append(FahrstrHauptsignal(result.ziel, idx2, False))
+                        result.signale.append(FahrstrHauptsignal(result.ziel, zeilenidx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
                             logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
                         break
