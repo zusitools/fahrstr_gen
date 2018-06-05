@@ -12,7 +12,7 @@ import logging
 
 path_insensitive_cache = {}
 
-# http://stackoverflow.com/a/8462613/1083696
+# http://stackoverflow.com/a/8462613
 def path_insensitive(path):
     """
     Get a case-insensitive path for use on a case sensitive system.
@@ -222,19 +222,26 @@ class Modul:
         shutil.copyfile(fp.name, self.dateiname)
         os.remove(fp.name)
 
+# Liefert das angegebene Modul oder None zurueck (relpath leer = Fallback)
+def get_modul_by_name(relpath, fallback):
+    if not len(relpath):
+        return fallback
+
+    relpath_norm = normalize_zusi_relpath(relpath)
+    if relpath_norm not in module:
+        dateiname = get_abspath(relpath)
+        try:
+            logging.debug("Lade Modul {}".format(relpath))
+            module[relpath_norm] = Modul(dateiname, relpath)
+        except FileNotFoundError:
+            logging.warn("Moduldatei {} nicht gefunden".format(dateiname))
+            module[relpath_norm] = None
+    return module[relpath_norm]
+
 # Sucht Knoten ./Datei und liefert Modul oder None zurueck (leerer String oder nicht vorhandener Knoten = Fallback)
 def get_modul_aus_dateiknoten(knoten, fallback):
     datei = knoten.find("./Datei")
     if datei is not None and "Dateiname" in datei.attrib:
         relpath = datei.attrib["Dateiname"]
-        relpath_norm = normalize_zusi_relpath(relpath)
-        if relpath_norm not in module:
-            dateiname = get_abspath(relpath)
-            try:
-                logging.debug("Lade Modul {}".format(relpath))
-                module[relpath_norm] = Modul(dateiname, relpath)
-            except FileNotFoundError:
-                logging.warn("Moduldatei {} nicht gefunden".format(dateiname))
-                module[relpath_norm] = None
-        return module[relpath_norm]
+        return get_modul_by_name(relpath, fallback)
     return fallback

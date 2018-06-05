@@ -4,14 +4,12 @@ import xml.etree.ElementTree as ET
 from collections import namedtuple, defaultdict, OrderedDict
 
 from .konstanten import *
+from .modulverwaltung import get_modul_by_name
 from .strecke import ist_hsig_fuer_fahrstr_typ, gegenrichtung, geschw_min
 from .streckengraph import Streckengraph, Knoten
 from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
 
 import logging
-
-import re
-bedingtes_register_re = re.compile("Bedingtes Register: ?(.*)")
 
 # Ein Streckengraph, der zum Aufbau von Fahrstrassen eines bestimmten Typs benutzt wird.
 # Knoten sind zusaetzlich Hauptsignale fuer den gewuenschten Typ sowie Aufgleispunkte.
@@ -202,11 +200,18 @@ class FahrstrGraphKnoten(Knoten):
                     else:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
 
+            # Register am aktuellen Element in die Registerliste einfuegen
+            regnr = element_richtung.registernr()
+            if regnr != 0:
+                refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
+                if refpunkt is None:
+                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                else:
+                    kante.register.append(refpunkt)
+
             # Ereignisse am aktuellen Element verarbeiten
             hat_ende_weichenbereich = False
             hat_aufloesepunkt = False
-            hat_bedingtes_register = False
-            bedingtes_register_beschreibung = ""
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
                 if ereignis_nr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
@@ -250,12 +255,18 @@ class FahrstrGraphKnoten(Knoten):
                     else:
                         kante.aufloesepunkte.append(refpunkt)
 
-                elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
+                elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN or ereignis_nr == EREIGNIS_REGISTER_BEDINGT_VERKNUEPFEN:
                     try:
-                        kante.register.append(element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))])
+                        refpunkt_modul = get_modul_by_name(ereignis.get("Beschr", ""), element_richtung.element.modul)
+                        refpunkt = refpunkt_modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))]
+
+                        if ereignis_nr == EREIGNIS_REGISTER_BEDINGT_VERKNUEPFEN:
+                            kante.bedingte_register.append((refpunkt, "Bahnsteigkreuzung"))
+                        else:
+                            kante.register.append(refpunkt)
+
                     except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
-                        continue
+                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltigen Referenzpunkt (Nummer \"{}\", Modul \"{}\"). Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0), ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
@@ -298,25 +309,6 @@ class FahrstrGraphKnoten(Knoten):
                         kante.vorsignale.append(FahrstrVorsignal(refpunkt, int(ereignis.get("Beschr", ""))))
                     except ValueError:
                         logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Spaltennummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
-
-                elif ereignis_nr == EREIGNIS_BESCHREIBUNG:
-                    m = bedingtes_register_re.match(ereignis.get("Beschr", ""))
-                    if m:
-                        hat_bedingtes_register = True
-                        bedingtes_register_beschreibung = m.group(1)
-                        if not len(bedingtes_register_beschreibung):
-                            logging.warn("Ereignis \"Register bedingt in Fahrstrasse verknuepfen\" an Element {} hat keine Beschreibung.".format(element_richtung))
-
-            # Register am aktuellen Element in die Registerliste einfuegen
-            if element_richtung.registernr() != 0:
-                refpunkt = element_richtung.refpunkt(REFTYP_REGISTER)
-                if refpunkt is None:
-                    logging.warn("Element {} enthaelt ein Register, aber es existiert kein passender Referenzpunkt. Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung))
-                else:
-                    if hat_bedingtes_register:
-                        kante.bedingte_register.append((refpunkt, bedingtes_register_beschreibung))
-                    else:
-                        kante.register.append(refpunkt)
 
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
             kante.laenge += element_richtung.element.laenge()
