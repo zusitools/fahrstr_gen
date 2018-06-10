@@ -76,7 +76,7 @@ class RefPunkt(object):
         global dieses_modul
         return "{}{}{}".format(
             self.element_richtung.element.xml_knoten.get("Nr", "0"),
-            'n' if self.element_richtung.richtung == NORM else 'g',
+            'b' if self.element_richtung.richtung == NORM else 'g',
             "" if self.element_richtung.element.modul == dieses_modul else "[{}]".format(self.modul_kurz())
         )
 
