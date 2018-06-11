@@ -368,7 +368,9 @@ class Signal:
 
         self.element_richtung.element.modul.geaendert = True
 
-        return len(self.zeilen) - 1
+        result = len(self.zeilen) - 1
+        logging.debug("{}: Erweitere Signalmatrix: Neue Zeile {} als Kopie von Zeile {} fuer Gleisangabe \"{}\" und Richtungsanzeiger-Ziel \"{}\"".format(self, result, zeilenidx_original, str_rgl_ggl(rgl_ggl), richtungsanzeiger_ziel))
+        return result
 
     def get_hsig_ersatzsignal_zeile(self, rgl_ggl):
         for zeile, begriff in enumerate(self.xml_knoten.iterfind("./Ersatzsignal")):
@@ -444,7 +446,7 @@ class Signal:
 
         # Neue <MatrixEintrag>-Knoten
         for idx in range(0, len(self.zeilen)):
-            neuer_eintrag = deepcopy(self.matrix[idx * len(self.spalten) + spaltenidx_original])
+            neuer_eintrag = deepcopy(self.matrix[idx * (len(self.spalten) + 1) + spaltenidx_original])
             neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
             neuer_eintrag_idx = idx * (len(self.spalten) + 1) + (len(self.spalten) - 1)
             kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, neuer_eintrag_idx)
@@ -453,7 +455,9 @@ class Signal:
         self.element_richtung.element.modul.geaendert = True
 
         self.spalten.append(self.spalten[spaltenidx_original])
-        return len(self.spalten) - 1
+        result = len(self.spalten) - 1
+        logging.debug("{}: Erweitere Signalmatrix: Neue Spalte {} als Kopie von Spalte {} fuer Gleisangabe \"{}\" und Richtungsvoranzeiger-Ziel \"{}\"".format(self, result, spaltenidx_original, str_rgl_ggl(rgl_ggl), richtungsanzeiger_ziel))
+        return result
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)

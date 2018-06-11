@@ -113,10 +113,14 @@ class FahrstrassenSuche:
         signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.fahrstr_typ):
             logging.debug("Zielsignal gefunden: {}".format(signal))
-            try:
-                ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append(fahrstrasse)
-            except KeyError:
-                ergebnis_dict[fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)] = [fahrstrasse]
+            refpunkt = fahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)
+            if refpunkt is None:
+                logging.warn("{}: Element hat keinen Referenzpunkt vom Typ Signal. Es werden keine Fahrstrassen zu diesem Signal eingerichtet.".format(signal))
+            else:
+                try:
+                    ergebnis_dict[refpunkt].append(fahrstrasse)
+                except KeyError:
+                    ergebnis_dict[refpunkt] = [fahrstrasse]
             return
 
         folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
