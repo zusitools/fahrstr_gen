@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Zusi>
+<Info DateiTyp="Strecke" Version="A.1" MinVersion="A.1"/>
+<Strecke>
+<Datei/>
+<HintergrundDatei/>
+<BefehlsKonfiguration/>
+<Kachelpfad Dateiname="Kacheln\" NurInfo="1"/>
+<UTM/>
+<SkyDome>
+<HimmelTex Dateiname="_Setup\sky\sky.dds"/>
+<SonneTex Dateiname="_Setup\sky\sun.dds"/>
+<SonneHorizontTex Dateiname="_Setup\sky\sun_horizon.dds"/>
+<MondTex Dateiname="_Setup\sky\moon.dds"/>
+<SternTex Dateiname="_Setup\sky\star.dds"/>
+</SkyDome>
+<ReferenzElemente ReferenzNr="1" StrElement="1" StrNorm="1"/>
+<ReferenzElemente ReferenzNr="2" StrElement="1" StrNorm="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="3" StrElement="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="4" StrElement="3" StrNorm="1" RefTyp="4" Info="Signal: Anfang A"/>
+<ReferenzElemente ReferenzNr="5" StrElement="3" StrNorm="1" RefTyp="2" Info="Register no. 5001"/>
+<ReferenzElemente ReferenzNr="6" StrElement="3" RefTyp="2" Info="Register no. 5001"/>
+<ReferenzElemente ReferenzNr="7" StrElement="5" StrNorm="1" RefTyp="4" Info="Signal: Mitte M"/>
+<ReferenzElemente ReferenzNr="8" StrElement="5" StrNorm="1" RefTyp="2" Info="Register no. 5002"/>
+<ReferenzElemente ReferenzNr="9" StrElement="5" RefTyp="2" Info="Register no. 5002"/>
+<ReferenzElemente ReferenzNr="10" StrElement="12" StrNorm="1" RefTyp="4" Info="Signal: Ende E"/>
+<ReferenzElemente ReferenzNr="11" StrElement="12" StrNorm="1" RefTyp="2" Info="Register no. 5003"/>
+<ReferenzElemente ReferenzNr="12" StrElement="12" RefTyp="2" Info="Register no. 5003"/>
+<StrElement Nr="1" spTrass="27.7778">
+<g/>
+<b X="10"/>
+<InfoNormRichtung vMax="-1" Reg="5000"/>
+<InfoGegenRichtung vMax="-1" Reg="5000"/>
+<NachNorm Nr="2"/>
+</StrElement>
+<StrElement Nr="2" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="10"/>
+<b X="100.9091"/>
+<NachNorm Nr="3"/>
+<NachGegen Nr="1"/>
+</StrElement>
+<StrElement Nr="3" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="100.9091"/>
+<b X="191.8182"/>
+<InfoNormRichtung vMax="-1" Reg="5001">
+<Signal NameBetriebsstelle="Anfang" Stellwerk="Anfang Af" Signalname="A" SignalTyp="7" BoundingR="10">
+<p X="191.8182" Y="-3.2" Z="-0.5"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_Gittermast-8m.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="-0.15" Z="7.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_HSigBlende_HP1-Gas-DB.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="0.045" Z="8"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\HP1-normal.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\Mastblech-5Marken2begr-breit.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_8m-gitter-2begr.lod0.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.2" Z="0.5"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2451">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<Ersatzsignal ErsatzsigBezeichnung="Befehl" ErsatzsigID="0000050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="BefehlGegengleis" ErsatzsigID="0001050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="28" Wert="11"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5001"/>
+<NachNorm Nr="4"/>
+<NachGegen Nr="2"/>
+</StrElement>
+<StrElement Nr="4" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="191.8182"/>
+<b X="282.7273"/>
+<NachNorm Nr="5"/>
+<NachGegen Nr="3"/>
+</StrElement>
+<StrElement Nr="5" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="282.7273"/>
+<b X="373.6364"/>
+<InfoNormRichtung vMax="-1" Reg="5002">
+<Signal NameBetriebsstelle="Mitte" Stellwerk="Mitte Mf" Signalname="M" SignalFlags="4" SignalTyp="5" BoundingR="10">
+<p X="373.6364" Y="-2.25"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Rangierdienst\Lichtgleissperrsignale\GsSElSiemens_Mast-4m8.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Z="5"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Rangierdienst\Lichtgleissperrsignale\GsSiemens_Schirm1948-h.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="2.25"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p X="-0.1" Z="1.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Rangierdienst\Lichtgleissperrsignale\Gs_Schild_wrw-h.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="2"/>
+<HsigBegriff FahrstrTyp="6"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="29" MatrixGeschw="6.9444"/>
+<MatrixEintrag Signalbild="27">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<Ersatzsignal>
+<MatrixEintrag/>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5002"/>
+<NachNorm Nr="6"/>
+<NachGegen Nr="4"/>
+</StrElement>
+<StrElement Nr="6" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="373.6364"/>
+<b X="464.5454"/>
+<NachNorm Nr="7"/>
+<NachGegen Nr="5"/>
+</StrElement>
+<StrElement Nr="7" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="464.5454"/>
+<b X="555.4545"/>
+<NachNorm Nr="8"/>
+<NachGegen Nr="6"/>
+</StrElement>
+<StrElement Nr="8" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="555.4545"/>
+<b X="646.3636"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="28" Beschr="1337a"/>
+</InfoNormRichtung>
+<NachNorm Nr="9"/>
+<NachGegen Nr="7"/>
+</StrElement>
+<StrElement Nr="9" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="646.3636"/>
+<b X="737.2727"/>
+<NachNorm Nr="10"/>
+<NachGegen Nr="8"/>
+</StrElement>
+<StrElement Nr="10" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="737.2727"/>
+<b X="828.1818"/>
+<NachNorm Nr="11"/>
+<NachGegen Nr="9"/>
+</StrElement>
+<StrElement Nr="11" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="828.1818"/>
+<b X="919.0908"/>
+<NachNorm Nr="12"/>
+<NachGegen Nr="10"/>
+</StrElement>
+<StrElement Nr="12" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="919.0908"/>
+<b X="1009.9999"/>
+<InfoNormRichtung vMax="-1" Reg="5003">
+<Signal NameBetriebsstelle="Ende" Stellwerk="Ende Ef" Signalname="E" SignalTyp="7" BoundingR="10">
+<p X="1009.9999" Y="-3.2" Z="-0.5"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_Gittermast-8m.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="-0.15" Z="7.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_HSigBlende_HP1-Gas-DB.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="0.045" Z="8"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\HP1-normal.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\Mastblech-5Marken2begr-breit.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_8m-gitter-2begr.lod0.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.2" Z="0.5"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2451">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<Ersatzsignal ErsatzsigBezeichnung="Befehl" ErsatzsigID="0000050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="BefehlGegengleis" ErsatzsigID="0001050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="28" Wert="11"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5003"/>
+<NachGegen Nr="11"/>
+</StrElement>
+<Fahrstrasse FahrstrName="Aufgleispunkt -&gt; Anfang A" FahrstrTyp="TypZug" Laenge="100.9091">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="4">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrRegister>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M" FahrstrTyp="TypZug" Laenge="181.8182">
+<FahrstrStart Ref="4">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="7">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="8">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrSignal Ref="4">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="7">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Mitte M -&gt; Ende E" FahrstrStrecke="1337a" RglGgl="3" FahrstrTyp="TypZug" Laenge="636.3636">
+<FahrstrStart Ref="7">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="10">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="11">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrSignal Ref="7" FahrstrSignalZeile="-1" FahrstrSignalErsatzsignal="1">
+<Datei Dateiname="routes\RangiersignalTest.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+</Strecke>
+</Zusi>
