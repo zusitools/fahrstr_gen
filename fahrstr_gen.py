@@ -108,7 +108,7 @@ def finde_fahrstrassen(args):
 
                         for f in fahrstr_suche.get_fahrstrassen(graph.get_knoten(str_element), richtung):
                             if args.nummerieren:
-                                idx = len(fahrstrassen_nummerierung[(f.start, f.ziel)])
+                                idx = sum(1 for f2 in fahrstrassen_nummerierung[(f.start, f.ziel)] if f2.fahrstr_typ == f.fahrstr_typ)
                                 if idx != 0:
                                     f.name += " ({})".format(idx)
                                 fahrstrassen_nummerierung[(f.start, f.ziel)].append(f)
