@@ -265,7 +265,7 @@ class FahrstrGraphKnoten(Knoten):
                         else:
                             kante.register.append(refpunkt)
 
-                    except (KeyError, ValueError):
+                    except (KeyError, ValueError, AttributeError):
                         logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltigen Referenzpunkt (Nummer \"{}\", Modul \"{}\"). Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0), ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
