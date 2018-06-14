@@ -250,13 +250,31 @@ class Signal:
                             if signalgeschwindigkeit != 0:
                                 self.signalgeschwindigkeit = signalgeschwindigkeit
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
-                            self.gegengleisanzeiger |= 1 << int(float(ereignis.get("Wert", 0)))
+                            signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
+                            if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
+                                self.gegengleisanzeiger |= 1 << signalbegriff_nr
+                            else:
+                                logging.warn("{}: Matrix enthaelt Ereignis \"Gegengleis kennzeichnen\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
                         elif ereignisnr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
-                            if ereignis.get("Beschr") is not None:
-                                self.richtungsanzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
+                            beschr = ereignis.get("Beschr", "")
+                            if len(beschr):
+                                signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
+                                if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
+                                    self.richtungsanzeiger[ereignis.get("Beschr")] |= 1 << signalbegriff_nr
+                                else:
+                                    logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsanzeiger-Ziel\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
+                            else:
+                                logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsanzeiger-Ziel\" ohne Text".format(self))
                         elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
-                            if ereignis.get("Beschr") is not None:
-                                self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << int(float(ereignis.get("Wert", 0)))
+                            beschr = ereignis.get("Beschr", "")
+                            if len(beschr):
+                                signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
+                                if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
+                                    self.richtungsvoranzeiger[ereignis.get("Beschr")] |= 1 << signalbegriff_nr
+                                else:
+                                    logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsvoranzeiger\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
+                            else:
+                                logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsvoranzeiger\" ohne Text".format(self))
             elif n.tag == "Ersatzsignal":
                 self.hat_ersatzsignal = True
 
