@@ -2,7 +2,7 @@
 
 from .konstanten import *
 from .streckengraph import Streckengraph, Knoten
-from .strecke import ist_hsig_fuer_fahrstr_typ, ist_vsig, geschw_min
+from .strecke import ist_hsig_fuer_fahrstr_typ, ist_fahrstr_start_sig, ist_vsig, geschw_min
 
 import logging
 
@@ -19,7 +19,9 @@ class VorsignalGraph(Streckengraph):
         return element is not None and (
                 super()._ist_knoten(element) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(NORM), FAHRSTR_TYP_ZUG) or
-                ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), FAHRSTR_TYP_ZUG))
+                ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), FAHRSTR_TYP_ZUG) or
+                ist_fahrstr_start_sig(element.signal(NORM), FAHRSTR_TYP_ZUG) or
+                ist_fahrstr_start_sig(element.signal(GEGEN), FAHRSTR_TYP_ZUG))
 
 # Eine Kante zwischen zwei Knoten im Streckengraphen, die alle Vorsignale auf dem Weg zwischen zwei Knoten (rueckwaerts) enthaelt.
 # Der Zielknoten ist also ein *Vorgaenger* des Startknotens.
@@ -92,7 +94,7 @@ class VorsignalGraphKnoten(Knoten):
             knoten = self.graph.get_knoten(element_richtung.element)
             if knoten is not None:
                 kante.ziel = knoten.richtung(element_richtung.richtung)
-                if ist_hsig_fuer_fahrstr_typ(element_richtung.signal(), FAHRSTR_TYP_ZUG) and \
+                if (ist_hsig_fuer_fahrstr_typ(element_richtung.signal(), FAHRSTR_TYP_ZUG) or ist_fahrstr_start_sig(element_richtung.signal(), FAHRSTR_TYP_ZUG)) and \
                         element_richtung.signal().sigflags & (SIGFLAG_KENNLICHT_NACHFOLGESIGNAL | SIGFLAG_KENNLICHT_VORGAENGERSIGNAL | SIGFLAG_HOCHSIGNALISIERUNG) == 0:
                     kante.vorher_keine_vsig_verknuepfung = True
                 break

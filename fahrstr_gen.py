@@ -106,7 +106,9 @@ def finde_fahrstrassen(args):
                             for r in modulverwaltung.dieses_modul.referenzpunkte[str_element] if r.element_richtung.richtung == richtung
                         ):
 
-                        for f in fahrstr_suche.get_fahrstrassen(graph.get_knoten(str_element), richtung):
+                        knoten = graph.get_knoten(str_element)
+                        assert(knoten is not None)
+                        for f in fahrstr_suche.get_fahrstrassen(knoten, richtung):
                             if args.nummerieren:
                                 idx = sum(1 for f2 in fahrstrassen_nummerierung[(f.start, f.ziel)] if f2.fahrstr_typ == f.fahrstr_typ)
                                 if idx != 0:

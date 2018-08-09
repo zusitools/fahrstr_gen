@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
-from .strecke import ist_hsig_fuer_fahrstr_typ, geschw_kleiner, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
+from .strecke import ist_fahrstr_start_sig, ist_hsig_fuer_fahrstr_typ, geschw_kleiner, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
 from . import modulverwaltung
 
 import logging
@@ -51,7 +51,7 @@ class FahrstrassenSuche:
 
         result = []
         for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
-            einzelfahrstr_name = ("Aufgleispunkt" if not ist_hsig_fuer_fahrstr_typ(knoten.signal(richtung), self.fahrstr_typ) else knoten.signal(richtung).signalbeschreibung()) + \
+            einzelfahrstr_name = ("Aufgleispunkt" if not ist_fahrstr_start_sig(knoten.signal(richtung), self.fahrstr_typ) else knoten.signal(richtung).signalbeschreibung()) + \
                     " -> " + ziel_refpunkt.signal().signalbeschreibung()
 
             if einzelfahrstr_name in self.bedingungen:
@@ -156,8 +156,9 @@ class FahrstrassenSuche:
 
         # Setze Start und Ziel
         result.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
-        if result.start is None or not ist_hsig_fuer_fahrstr_typ(result.start.signal(), self.fahrstr_typ):
+        if result.start is None or not ist_fahrstr_start_sig(result.start.signal(), self.fahrstr_typ):
             result.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
+            assert(result.start is not None)
 
         result.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
         result.zufallswert = float(result.ziel.signal().xml_knoten.get("ZufallsWert", 0))
@@ -217,7 +218,7 @@ class FahrstrassenSuche:
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             if idx == 0:
                 # Startsignal ansteuern
-                if ist_hsig_fuer_fahrstr_typ(result.start.signal(), self.fahrstr_typ):
+                if ist_fahrstr_start_sig(result.start.signal(), self.fahrstr_typ):
                     zeile_ersatzsignal = result.start.signal().get_hsig_ersatzsignal_zeile(result.rgl_ggl)
                     zeile_regulaer = result.start.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
                     nutze_ersatzsignal = any(einzelfahrstrasse.ziel.signal().ist_hilfshauptsignal for einzelfahrstrasse in einzelfahrstrassen)

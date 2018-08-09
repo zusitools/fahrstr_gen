@@ -294,8 +294,16 @@ class Signal:
         return self.hsig_fuer & fahrstr_typ != 0
 
     def ist_fahrstr_start_sig(self, fahrstr_typ):
-        return self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ) and (
-            self.hat_ersatzsignal or any(zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw != 0 for zeile in self.zeilen))
+        # Zusi-Logik: Das Signal muss ein Hauptsignal fuer mindestens einen der bei der
+        # Fahrstrassenerzeugung angekreuzten Fahrstrassentypen sein sowie eine Zeile
+        # (gleich welcher Geschwindigkeit) fuer `fahrstr_typ` haben.
+        #
+        # Die fahrstr_gen-Logik ist leicht anders:
+        #  - Sie ist unabhaengig davon, ob andere Fahrstrassentypen als `fahrstr_typ` angekreuzt sind.
+        #  - Sie verlangt eine Zeile mit v != 0 oder ein Ersatzsignal fuer `fahrstr_typ`, da sonst das
+        #    Signal nicht sinnvoll angesteuert werden kann (Zusi steuert in diesem Fall die nicht existente Zeile -1 an).
+        return self.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER | FAHRSTR_TYP_ZUG | FAHRSTR_TYP_LZB) and (
+            any(zeile.fahrstr_typ & fahrstr_typ != 0 and (self.hat_ersatzsignal or zeile.hsig_geschw != 0) for zeile in self.zeilen))
 
     def ist_vsig(self):
         # Anders als in der Doku angegeben, ist fuer Zusi anscheinend nur relevant, ob das Signal eine
@@ -334,7 +342,7 @@ class Signal:
             # WORKAROUND zur Kompatibilitaet mit Zusi: Zusi akzeptiert auch Zeile -2 als Hsig-Geschwindigkeit.
             for idx, zeile in enumerate(self.zeilen):
                 if zeile.fahrstr_typ & fahrstr_typ != 0 and zeile.hsig_geschw == -2.0:
-                    logging.warn("{}: Nutze Kennlichtzeile (Geschwindigkeit -2) als regulaere Fahrstrassenzeile (Geschwindigkeit {})".format(self, str_geschw(zielgeschwindigkeit)))
+                    logging.warn("{}: Nutze Kennlichtzeile {} (Geschwindigkeit -2) als regulaere Fahrstrassenzeile fuer Fahrstrassentyp {} (Geschwindigkeit {})".format(self, idx, str_fahrstr_typ(fahrstr_typ), str_geschw(zielgeschwindigkeit)))
                     return idx
 
         return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser

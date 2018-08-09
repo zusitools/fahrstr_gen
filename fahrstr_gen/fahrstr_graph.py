@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from collections import namedtuple, defaultdict, OrderedDict
 
 from .konstanten import *
-from .strecke import ist_hsig_fuer_fahrstr_typ, gegenrichtung, geschw_min
+from .strecke import ist_hsig_fuer_fahrstr_typ, ist_fahrstr_start_sig, gegenrichtung, geschw_min
 from .streckengraph import Streckengraph, Knoten
 from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
 
@@ -25,12 +25,15 @@ class FahrstrGraph(Streckengraph):
                 super()._ist_knoten(element) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(NORM), self.fahrstr_typ) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), self.fahrstr_typ) or
+                ist_fahrstr_start_sig(element.signal(NORM), self.fahrstr_typ) or
+                ist_fahrstr_start_sig(element.signal(GEGEN), self.fahrstr_typ) or
                 (self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_RANGIER] and any(refpunkt.reftyp == REFTYP_AUFGLEISPUNKT for refpunkt in element.modul.referenzpunkte[element])))
 
 # Eine Kante zwischen zwei Knoten im Streckengraphen. Sie enthaelt alle fahrstrassenrelevanten Daten (Signale, Weichen, Aufloesepunkte etc.)
 # einer Folge von gerichteten Streckenelementen zwischen den beiden Knoten (exklusive Start, inklusive Ziel, inklusive Start-Weichenstellung).
 class FahrstrGraphKante:
     def __init__(self, start):
+        assert(start is not None)
         self.start = start  # KnotenUndRichtung
         self.ziel = None  # KnotenUndRichtung
 
@@ -125,29 +128,29 @@ class FahrstrGraphKnoten(Knoten):
                 element_richtung = None
                 break
 
-            # Signal am aktuellen Element in die Signalliste einfuegen
+            # Signal am aktuellen Element in die Signalliste einfuegen, falls es nicht Zielsignal der Kante ist
             signal = element_richtung.signal()
             if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
                 verkn = False
                 zeile = -1
 
-                # Hauptsignale, die nicht dem aktuellen Fahrstrassentyp entsprechen, auf -1 stellen:
-                if signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB):
+                # Hauptsignale im Fahrweg, die nicht Zielsignal sind, auf -1 stellen:
+                if self.graph.fahrstr_typ == FAHRSTR_TYP_ZUG and (signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_LZB)):
                     zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
                     if zeile is None:
                         logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                     else:
-                        logging.debug("{}: LZB-Hauptsignal bei Nicht-LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
+                        logging.debug("{}: LZB-Hauptsignal bei Zugfahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                         verkn = True
-                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER):
-                    if signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0:
+                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_RANGIER):
+                    if (self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER) or (signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0):
                         zeile = signal.get_hsig_zeile(FAHRSTR_TYP_RANGIER, -1)
                         if zeile is None:
                             logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                         else:
                             logging.debug("{}: Rangiersignal bei Zug- oder LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                             verkn = True
-                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG):
+                elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_FAHRWEG):
                     if signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:
                         zeile = signal.get_hsig_zeile(FAHRSTR_TYP_FAHRWEG, -1)
                         if zeile is None:
@@ -171,15 +174,14 @@ class FahrstrGraphKnoten(Knoten):
                     logging.debug("{}: hat Richtungs- oder Gegengleisanzeiger (Zeile noch unbekannt)".format(signal))
                     # Zeile muss ermittelt werden
 
-                else:
-                    logging.debug("{}: wird nicht in die Fahrstrasse aufgenommen".format(signal))
-
                 if verkn:
                     refpunkt = element_richtung.refpunkt(REFTYP_SIGNAL)
                     if refpunkt is None:
                         logging.warn("Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
+                else:
+                    logging.debug("{}: wird nicht in die Fahrstrasse aufgenommen".format(signal))
 
             # Signal am aktuellen Element (Gegenrichtung) in die Signalliste einfuegen
             element_richtung_gegenrichtung = element_richtung.gegenrichtung()
