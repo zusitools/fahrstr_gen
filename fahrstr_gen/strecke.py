@@ -345,7 +345,12 @@ class Signal:
                     logging.warn("{}: Nutze Kennlichtzeile {} (Geschwindigkeit -2) als regulaere Fahrstrassenzeile fuer Fahrstrassentyp {} (Geschwindigkeit {})".format(self, idx, str_fahrstr_typ(fahrstr_typ), str_geschw(zielgeschwindigkeit)))
                     return idx
 
-        return zeile_kleinergleich if zeile_kleinergleich is not None else zeile_groesser
+        if zeile_kleinergleich is not None:
+            return zeile_kleinergleich
+        else:
+            # Das ist recht normal, falls Signale nicht geschwindigkeitsabhaengig sind (etwa alleinstehende Zs oder GUe)
+            # logging.warn("{}: Nutze Zeile {} (Geschwindigkeit {}) fuer Fahrstrassengeschwindigkeit {}, weil keine Zeile mit kleinerer Geschwindigkeit != 0 existiert.".format(self, zeile_groesser, str_geschw(geschw_groesser), str_geschw(zielgeschwindigkeit)))
+            return zeile_groesser
 
     # Gibt die Zeile zurueck, die die Zeile Nummer `zeilenidx_original` gemaess dem angegebenen Richtungsanzeiger
     # und der angegebenen Gleisangabe erweitert.
