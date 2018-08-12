@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import xml.etree.ElementTree as ET
-from collections import defaultdict, Counter
+from collections import defaultdict, Counter, OrderedDict
+import itertools
 import operator
 
 from .konstanten import *
@@ -10,6 +11,28 @@ from .strecke import ist_fahrstr_start_sig, ist_hsig_fuer_fahrstr_typ, geschw_kl
 from . import modulverwaltung
 
 import logging
+
+def get_alle_bedingten_register(einzelfahrstr):
+    result = []
+    for kante in einzelfahrstr.kantenliste():
+        result.extend(kante.bedingte_register)
+    return result
+
+def get_bedingte_register_kombinationen(einzelfahrstr_liste):
+    """
+    Liefert eine Liste mit gleicher Laenge wie `einzelfahrstr_liste`,
+    in der fuer jede Einzelfahrstrasse eine Liste mit allen moeglichen
+    Kombinationen bedingter Register (derzeit nur: leere Liste und
+    Liste aller bedingten Register) enthalten sind.
+    """
+    result = []
+    for einzelfahrstr in einzelfahrstr_liste:
+        alle_bedingten_register = get_alle_bedingten_register(einzelfahrstr)
+        if len(alle_bedingten_register):
+            result.append([[], alle_bedingten_register])
+        else:
+            result.append([[]])
+    return result
 
 class FahrstrassenSuche:
     def __init__(self, fahrstr_typ, alternative_fahrwege, bedingungen, vorsignal_graph, flankenschutz_graph, loeschfahrstr_namen):
@@ -157,9 +180,10 @@ class FahrstrassenSuche:
             fahrstr_abschliessen, fahrstr_weiterfuehren))
 
         if fahrstr_abschliessen:
-            fstr = self._neue_fahrstrasse(einzelfahrstr_liste)
-            if fstr is not None:
-                ziel_liste.append(fstr)
+            for bedingte_register in itertools.product(*get_bedingte_register_kombinationen(einzelfahrstr_liste)):
+                fstr = self._neue_fahrstrasse(einzelfahrstr_liste, bedingte_register)
+                if fstr is not None:
+                    ziel_liste.append(fstr)
         if fahrstr_weiterfuehren:
             for einzelfahrstrasse in self._get_einzelfahrstrassen(zielknoten, zielrichtung):
                 self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
@@ -169,9 +193,13 @@ class FahrstrassenSuche:
     def _rangiersignal_in_zugfahrstr_warnung(self, signal):
         return self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and any(z.fahrstr_typ & FAHRSTR_TYP_RANGIER != 0 and z.hsig_geschw not in [0, -2, -999] for z in signal.zeilen)
 
-    # Baut eine neue Fahrstrasse aus den angegebenen Einzelfahrstrassen zusammen.
-    def _neue_fahrstrasse(self, einzelfahrstrassen):
+    # Baut eine neue Fahrstrasse aus den angegebenen Einzelfahrstrassen zusammen,
+    # `bedingte_register` hat die gleiche Laenge wie `einzelfahrstrassen`
+    # und enthaelt fuer jede Einzelfahrstrasse die zu aktivierenden bedingten Register
+    # (Paare aus Referenzpunkt und Beschreibung)
+    def _neue_fahrstrasse(self, einzelfahrstrassen, bedingte_register):
         assert(len(einzelfahrstrassen) > 0)
+        assert(len(bedingte_register) == len(einzelfahrstrassen))
         result = Fahrstrasse(self.fahrstr_typ)
 
         # Setze Start und Ziel
@@ -181,7 +209,10 @@ class FahrstrassenSuche:
             assert(result.start is not None)
 
         result.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
-        result.zufallswert = float(result.ziel.signal().xml_knoten.get("ZufallsWert", 0))
+        if any(len(_) for _ in bedingte_register):
+            result.zufallswert = 1  # Nicht als Ziel: 100%
+        else:
+            result.zufallswert = float(result.ziel.signal().xml_knoten.get("ZufallsWert", 0))
 
         result.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
 
@@ -194,11 +225,14 @@ class FahrstrassenSuche:
         result.rgl_ggl = GLEIS_BAHNHOF
         result.streckenname = ""
         result.richtungsanzeiger = ""
-        for einzelfahrstrasse in einzelfahrstrassen:
+        for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             result.laenge += einzelfahrstrasse.laenge
 
             zielkante = einzelfahrstrasse.kanten.eintrag
             result.name += " -> {}".format(zielkante.ziel.signal().signalbeschreibung())
+
+            if len(bedingte_register[idx]):
+                result.name += " (" + ", ".join(list(OrderedDict.fromkeys(reg[1] for reg in bedingte_register[idx]))) + ")"
 
             for kante in einzelfahrstrasse.kantenliste():
                 if kante.rgl_ggl != GLEIS_BAHNHOF:
@@ -275,15 +309,15 @@ class FahrstrassenSuche:
             else:
                 # Kennlichtsignal ansteuern
                 gefunden = False
-                for idx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
+                for zeilenidx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
                     if zeile.hsig_geschw == -2.0:
                         refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
                         if refpunkt is None:
                             logging.error("{}: Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start))
                             return None
                         else:
-                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(idx, result.rgl_ggl, result.richtungsanzeiger)
-                            if idx != kennlichtsignal_zeile:
+                            kennlichtsignal_zeile = einzelfahrstrasse.start.signal().get_richtungsanzeiger_zeile(zeilenidx, result.rgl_ggl, result.richtungsanzeiger)
+                            if zeilenidx != kennlichtsignal_zeile:
                                 logging.info("{}: Kennlichtsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor nicht mit Richtungs-/Gegengleisanzeiger angesteuert.".format(result.name, refpunkt.signal(), refpunkt.refnr))
                             result.signale.append(FahrstrHauptsignal(refpunkt, kennlichtsignal_zeile, False))
                         gefunden = True
@@ -298,10 +332,10 @@ class FahrstrassenSuche:
 
             # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
             if idx == len(einzelfahrstrassen) - 1:
-                for idx, zeile in enumerate(result.ziel.signal().zeilen):
+                for zeilenidx, zeile in enumerate(result.ziel.signal().zeilen):
                     if zeile.hsig_geschw == -999.0:
                         logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
-                        result.signale.append(FahrstrHauptsignal(result.ziel, idx, False))
+                        result.signale.append(FahrstrHauptsignal(result.ziel, zeilenidx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
                             logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
                         break
@@ -342,6 +376,8 @@ class FahrstrassenSuche:
                             flankenschutz_neu = knoten.get_flankenschutz_stellungen(richtung, nachfolger_idx)
                             flankenschutz_stellungen = [w for w in flankenschutz_stellungen if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_neu)]
                             flankenschutz_stellungen.extend([w for w in flankenschutz_neu if not any(w.refpunkt == w2.refpunkt and w.abstand > w2.abstand for w2 in flankenschutz_stellungen)])
+
+            result.register.extend(reg[0] for reg in bedingte_register[idx])
 
         for weichenstellung in flankenschutz_stellungen:
             if weichenstellung.weichenlage != 1 and weichenstellung not in result.weichen:

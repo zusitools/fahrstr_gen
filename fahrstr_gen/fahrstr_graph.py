@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from collections import namedtuple, defaultdict, OrderedDict
 
 from .konstanten import *
+from .modulverwaltung import get_modul_by_name
 from .strecke import ist_hsig_fuer_fahrstr_typ, ist_fahrstr_start_sig, gegenrichtung, geschw_min
 from .streckengraph import Streckengraph, Knoten
 from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
@@ -44,6 +45,7 @@ class FahrstrGraphKante:
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
 
         self.register = []  # [RefPunkt]
+        self.bedingte_register = []  # [(RefPunkt, Beschreibung)]
         self.weichen = []  # [FahrstrWeichenstellung]
         self.signale = []  # [FahrstrHauptsignal] -- alle Signale, die nicht eine Fahrstrasse beenden, also z.B. Rangiersignale, sowie "Signal in Fahrstrasse verknuepfen". Wenn die Signalzeile den Wert -1 hat, ist die zu waehlende Zeile fahrstrassenabhaengig.
         self.vorsignale = []  # [FahrstrVorsignal] -- nur Vorsignale, die mit "Vorsignal in Fahrstrasse verknuepfen" in einem Streckenelement dieser Kante verknuepft sind
@@ -255,12 +257,18 @@ class FahrstrGraphKnoten(Knoten):
                     else:
                         kante.aufloesepunkte.append(refpunkt)
 
-                elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN:
+                elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN or ereignis_nr == EREIGNIS_REGISTER_BEDINGT_VERKNUEPFEN:
                     try:
-                        kante.register.append(element_richtung.element.modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))])
-                    except (KeyError, ValueError):
-                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
-                        continue
+                        refpunkt_modul = get_modul_by_name(ereignis.get("Beschr", ""), element_richtung.element.modul)
+                        refpunkt = refpunkt_modul.referenzpunkte_by_nr[int(float(ereignis.get("Wert", 0)))]
+
+                        if ereignis_nr == EREIGNIS_REGISTER_BEDINGT_VERKNUEPFEN:
+                            kante.bedingte_register.append((refpunkt, "Bahnsteigkreuzung"))
+                        else:
+                            kante.register.append(refpunkt)
+
+                    except (KeyError, ValueError, AttributeError):
+                        logging.warn("Ereignis \"Register in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltigen Referenzpunkt (Nummer \"{}\", Modul \"{}\"). Die Registerverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0), ereignis.get("Beschr", "")))
 
                 elif ereignis_nr == EREIGNIS_WEICHE_VERKNUEPFEN:
                     try:
