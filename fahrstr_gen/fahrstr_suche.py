@@ -201,6 +201,7 @@ class FahrstrassenSuche:
         assert(len(einzelfahrstrassen) > 0)
         assert(len(bedingte_register) == len(einzelfahrstrassen))
         result = Fahrstrasse(self.fahrstr_typ)
+        hat_bedingte_register = any(len(_) for _ in bedingte_register)
 
         # Setze Start und Ziel
         result.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
@@ -209,7 +210,7 @@ class FahrstrassenSuche:
             assert(result.start is not None)
 
         result.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
-        if any(len(_) for _ in bedingte_register):
+        if hat_bedingte_register:
             result.zufallswert = 1  # Nicht als Ziel: 100%
         else:
             result.zufallswert = float(result.ziel.signal().xml_knoten.get("ZufallsWert", 0))
@@ -246,9 +247,14 @@ class FahrstrassenSuche:
         # Der 3D-Editor nummeriert nur Fahrstrassen, die an einem Signal beginnen.
         if result.start.reftyp != REFTYP_AUFGLEISPUNKT:
             idx = self.fahrstr_nummerierung[(result.start, result.ziel)]
-            if idx != 0:
+            # HACK: Fahrstrassen mit bedingten Registern bekommen die selbe Nummerierung wie ihre zugehoerige
+            # Original-Fahrstrasse ohne bedingte Register (die vorher erzeugt wurde).
+            if hat_bedingte_register:
+                idx -= 1
+            if idx > 0:
                 result.name += " ({})".format(idx)
-            self.fahrstr_nummerierung[(result.start, result.ziel)] += 1
+            if not hat_bedingte_register:
+                self.fahrstr_nummerierung[(result.start, result.ziel)] += 1
 
         if result.name in self.loeschfahrstr_namen:
             logging.info("Loesche Fahrstrasse {}".format(result.name))

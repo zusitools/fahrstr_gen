@@ -1,0 +1,2252 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Zusi>
+<Info DateiTyp="Strecke" Version="A.1" MinVersion="A.1">
+<AutorEintrag/>
+</Info>
+<Strecke>
+<Datei Dateiname="Routes\AlternativeFahrwegeBahnsteigkreuzung.ls3"/>
+<HintergrundDatei/>
+<BefehlsKonfiguration/>
+<Kachelpfad Dateiname="Kacheln\" NurInfo="1"/>
+<UTM/>
+<SkyDome>
+<HimmelTex Dateiname="_Setup\sky\sky.dds"/>
+<SonneTex Dateiname="_Setup\sky\sun.dds"/>
+<SonneHorizontTex Dateiname="_Setup\sky\sun_horizon.dds"/>
+<MondTex Dateiname="_Setup\sky\moon.dds"/>
+<SternTex Dateiname="_Setup\sky\star.dds"/>
+</SkyDome>
+<ReferenzElemente ReferenzNr="1" StrElement="1" StrNorm="1" RefTyp="4" Info="Signal: Anfang A"/>
+<ReferenzElemente ReferenzNr="2" StrElement="3" StrNorm="1" RefTyp="4" Info="Signal: Ende E"/>
+<ReferenzElemente ReferenzNr="3" StrElement="4" StrNorm="1" RefTyp="3" Info="Points  "/>
+<ReferenzElemente ReferenzNr="4" StrElement="17" StrNorm="1" RefTyp="3" Info="Points  "/>
+<ReferenzElemente ReferenzNr="5" StrElement="27" StrNorm="1" RefTyp="2" Info="Register no. 1"/>
+<ReferenzElemente ReferenzNr="6" StrElement="27" RefTyp="2" Info="Register no. 1"/>
+<ReferenzElemente ReferenzNr="7" StrElement="28" StrNorm="1" RefTyp="4" Info="Signal: Mitte M2"/>
+<ReferenzElemente ReferenzNr="8" StrElement="29" StrNorm="1" RefTyp="3" Info="Points  "/>
+<ReferenzElemente ReferenzNr="9" StrElement="41" StrNorm="1" RefTyp="3" Info="Points  "/>
+<ReferenzElemente ReferenzNr="10" StrElement="52" StrNorm="1" RefTyp="4" Info="Signal: Mitte M1"/>
+<ReferenzElemente ReferenzNr="11" StrElement="53" StrNorm="1" RefTyp="3" Info="Points  "/>
+<ReferenzElemente ReferenzNr="12" StrElement="1" StrNorm="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="13" StrElement="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="14" StrElement="3" StrNorm="1" RefTyp="2" Info="Register no. 5001"/>
+<ReferenzElemente ReferenzNr="15" StrElement="3" RefTyp="2" Info="Register no. 5001"/>
+<ReferenzElemente ReferenzNr="16" StrElement="4" StrNorm="1" RefTyp="2" Info="Register no. 5002"/>
+<ReferenzElemente ReferenzNr="17" StrElement="4" RefTyp="2" Info="Register no. 5002"/>
+<ReferenzElemente ReferenzNr="18" StrElement="17" StrNorm="1" RefTyp="2" Info="Register no. 5003"/>
+<ReferenzElemente ReferenzNr="19" StrElement="17" RefTyp="2" Info="Register no. 5003"/>
+<ReferenzElemente ReferenzNr="20" StrElement="28" StrNorm="1" RefTyp="2" Info="Register no. 5004"/>
+<ReferenzElemente ReferenzNr="21" StrElement="28" RefTyp="2" Info="Register no. 5004"/>
+<ReferenzElemente ReferenzNr="22" StrElement="29" StrNorm="1" RefTyp="2" Info="Register no. 5005"/>
+<ReferenzElemente ReferenzNr="23" StrElement="29" RefTyp="2" Info="Register no. 5005"/>
+<ReferenzElemente ReferenzNr="24" StrElement="41" StrNorm="1" RefTyp="2" Info="Register no. 5006"/>
+<ReferenzElemente ReferenzNr="25" StrElement="41" RefTyp="2" Info="Register no. 5006"/>
+<ReferenzElemente ReferenzNr="26" StrElement="52" StrNorm="1" RefTyp="2" Info="Register no. 5007"/>
+<ReferenzElemente ReferenzNr="27" StrElement="52" RefTyp="2" Info="Register no. 5007"/>
+<ReferenzElemente ReferenzNr="28" StrElement="53" StrNorm="1" RefTyp="2" Info="Register no. 5008"/>
+<ReferenzElemente ReferenzNr="29" StrElement="53" RefTyp="2" Info="Register no. 5008"/>
+<StrElement Nr="1" spTrass="27.7778" Oberbau="B55 SKL-Oberbau">
+<g X="-81" Y="15.75"/>
+<b X="-55" Y="15.75"/>
+<InfoNormRichtung vMax="-1" Reg="5000">
+<Signal NameBetriebsstelle="Anfang" Stellwerk="Anfang Af" Signalname="A" SignalTyp="7" BoundingR="10">
+<p X="-55" Y="12.55" Z="-0.5"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_Gittermast-8m.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="-0.15" Z="7.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_HSigBlende_HP1-Gas-DB.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="0.045" Z="8"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\HP1-normal.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\Mastblech-5Marken2begr-breit.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_8m-gitter-2begr.lod0.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.2" Z="0.5"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2451">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<Ersatzsignal ErsatzsigBezeichnung="Befehl" ErsatzsigID="0000050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="BefehlGegengleis" ErsatzsigID="0001050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="28" Wert="11"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="27.7778" km="-0.026" pos="1" Reg="5000"/>
+<NachNorm Nr="73"/>
+</StrElement>
+<StrElement Nr="2" spTrass="27.7778" Oberbau="B55 SKL-Oberbau">
+<g X="247.1563" Y="15.75"/>
+<b X="333.0781" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0859" pos="1"/>
+<NachNorm Nr="3"/>
+<NachGegen Nr="53"/>
+</StrElement>
+<StrElement Nr="3" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="333.0781" Y="15.75"/>
+<b X="419" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778" Reg="5001">
+<Signal NameBetriebsstelle="Ende" Stellwerk="Ende Ef" Signalname="E" SignalTyp="7" BoundingR="10">
+<p X="419" Y="12.55" Z="-0.5"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_Gittermast-8m.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="-0.15" Z="7.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_HSigBlende_HP1-Gas-DB.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="0.045" Z="8"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\HP1-normal.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\Mastblech-5Marken2begr-breit.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Formsignale_Einheitsbauform\Objekte\ls3-HSIG\egli_8m-gitter-2begr.lod0.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.2" Z="0.5"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2451">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="3273" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="2725" MatrixGeschw="-1"/>
+<Ersatzsignal ErsatzsigBezeichnung="Befehl" ErsatzsigID="0000050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="BefehlGegengleis" ErsatzsigID="0001050D">
+<MatrixEintrag Signalbild="2451" MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+<Ereignis Er="28" Wert="11"/>
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="27.7778" km="-0.0859" pos="1" Reg="5001"/>
+<NachGegen Nr="2"/>
+</StrElement>
+<StrElement Nr="4" spTrass="27.7778" Anschluss="256" Fkt="4" Oberbau="B55 SKL-Oberbau">
+<g X="-29" Y="15.75"/>
+<b X="-27.8" Y="15.75"/>
+<InfoNormRichtung vMax="-1" km="-0.01" pos="1" Reg="5002">
+<Signal SignalFlags="3" SignalTyp="2" BoundingR="27">
+<p X="-29" Y="15.75"/>
+<phi Z="0"/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\54 190 1-7_5 Links Schienen K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190L gerade K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190L abzweig K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.65" Y="-2.07"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) links" WeichenbaugruppePos1="1">
+<p X="1.65" Y="2.07"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) links" WeichenbaugruppePos0="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="10" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_links.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="11" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_rechts.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeBeschreibung="ohne Weichensignal">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Weichensignal reflektierend rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Weichensignal reflektierend links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Weichensignal für EOW rechts" WeichenbaugruppePos0="1">
+<p X="0.7" Y="-2.35" Z="-0.35"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Weichensignal für EOW links" WeichenbaugruppePos0="1">
+<p X="0.7" Y="2.35" Z="-0.35"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeBeschreibung="Keine Aufschüttung">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links und rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff FahrstrTyp="1"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="1"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="3" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="5" MatrixGeschw="-1"/>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5002"/>
+<NachNorm Nr="5"/>
+<NachNorm Nr="8"/>
+<NachGegen Nr="73"/>
+</StrElement>
+<StrElement Nr="5" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="-27.8" Y="15.75"/>
+<b X="-16.95" Y="15.75"/>
+<NachNorm Nr="6"/>
+<NachGegen Nr="4"/>
+</StrElement>
+<StrElement Nr="6" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="-16.95" Y="15.75"/>
+<b X="-5.751" Y="15.75"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="7"/>
+<NachGegen Nr="5"/>
+</StrElement>
+<StrElement Nr="7" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="-5.751" Y="15.75"/>
+<b X="-3.1387" Y="15.75"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="40"/>
+<NachGegen Nr="6"/>
+</StrElement>
+<StrElement Nr="8" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-27.8" Y="15.75"/>
+<b X="-22.3763" Y="15.8655"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoGegenRichtung>
+<NachNorm Nr="9"/>
+<NachGegen Nr="4"/>
+</StrElement>
+<StrElement Nr="9" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-22.3763" Y="15.8655"/>
+<b X="-16.9581" Y="16.142"/>
+<NachNorm Nr="10"/>
+<NachGegen Nr="8"/>
+</StrElement>
+<StrElement Nr="10" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-16.9581" Y="16.142"/>
+<b X="-11.3759" Y="16.5692"/>
+<NachNorm Nr="11"/>
+<NachGegen Nr="9"/>
+</StrElement>
+<StrElement Nr="11" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-11.3759" Y="16.5692"/>
+<b X="-5.809" Y="17.1706"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="12"/>
+<NachGegen Nr="10"/>
+</StrElement>
+<StrElement Nr="12" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-5.809" Y="17.1706"/>
+<b X="-3.8889" Y="17.4167"/>
+<InfoNormRichtung vMax="-1" pos="1"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="13"/>
+<NachGegen Nr="11"/>
+</StrElement>
+<StrElement Nr="13" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="-3.8889" Y="17.4167"/>
+<b X="-3.2549" Y="17.5012"/>
+<InfoGegenRichtung vMax="-1"/>
+<NachNorm Nr="15"/>
+<NachGegen Nr="12"/>
+</StrElement>
+<StrElement Nr="14" spTrass="27.7778" Oberbau="B55 SKL-Oberbau">
+<g X="26.2188" Y="19.75"/>
+<b X="48.1875" Y="19.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.022" pos="1"/>
+<NachNorm Nr="29"/>
+<NachGegen Nr="17"/>
+</StrElement>
+<StrElement Nr="15" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="-3.2549" Y="17.5012"/>
+<b X="0.4737" Y="17.9988"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0038" pos="1"/>
+<NachNorm Nr="26"/>
+<NachGegen Nr="13"/>
+</StrElement>
+<StrElement Nr="16" spTrass="27.7778" Anschluss="1" Oberbau="B55 SKL-Oberbau">
+<g X="-3.138" Y="19.75"/>
+<b X="0.3575" Y="19.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0035" pos="1"/>
+<NachNorm Nr="20"/>
+</StrElement>
+<StrElement Nr="17" spTrass="27.7778" Fkt="4" Oberbau="B55 SKL-Oberbau">
+<g X="26.2188" Y="19.75"/>
+<b X="25.0187" Y="19.75"/>
+<InfoNormRichtung vMax="-1" km="-0.01" pos="1" Reg="5003">
+<Signal SignalFlags="3" SignalTyp="2" BoundingR="27">
+<p X="26.2188" Y="19.75"/>
+<phi Z="-3.141593"/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\54 190 1-7_5 Links Schienen K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190L gerade K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190L abzweig K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.65" Y="-2.07"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) links" WeichenbaugruppePos1="1">
+<p X="1.65" Y="2.07"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) links" WeichenbaugruppePos0="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="10" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_links.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="11" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_rechts.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeBeschreibung="ohne Weichensignal">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Weichensignal reflektierend rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Weichensignal reflektierend links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Weichensignal für EOW rechts" WeichenbaugruppePos0="1">
+<p X="0.7" Y="-2.35" Z="-0.35"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Weichensignal für EOW links" WeichenbaugruppePos0="1">
+<p X="0.7" Y="2.35" Z="-0.35"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeBeschreibung="Keine Aufschüttung">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links und rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff FahrstrTyp="1"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="1"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="3" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="5" MatrixGeschw="-1"/>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5003"/>
+<NachNorm Nr="18"/>
+<NachNorm Nr="21"/>
+<NachGegen Nr="14"/>
+</StrElement>
+<StrElement Nr="18" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="25.0187" Y="19.75"/>
+<b X="14.1687" Y="19.75"/>
+<NachNorm Nr="19"/>
+<NachGegen Nr="17"/>
+</StrElement>
+<StrElement Nr="19" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="14.1687" Y="19.75"/>
+<b X="2.9697" Y="19.75"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="20"/>
+<NachGegen Nr="18"/>
+</StrElement>
+<StrElement Nr="20" spTrass="27.7778" Anschluss="257" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="2.9697" Y="19.75"/>
+<b X="0.3575" Y="19.75"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="16"/>
+<NachGegen Nr="19"/>
+</StrElement>
+<StrElement Nr="21" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="25.0187" Y="19.75"/>
+<b X="19.5951" Y="19.6345"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoGegenRichtung>
+<NachNorm Nr="22"/>
+<NachGegen Nr="17"/>
+</StrElement>
+<StrElement Nr="22" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="19.5951" Y="19.6345"/>
+<b X="14.1769" Y="19.358"/>
+<NachNorm Nr="23"/>
+<NachGegen Nr="21"/>
+</StrElement>
+<StrElement Nr="23" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="14.1769" Y="19.358"/>
+<b X="8.5947" Y="18.9308"/>
+<NachNorm Nr="24"/>
+<NachGegen Nr="22"/>
+</StrElement>
+<StrElement Nr="24" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="8.5947" Y="18.9308"/>
+<b X="3.0278" Y="18.3294"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="25"/>
+<NachGegen Nr="23"/>
+</StrElement>
+<StrElement Nr="25" kr="0.0053" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="3.0278" Y="18.3294"/>
+<b X="1.1077" Y="18.0833"/>
+<InfoNormRichtung vMax="-1" pos="1"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="26"/>
+<NachGegen Nr="24"/>
+</StrElement>
+<StrElement Nr="26" spTrass="27.7778" Anschluss="257" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="1.1077" Y="18.0833"/>
+<b X="0.4737" Y="17.9988"/>
+<InfoGegenRichtung vMax="-1"/>
+<NachNorm Nr="15"/>
+<NachGegen Nr="25"/>
+</StrElement>
+<StrElement Nr="27" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="74.0488" Y="19.75"/>
+<b X="132.9935" Y="19.75"/>
+<InfoNormRichtung vMax="27.7778" Reg="1"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0589" pos="1" Reg="1"/>
+<NachNorm Nr="28"/>
+<NachGegen Nr="32"/>
+</StrElement>
+<StrElement Nr="28" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="132.9935" Y="19.75"/>
+<b X="191.9383" Y="19.75"/>
+<InfoNormRichtung vMax="27.7778" Reg="5004">
+<Signal NameBetriebsstelle="Mitte" Stellwerk="Mitte Mf" Signalname="M2" SignalFlags="16" SignalTyp="9" BoundingR="10">
+<p X="191.9383" Y="16.61" Z="-0.6"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Mast69_5m60.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p X="-0.35" Z="6.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Asig69_Kennlicht.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.14" Z="0.6"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p X="-0.35" Z="6.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Zs1_8-69.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Z="0.5"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Mastschild69Hp.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Schaltkasten69-doppelt.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="6.9444" FahrstrTyp="2"/>
+<HsigBegriff HsigGeschw="-2" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1603">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1617" MatrixGeschw="6.9444">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="1633" MatrixGeschw="-2"/>
+<Ersatzsignal ErsatzsigBezeichnung="Zs1">
+<MatrixEintrag Signalbild="1731" MatrixGeschw="11.1111">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="Zs8" ErsatzsigID="00000001">
+<MatrixEintrag Signalbild="1859" MatrixGeschw="11.1111">
+<Ereignis Er="2000"/>
+<Ereignis Er="28" Wert="7"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="27.7778" km="-0.0589" pos="1" Reg="5004"/>
+<NachNorm Nr="65"/>
+<NachGegen Nr="27"/>
+</StrElement>
+<StrElement Nr="29" spTrass="27.7778" Anschluss="256" Fkt="4" Oberbau="B55 SKL-Oberbau">
+<g X="48.1875" Y="19.75"/>
+<b X="49.3875" Y="19.75"/>
+<InfoNormRichtung vMax="-1" km="-0.01" pos="1" Reg="5005">
+<Signal SignalFlags="3" SignalTyp="2" BoundingR="27">
+<p X="48.1875" Y="19.75"/>
+<phi Z="0"/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\54 190 1-7_5 Rechts Schienen K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R gerade K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R abzweig K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) links" WeichenbaugruppePos1="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) links" WeichenbaugruppePos0="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="10" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_links.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="11" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_rechts.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeBeschreibung="ohne Weichensignal">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Weichensignal reflektierend links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Weichensignal reflektierend rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Weichensignal für EOW rechts" WeichenbaugruppePos0="1">
+<p X="0.7" Y="-2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Weichensignal für EOW links" WeichenbaugruppePos0="1">
+<p X="0.7" Y="2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeBeschreibung="Keine Aufschüttung">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links und rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff FahrstrTyp="1"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="1"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="3" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="5" MatrixGeschw="-1"/>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5005"/>
+<NachNorm Nr="30"/>
+<NachNorm Nr="33"/>
+<NachGegen Nr="14"/>
+</StrElement>
+<StrElement Nr="30" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="49.3875" Y="19.75"/>
+<b X="60.2375" Y="19.75"/>
+<NachNorm Nr="31"/>
+<NachGegen Nr="29"/>
+</StrElement>
+<StrElement Nr="31" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="60.2375" Y="19.75"/>
+<b X="71.4365" Y="19.75"/>
+<InfoNormRichtung vMax="-1" km="0.012" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="32"/>
+<NachGegen Nr="30"/>
+</StrElement>
+<StrElement Nr="32" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="71.4365" Y="19.75"/>
+<b X="74.0488" Y="19.75"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="27"/>
+<NachGegen Nr="31"/>
+</StrElement>
+<StrElement Nr="33" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="49.3875" Y="19.75"/>
+<b X="54.8112" Y="19.6345"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoGegenRichtung>
+<NachNorm Nr="34"/>
+<NachGegen Nr="29"/>
+</StrElement>
+<StrElement Nr="34" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="54.8112" Y="19.6345"/>
+<b X="60.2294" Y="19.358"/>
+<NachNorm Nr="35"/>
+<NachGegen Nr="33"/>
+</StrElement>
+<StrElement Nr="35" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="60.2294" Y="19.358"/>
+<b X="65.8116" Y="18.9308"/>
+<NachNorm Nr="36"/>
+<NachGegen Nr="34"/>
+</StrElement>
+<StrElement Nr="36" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="65.8116" Y="18.9308"/>
+<b X="71.3785" Y="18.3294"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="37"/>
+<NachGegen Nr="35"/>
+</StrElement>
+<StrElement Nr="37" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="71.3785" Y="18.3294"/>
+<b X="73.2986" Y="18.0833"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="38"/>
+<NachGegen Nr="36"/>
+</StrElement>
+<StrElement Nr="38" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="73.2986" Y="18.0833"/>
+<b X="73.9326" Y="17.9988"/>
+<NachNorm Nr="39"/>
+<NachGegen Nr="37"/>
+</StrElement>
+<StrElement Nr="39" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="73.9326" Y="17.9988"/>
+<b X="77.6611" Y="17.5012"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0038" pos="1"/>
+<NachNorm Nr="50"/>
+<NachGegen Nr="38"/>
+</StrElement>
+<StrElement Nr="40" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="-3.1387" Y="15.75"/>
+<b X="77.545" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0807" pos="1"/>
+<NachNorm Nr="44"/>
+<NachGegen Nr="7"/>
+</StrElement>
+<StrElement Nr="41" spTrass="27.7778" Fkt="4" Oberbau="B55 SKL-Oberbau">
+<g X="103.4063" Y="15.75"/>
+<b X="102.2063" Y="15.75"/>
+<InfoNormRichtung vMax="-1" km="-0.01" pos="1" Reg="5006">
+<Signal SignalFlags="3" SignalTyp="2" BoundingR="27">
+<p X="103.4063" Y="15.75"/>
+<phi Z="-3.141593"/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\54 190 1-7_5 Rechts Schienen K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R gerade K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R abzweig K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) links" WeichenbaugruppePos1="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) links" WeichenbaugruppePos0="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="10" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_links.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="11" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_rechts.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeBeschreibung="ohne Weichensignal">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Weichensignal reflektierend links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Weichensignal reflektierend rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Weichensignal für EOW rechts" WeichenbaugruppePos0="1">
+<p X="0.7" Y="-2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Weichensignal für EOW links" WeichenbaugruppePos0="1">
+<p X="0.7" Y="2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeBeschreibung="Keine Aufschüttung">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links und rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff FahrstrTyp="1"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="1"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="3" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="5" MatrixGeschw="-1"/>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5006"/>
+<NachNorm Nr="42"/>
+<NachNorm Nr="45"/>
+<NachGegen Nr="51"/>
+</StrElement>
+<StrElement Nr="42" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="102.2063" Y="15.75"/>
+<b X="91.3562" Y="15.75"/>
+<NachNorm Nr="43"/>
+<NachGegen Nr="41"/>
+</StrElement>
+<StrElement Nr="43" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="91.3562" Y="15.75"/>
+<b X="80.1572" Y="15.75"/>
+<InfoNormRichtung vMax="-1" km="0.012" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="44"/>
+<NachGegen Nr="42"/>
+</StrElement>
+<StrElement Nr="44" spTrass="27.7778" Anschluss="257" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="80.1572" Y="15.75"/>
+<b X="77.545" Y="15.75"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="40"/>
+<NachGegen Nr="43"/>
+</StrElement>
+<StrElement Nr="45" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="102.2063" Y="15.75"/>
+<b X="96.7825" Y="15.8655"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoGegenRichtung>
+<NachNorm Nr="46"/>
+<NachGegen Nr="41"/>
+</StrElement>
+<StrElement Nr="46" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="96.7825" Y="15.8655"/>
+<b X="91.3643" Y="16.142"/>
+<NachNorm Nr="47"/>
+<NachGegen Nr="45"/>
+</StrElement>
+<StrElement Nr="47" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="91.3643" Y="16.142"/>
+<b X="85.7822" Y="16.5692"/>
+<NachNorm Nr="48"/>
+<NachGegen Nr="46"/>
+</StrElement>
+<StrElement Nr="48" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="85.7822" Y="16.5692"/>
+<b X="80.2152" Y="17.1706"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="49"/>
+<NachGegen Nr="47"/>
+</StrElement>
+<StrElement Nr="49" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="80.2152" Y="17.1706"/>
+<b X="78.2952" Y="17.4167"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="50"/>
+<NachGegen Nr="48"/>
+</StrElement>
+<StrElement Nr="50" spTrass="27.7778" Anschluss="257" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="78.2952" Y="17.4167"/>
+<b X="77.6611" Y="17.5012"/>
+<NachNorm Nr="39"/>
+<NachGegen Nr="49"/>
+</StrElement>
+<StrElement Nr="51" spTrass="27.7778" Oberbau="B55 SKL-Oberbau">
+<g X="103.4063" Y="15.75"/>
+<b X="162.3503" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778">
+<Ereignis Er="35" Wert="5"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="27.7778" km="-0.0589" pos="1">
+<Ereignis Er="35" Wert="5"/>
+</InfoGegenRichtung>
+<NachNorm Nr="52"/>
+<NachGegen Nr="41"/>
+</StrElement>
+<StrElement Nr="52" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="162.3503" Y="15.75"/>
+<b X="191.8227" Y="15.75"/>
+<InfoNormRichtung vMax="-1" Reg="5007">
+<Signal NameBetriebsstelle="Mitte" Stellwerk="Mitte Mf" Signalname="M1" SignalFlags="16" SignalTyp="9" BoundingR="10">
+<p X="191.8227" Y="12.61" Z="-0.6"/>
+<phi/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Mast69_5m60.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p X="-0.35" Z="6.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Asig69_Kennlicht.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Y="3.14" Z="0.6"/>
+<phi/>
+<Datei Dateiname="signals\Deutschland\Indusi\Indusi-Sie_gr.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p X="-0.35" Z="6.7"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Zs1_8-69.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p Z="0.5"/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Mastschild69Hp.lod.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="Signals\Deutschland\Signalordnung_1959_DB\Lichtsignale_Einheitsbauform_69\Schaltkasten69-doppelt.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="2.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="5.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="8.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="13.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="16.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="19.4444" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="22.2222" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="25" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="27.7778" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="30.5556" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="33.3333" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="36.1111" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="38.8889" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="41.6667" FahrstrTyp="4"/>
+<HsigBegriff HsigGeschw="6.9444" FahrstrTyp="2"/>
+<HsigBegriff HsigGeschw="-2" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1603">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1609" MatrixGeschw="11.1111"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1605" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="1617" MatrixGeschw="6.9444">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+<MatrixEintrag Signalbild="1633" MatrixGeschw="-2"/>
+<Ersatzsignal ErsatzsigBezeichnung="Zs1">
+<MatrixEintrag Signalbild="1731" MatrixGeschw="11.1111">
+<Ereignis Er="2000"/>
+</MatrixEintrag>
+</Ersatzsignal>
+<Ersatzsignal ErsatzsigBezeichnung="Zs8" ErsatzsigID="00000001">
+<MatrixEintrag Signalbild="1859" MatrixGeschw="11.1111">
+<Ereignis Er="2000"/>
+<Ereignis Er="28" Wert="7"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="27.7778" km="-0.0295" pos="1" Reg="5007"/>
+<NachNorm Nr="74"/>
+<NachGegen Nr="51"/>
+</StrElement>
+<StrElement Nr="53" spTrass="27.7778" Fkt="4" Oberbau="B55 SKL-Oberbau">
+<g X="247.1563" Y="15.75"/>
+<b X="245.9563" Y="15.75"/>
+<InfoNormRichtung vMax="-1" km="-0.01" pos="1" Reg="5008">
+<Signal SignalFlags="3" SignalTyp="2" BoundingR="27">
+<p X="247.1563" Y="15.75"/>
+<phi Z="-3.141593"/>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\54 190 1-7_5 Rechts Schienen K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R gerade K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame>
+<p/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\190\Zunge EW190R abzweig K-Oberbau.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Elektrischer Antrieb S700 (blaßgrün) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_S700_blassgruen.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle vorne) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleRe.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Mechanischer Antrieb (Umlenkrolle hinten) rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Mechanisch\Antrieb_RolleLi.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="6" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppeBeschreibung="Handweiche (gelbes Umstellgewicht) links" WeichenbaugruppePos1="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_gelb.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="7" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) rechts" WeichenbaugruppePos0="1">
+<p X="1.05" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="8" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppeBeschreibung="Handweiche (weiß-schwarzes Umstellgewicht) links" WeichenbaugruppePos0="1">
+<p X="1.05" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Manuell\Umstellgewicht_weissschwarz_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="9" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Laternenbock_Li.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="10" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_links.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="1" WeichenbaugruppeNr="11" WeichenbaugruppeBeschreibung="Elektrischer Antrieb WSSB rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.13"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Elektrisch\Antrieb_WA350_rechts.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeBeschreibung="ohne Weichensignal">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Weichensignal reflektierend links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Weichensignal reflektierend rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_reflekt_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet links" WeichenbaugruppePos0="1">
+<p X="1.6" Y="2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="4" WeichenbaugruppeBeschreibung="Weichensignal elektr. beleuchtet rechts" WeichenbaugruppePos0="1">
+<p X="1.6" Y="-2.07"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\Weichensignal_elektr_Re.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="5" WeichenbaugruppeBeschreibung="Weichensignal für EOW rechts" WeichenbaugruppePos0="1">
+<p X="0.7" Y="-2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="2" WeichenbaugruppeNr="6" WeichenbaugruppeBeschreibung="Weichensignal für EOW links" WeichenbaugruppePos0="1">
+<p X="0.7" Y="2.35" Z="-0.35"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Signale\EOW-Signal.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeBeschreibung="Keine Aufschüttung">
+<p/>
+<phi/>
+<Datei/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="1" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="2" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppeBeschreibung="Aufschüttung Betoneinfassung links und rechts" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<SignalFrame WeichenbaugruppeIndex="3" WeichenbaugruppeNr="3" WeichenbaugruppePos0="1" WeichenbaugruppePos1="1">
+<p X="1.17"/>
+<phi Z="3.1415"/>
+<Datei Dateiname="PermanentWay\Deutschland\1435mm\Regeloberbau\Weichen\Antriebe\Aufschuettung\Aufschuettung_Antrieb_Beton.lod.ls3"/>
+</SignalFrame>
+<HsigBegriff FahrstrTyp="1"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="1"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag Signalbild="3" MatrixGeschw="-1"/>
+<MatrixEintrag Signalbild="5" MatrixGeschw="-1"/>
+</Signal>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1" Reg="5008"/>
+<NachNorm Nr="54"/>
+<NachNorm Nr="57"/>
+<NachGegen Nr="2"/>
+</StrElement>
+<StrElement Nr="54" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="245.9563" Y="15.75"/>
+<b X="235.1062" Y="15.75"/>
+<NachNorm Nr="55"/>
+<NachGegen Nr="53"/>
+</StrElement>
+<StrElement Nr="55" spTrass="27.7778" Anschluss="256" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="235.1062" Y="15.75"/>
+<b X="223.9073" Y="15.75"/>
+<InfoNormRichtung vMax="-1" km="0.012" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="56"/>
+<NachGegen Nr="54"/>
+</StrElement>
+<StrElement Nr="56" spTrass="27.7778" Anschluss="257" Fkt="12" Oberbau="B55 SKL-Oberbau">
+<g X="223.9073" Y="15.75"/>
+<b X="221.295" Y="15.75"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="74"/>
+<NachGegen Nr="55"/>
+</StrElement>
+<StrElement Nr="57" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="245.9563" Y="15.75"/>
+<b X="240.5325" Y="15.8655"/>
+<InfoNormRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoNormRichtung>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="1" Wert="11.1111"/>
+</InfoGegenRichtung>
+<NachNorm Nr="58"/>
+<NachGegen Nr="53"/>
+</StrElement>
+<StrElement Nr="58" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="240.5325" Y="15.8655"/>
+<b X="235.1143" Y="16.142"/>
+<NachNorm Nr="59"/>
+<NachGegen Nr="57"/>
+</StrElement>
+<StrElement Nr="59" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="235.1143" Y="16.142"/>
+<b X="229.5322" Y="16.5692"/>
+<NachNorm Nr="60"/>
+<NachGegen Nr="58"/>
+</StrElement>
+<StrElement Nr="60" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="229.5322" Y="16.5692"/>
+<b X="223.9653" Y="17.1706"/>
+<InfoNormRichtung vMax="-1" pos="1">
+<Ereignis Er="31" Wert="1"/>
+</InfoNormRichtung>
+<NachNorm Nr="61"/>
+<NachGegen Nr="59"/>
+</StrElement>
+<StrElement Nr="61" kr="-0.0053" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="223.9653" Y="17.1706"/>
+<b X="222.0452" Y="17.4167"/>
+<InfoGegenRichtung vMax="-1">
+<Ereignis Er="31" Wert="1"/>
+</InfoGegenRichtung>
+<NachNorm Nr="62"/>
+<NachGegen Nr="60"/>
+</StrElement>
+<StrElement Nr="62" spTrass="27.7778" Anschluss="256" Fkt="20" Oberbau="B55 SKL-Oberbau">
+<g X="222.0452" Y="17.4167"/>
+<b X="221.4111" Y="17.5012"/>
+<NachNorm Nr="63"/>
+<NachGegen Nr="61"/>
+</StrElement>
+<StrElement Nr="63" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="221.4111" Y="17.5012"/>
+<b X="217.6826" Y="17.9988"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0038" pos="1"/>
+<NachNorm Nr="72"/>
+<NachGegen Nr="62"/>
+</StrElement>
+<StrElement Nr="65" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="191.9383" Y="19.75"/>
+<b X="195.5392" Y="19.7159"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="66"/>
+<NachGegen Nr="28"/>
+</StrElement>
+<StrElement Nr="66" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="195.5392" Y="19.7159"/>
+<b X="199.1387" Y="19.6135"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="67"/>
+<NachGegen Nr="65"/>
+</StrElement>
+<StrElement Nr="67" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="199.1387" Y="19.6135"/>
+<b X="202.7357" Y="19.4429"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="68"/>
+<NachGegen Nr="66"/>
+</StrElement>
+<StrElement Nr="68" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="202.7357" Y="19.4429"/>
+<b X="206.3289" Y="19.2042"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="69"/>
+<NachGegen Nr="67"/>
+</StrElement>
+<StrElement Nr="69" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="206.3289" Y="19.2042"/>
+<b X="209.9168" Y="18.8975"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="70"/>
+<NachGegen Nr="68"/>
+</StrElement>
+<StrElement Nr="70" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="209.9168" Y="18.8975"/>
+<b X="213.4983" Y="18.5228"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="71"/>
+<NachGegen Nr="69"/>
+</StrElement>
+<StrElement Nr="71" kr="-0.005263" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="213.4983" Y="18.5228"/>
+<b X="217.072" Y="18.0803"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0036" pos="1"/>
+<NachNorm Nr="72"/>
+<NachGegen Nr="70"/>
+</StrElement>
+<StrElement Nr="72" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="217.072" Y="18.0803"/>
+<b X="217.6826" Y="17.9988"/>
+<InfoNormRichtung vMax="27.7778"/>
+<InfoGegenRichtung vMax="27.7778" km="-0.0006" pos="1"/>
+<NachNorm Nr="63"/>
+<NachGegen Nr="71"/>
+</StrElement>
+<StrElement Nr="73" spTrass="27.7778" Anschluss="256" Oberbau="B55 SKL-Oberbau">
+<g X="-55" Y="15.75"/>
+<b X="-29" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<NachNorm Nr="4"/>
+<NachGegen Nr="1"/>
+</StrElement>
+<StrElement Nr="74" spTrass="27.7778" Anschluss="257" Oberbau="B55 SKL-Oberbau">
+<g X="191.8227" Y="15.75"/>
+<b X="221.295" Y="15.75"/>
+<InfoNormRichtung vMax="27.7778"/>
+<NachNorm Nr="56"/>
+<NachGegen Nr="52"/>
+</StrElement>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1" FahrstrTyp="TypZug" Laenge="246.8">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 (Bahnsteigkreuzung)" FahrstrTyp="TypZug" ZufallsWert="1" Laenge="246.8">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 -&gt; Ende E" FahrstrTyp="TypZug" Laenge="474.0">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="10" FahrstrSignalZeile="18">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 (Bahnsteigkreuzung) -&gt; Ende E" FahrstrTyp="TypZug" ZufallsWert="1" Laenge="474.0">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="10" FahrstrSignalZeile="18">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M2" FahrstrTyp="TypZug" Laenge="247.1">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="7">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="20">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M2 -&gt; Ende E (1)" FahrstrTyp="TypZug" Laenge="474.4">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="20">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="7" FahrstrSignalZeile="18">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 (1)" FahrstrTyp="TypZug" Laenge="247.2">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 (Bahnsteigkreuzung) (1)" FahrstrTyp="TypZug" ZufallsWert="1" Laenge="247.2">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 -&gt; Ende E (2)" FahrstrTyp="TypZug" Laenge="474.4">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="10" FahrstrSignalZeile="18">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Mitte M1 (Bahnsteigkreuzung) -&gt; Ende E (2)" FahrstrTyp="TypZug" ZufallsWert="1" Laenge="474.4">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="16">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="19">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="22">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="25">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="26">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="3" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="4" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="8" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="9" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="10" FahrstrSignalZeile="18">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+<FahrstrSignal Ref="1" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Mitte M1 -&gt; Ende E" FahrstrTyp="TypZug" Laenge="227.2">
+<FahrstrStart Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="10">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Mitte M2 -&gt; Ende E" FahrstrTyp="TypZug" Laenge="227.3">
+<FahrstrStart Ref="7">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="29">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="14">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="11" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="7" FahrstrSignalZeile="5">
+<Datei Dateiname="routes\AlternativeFahrwegeBahnsteigkreuzung.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+</Strecke>
+</Zusi>
