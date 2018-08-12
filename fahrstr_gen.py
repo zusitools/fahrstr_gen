@@ -70,7 +70,6 @@ def finde_fahrstrassen(args):
     loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
 
     fahrstrassen = []
-    fahrstrassen_nummerierung = defaultdict(list) # (Start-Refpunkt, ZielRefpunkt) -> [Fahrstrasse], zwecks Durchnummerierung
 
     bedingungen = dict()
     if args.bedingungen is not None:
@@ -91,7 +90,7 @@ def finde_fahrstrassen(args):
 
     for fahrstr_typ in fahrstr_typen:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(str_fahrstr_typ(fahrstr_typ)))
-        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, bedingungen,
+        fahrstr_suche = FahrstrassenSuche(fahrstr_typ, args.alternative_fahrwege, bedingungen,
                 vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
                 flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None,
                 loeschfahrstrassen_namen)
@@ -108,13 +107,7 @@ def finde_fahrstrassen(args):
 
                         knoten = graph.get_knoten(str_element)
                         assert(knoten is not None)
-                        for f in fahrstr_suche.get_fahrstrassen(knoten, richtung):
-                            if args.nummerieren:
-                                idx = sum(1 for f2 in fahrstrassen_nummerierung[(f.start, f.ziel)] if f2.fahrstr_typ == f.fahrstr_typ)
-                                if idx != 0:
-                                    f.name += " ({})".format(idx)
-                                fahrstrassen_nummerierung[(f.start, f.ziel)].append(f)
-                            fahrstrassen.append(f)
+                        fahrstrassen.extend(fahrstr_suche.get_fahrstrassen(knoten, richtung))
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
     if strecke is not None:
@@ -339,14 +332,14 @@ def gui():
         ent_log.clear()
 
         try:
-            args = namedtuple('args', ['dateiname', 'modus', 'nummerieren', 'bedingungen', 'flankenschutz'])
+            args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz'])
             args.dateiname = ent_dateiname.get()
             args.fahrstr_typen = ",".join([
                 "r" if var_typ_rangier.get() else "",
                 "z" if var_typ_zug.get() else "",
                 "l" if var_typ_lzb.get() else ""])
             args.modus = 'vergleiche' if vergleiche else 'schreibe'
-            args.nummerieren = var_nummerieren.get()
+            args.alternative_fahrwege = var_alternative_fahrwege.get()
             args.flankenschutz = var_flankenschutz.get()
             args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
             finde_fahrstrassen(args)
@@ -413,9 +406,9 @@ def gui():
 
     frame_fahrstr_typen.grid(row=15, column=1, sticky=(tkinter.W,tkinter.E))
 
-    var_nummerieren = tkinter.BooleanVar()
-    chk_nummerieren = tkinter.Checkbutton(frame, text="Fahrstrassen nummerieren (normalerweise nicht notwendig)", variable=var_nummerieren)
-    chk_nummerieren.grid(row=20, column=1, columnspan=2, sticky=tkinter.W)
+    var_alternative_fahrwege = tkinter.BooleanVar()
+    chk_alternative_fahrwege = tkinter.Checkbutton(frame, text="Alternative Fahrwege einrichten", variable=var_alternative_fahrwege)
+    chk_alternative_fahrwege.grid(row=20, column=1, columnspan=2, sticky=tkinter.W)
 
     var_flankenschutz = tkinter.BooleanVar()
     chk_flankenschutz = tkinter.Checkbutton(frame, text="Weichen in Flankenschutz-Stellung verknuepfen", variable=var_flankenschutz)
@@ -474,7 +467,7 @@ if __name__ == '__main__':
         parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
         parser.add_argument('--kompat', action='store_true', help="Kompatibilitaetsmeldungen anzeigen")
         parser.add_argument('--debug', action='store_true', help="Kompatibilitaetsmeldungen und Debug-Ausgaben anzeigen")
-        parser.add_argument('--nummerieren', action='store_true', help="Fahrstrassen mit gleichem Start+Ziel durchnummerieren (wie 3D-Editor 3.1.0.4)")
+        parser.add_argument('--alternative_fahrwege', action='store_true', help="Alternative Fahrwege einrichten (Fahrstrassen fuer alle moeglichen Fahrwege zwischen Start- und Zielsignal erzeugen statt nur fuer den zuerst gefundenen)")
         parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
         parser.add_argument('--flankenschutz', action='store_true', help="Weichen in Flankenschutzstellung in Fahrstrassen verknuepfen")
         args = parser.parse_args()

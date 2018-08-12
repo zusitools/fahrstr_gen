@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import xml.etree.ElementTree as ET
-from collections import OrderedDict
+from collections import defaultdict, Counter
+import operator
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
@@ -11,13 +12,15 @@ from . import modulverwaltung
 import logging
 
 class FahrstrassenSuche:
-    def __init__(self, fahrstr_typ, bedingungen, vorsignal_graph, flankenschutz_graph, loeschfahrstr_namen):
+    def __init__(self, fahrstr_typ, alternative_fahrwege, bedingungen, vorsignal_graph, flankenschutz_graph, loeschfahrstr_namen):
         self.einzelfahrstrassen = dict()  # KnotenUndRichtung -> [EinzelFahrstrasse]
         self.fahrstr_typ = fahrstr_typ
+        self.alternative_fahrwege = alternative_fahrwege
         self.bedingungen = bedingungen
         self.vorsignal_graph = vorsignal_graph
         self.flankenschutz_graph = flankenschutz_graph
         self.loeschfahrstr_namen = loeschfahrstr_namen
+        self.fahrstr_nummerierung = Counter()  # (Start-Refpunkt, Ziel-Refpunkt) -> Anzahl gefundener Fahrstrassen, zwecks Nummerierung
 
     # Gibt alle vom angegebenen Knoten ausgehenden (kombinierten) Fahrstrassen in der angegebenen Richtung zurueck.
     def get_fahrstrassen(self, knoten, richtung):
@@ -39,15 +42,29 @@ class FahrstrassenSuche:
             return result
 
     # Gibt alle Einzelfahrstrassen zurueck, die an diesem Knoten in der angegebenen Richtung beginnen.
-    # Pro Zielsignal wird nur eine Einzelfahrstrasse behalten, auch wenn alternative Fahrwege existieren.
     def _suche_einzelfahrstrassen(self, knoten, richtung):
-        # Zielsignal-Refpunkt -> [EinzelFahrstrasse]
-        einzelfahrstrassen_by_zielsignal = OrderedDict()  # Reihenfolge, in der die Zielsignale gefunden wurden, ist wichtig fuer Nummerierung
+        einzelfahrstrassen = []
         for kante in knoten.get_nachfolger_kanten(richtung):
             if kante.ziel is not None:
                 f = EinzelFahrstrasse()
                 f.erweitere(kante)
-                self._suche_einzelfahrstrassen_rek(f, einzelfahrstrassen_by_zielsignal)
+                self._suche_einzelfahrstrassen_rek(f, einzelfahrstrassen)
+
+        # Gruppiere nach Zielsignal und filtere jeweils nach Bedingungen.
+        # Behalte die Reihenfolge, in der die Einzelfahrstrassen gefunden wurden (Tiefensuche).
+        # Das ist wichtig fuer die Nummerierung von Kennlichtfahrstrassen, wenn alternative Fahrwege beibehalten werden.
+        # Beispiel (Vorzugslage der Weiche ist jeweils die gerade Lage):
+        #
+        #      /-\---B--\
+        # A --/---\--C---\--D
+        #
+        # Resultierende Fahrstrassen:
+        #  - A -> C -> D,
+        #  - A -> B -> D (1)
+        #  - A -> C -> D (2)
+        einzelfahrstrassen_by_zielsignal = defaultdict(list)
+        for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
+            einzelfahrstrassen_by_zielsignal[einzelfahrstrasse.ziel.refpunkt(REFTYP_SIGNAL)].append((einzelfahrstrasse, idx))
 
         result = []
         for ziel_refpunkt, einzelfahrstrassen in einzelfahrstrassen_by_zielsignal.items():
@@ -64,7 +81,7 @@ class FahrstrassenSuche:
                             w.refpunkt.refnr == int(bed.get("Ref", 0)) and
                             w.refpunkt.element_richtung.element.modul.relpath.upper() == bed.find("Datei").get("Dateiname", "").upper() and
                             w.weichenlage == int(bed.get("FahrstrWeichenlage"))
-                            for kante in f.kantenliste() for w in kante.weichen
+                            for kante in f[0].kantenliste() for w in kante.weichen
                         )]
                     else:
                         logging.warn("Unbekannter Bedingungstyp: {}".format(bed.tag))
@@ -77,15 +94,21 @@ class FahrstrassenSuche:
             if len(einzelfahrstrassen) > 1:
                 logging.debug("{} Einzelfahrstrassen zu {} gefunden: {}".format(
                     len(einzelfahrstrassen), ziel_refpunkt.signal(),
-                    " / ".join("{} km/h, {:.2f} m".format(str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse in einzelfahrstrassen)))
-            # result.append(sorted(einzelfahrstrassen, key = lambda fstr: float_geschw(fstr.signalgeschwindigkeit), reverse = True)[0])  # anders als min wird bei sorted Stabilitaet garantiert
-            result.append(einzelfahrstrassen[0])
+                    " / ".join("{} km/h, {:.2f} m".format(str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse, idx in einzelfahrstrassen)))
 
-        return result
+            if self.alternative_fahrwege:
+                result.extend(einzelfahrstrassen)
+            else:
+                # Beispiel fuer alternative Sortierung: Signalgeschwindigkeit
+                # result.append(sorted(einzelfahrstrassen, key = lambda fstr: float_geschw(fstr.signalgeschwindigkeit), reverse = True)[0])  # anders als min wird bei sorted Stabilitaet garantiert
+                result.append(einzelfahrstrassen[0])
+
+        # Stelle urspruengliche Reihenfolge wieder her
+        return [t[0] for t in sorted(result, key=operator.itemgetter(1))]
 
     # Erweitert die angegebene Einzelfahrstrasse rekursiv ueber Kanten, bis ein Hauptsignal erreicht wird,
-    # und fuegt die resultierenden Einzelfahrstrassen in das Ergebnis-Dict ein.
-    def _suche_einzelfahrstrassen_rek(self, fahrstrasse, ergebnis_dict):
+    # und fuegt die resultierenden Einzelfahrstrassen in die Ergebnisliste ein.
+    def _suche_einzelfahrstrassen_rek(self, fahrstrasse, ergebnis_liste):
         # Sind wir am Hauptsignal?
         signal = fahrstrasse.ziel.signal()
         if ist_hsig_fuer_fahrstr_typ(signal, self.fahrstr_typ):
@@ -94,10 +117,7 @@ class FahrstrassenSuche:
             if refpunkt is None:
                 logging.warn("{}: Element hat keinen Referenzpunkt vom Typ Signal. Es werden keine Fahrstrassen zu diesem Signal eingerichtet.".format(signal))
             else:
-                try:
-                    ergebnis_dict[refpunkt].append(fahrstrasse)
-                except KeyError:
-                    ergebnis_dict[refpunkt] = [fahrstrasse]
+                ergebnis_liste.append(fahrstrasse)
             return
 
         folgekanten = fahrstrasse.ziel.knoten.get_nachfolger_kanten(fahrstrasse.ziel.richtung)
@@ -107,9 +127,9 @@ class FahrstrassenSuche:
 
             if idx == len(folgekanten) - 1:
                 fahrstrasse.erweitere(kante)
-                self._suche_einzelfahrstrassen_rek(fahrstrasse, ergebnis_dict)
+                self._suche_einzelfahrstrassen_rek(fahrstrasse, ergebnis_liste)
             else:
-                self._suche_einzelfahrstrassen_rek(fahrstrasse.erweiterte_kopie(kante), ergebnis_dict)
+                self._suche_einzelfahrstrassen_rek(fahrstrasse.erweiterte_kopie(kante), ergebnis_liste)
 
     def _get_fahrstrassen_rek(self, einzelfahrstr_liste, ziel_liste):
         letzte_fahrstrasse = einzelfahrstr_liste[-1]
@@ -186,6 +206,15 @@ class FahrstrassenSuche:
                     result.streckenname = kante.streckenname
                 if kante.richtungsanzeiger != "":
                     result.richtungsanzeiger = kante.richtungsanzeiger
+
+
+        # Durchnummerieren von Fahrstrassen mit gleichem Start und Ziel (seit 3D-Editor 3.1.0.2).
+        # Der 3D-Editor nummeriert nur Fahrstrassen, die an einem Signal beginnen.
+        if result.start.reftyp != REFTYP_AUFGLEISPUNKT:
+            idx = self.fahrstr_nummerierung[(result.start, result.ziel)]
+            if idx != 0:
+                result.name += " ({})".format(idx)
+            self.fahrstr_nummerierung[(result.start, result.ziel)] += 1
 
         if result.name in self.loeschfahrstr_namen:
             logging.info("Loesche Fahrstrasse {}".format(result.name))
