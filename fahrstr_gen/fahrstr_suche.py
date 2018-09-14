@@ -404,7 +404,7 @@ class FahrstrassenSuche:
             if vorsignal_knoten is not None:
 
                 # hochsignalisierung: True, wenn die Suche ueber ein Hauptsignal mit Hochsignalisierungs-Flag hinaus fortgesetzt wurde.
-                def finde_vsig_rek(vorsignal_knoten, richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung):
+                def finde_vsig_rek(vorsignal_knoten, richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung, dunkelschaltung):
                     for kante in vorsignal_knoten.get_vorsignal_kanten(richtung):
                         # TODO: Ziel ist hier, die Zeile zu bestimmen, auf der das vorherige Hauptsignal steht.
                         # Eigentlich muesste man Signalgeschwindigkeit-Ereignisse im Startsignal ebenfalls beruecksichtigen.
@@ -418,7 +418,7 @@ class FahrstrassenSuche:
                                 logging.debug("Vorsignal an {}".format(vsig))
                                 spalte = None
                                 spalte_startsignal_halt = None
-                                if geschw_naechstes_hsig == -2.0:
+                                if dunkelschaltung:
                                     try:
                                         spalte = vsig.signal().spalten.index(-2.0)
                                     except ValueError:
@@ -475,11 +475,11 @@ class FahrstrassenSuche:
                                     if geschw_kleiner(geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt):
                                         logging.warn("{}: {} hat Hochsignalisierung aktiviert und wechselt beim Stellen der Fahrstrasse auf eine niedrigere Geschwindigkeit (von {} auf {})".format(result.name, kante.ziel.signal(), str_geschw(geschw_naechstes_hsig_startsignal_halt), str_geschw(geschw_naechstes_hsig)))
                                     logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
-                                    finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, True)
+                                    finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, True, dunkelschaltung)
                                 else:
                                     logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst die Vorsignalstellung nicht. Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit)))
                             else:
-                                finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung)
+                                finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung, dunkelschaltung)
 
                 spalte = result.start.signal().get_vsig_spalte(0)
                 if spalte is None:
@@ -489,7 +489,7 @@ class FahrstrassenSuche:
                 geschw_naechstes_hsig = result.start.signal().matrix_geschw(startsignal_verkn.zeile, spalte)
                 geschw_naechstes_hsig_startsignal_halt = 0
                 logging.debug("{}: Suche Vorsignale ab {}, Vsig-Geschwindigkeit {}/{}".format(result.name, vorsignal_knoten.signal(result.start.element_richtung.richtung), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
-                finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, -2.0 if self.fahrstr_typ == FAHRSTR_TYP_LZB else geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, False)
+                finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung=False, dunkelschaltung=self.fahrstr_typ == FAHRSTR_TYP_LZB)
 
         if startsignal_verkn is not None:
             result.signale.append(startsignal_verkn)
