@@ -49,8 +49,8 @@ class Fahrstrasse:
             result.attrib["FahrstrTyp"] = "TypRangier"
         elif self.fahrstr_typ == FAHRSTR_TYP_ZUG:
             result.attrib["FahrstrTyp"] = "TypZug"
-        elif self.fahrstr_typ == FAHRSTR_TYP_LZB:
-            result.attrib["FahrstrTyp"] = "TypLZB"
+        elif self.fahrstr_typ == FAHRSTR_TYP_ANZEIGE:
+            result.attrib["FahrstrTyp"] = "TypAnzeige"
 
         if self.zufallswert != 0:
             result.set("ZufallsWert", "{:f}".format(self.zufallswert).rstrip('0').rstrip('.'))

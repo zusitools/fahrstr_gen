@@ -119,8 +119,8 @@ class FahrstrGraphKnoten(Knoten):
             # Bei Ereignis "Keine Fahrstrasse einrichten" sofort abbrechen (keine weiteren Ereignisse/Signale an diesem Element betrachten)
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
-                if ereignis_nr in [EREIGNIS_KEINE_LZB_FAHRSTRASSE, EREIGNIS_LZB_ENDE] and self.graph.fahrstr_typ == FAHRSTR_TYP_LZB \
-                        or ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] \
+                if ereignis_nr in [EREIGNIS_KEINE_ANZEIGE_FAHRSTRASSE, EREIGNIS_LZB_ENDE] and self.graph.fahrstr_typ == FAHRSTR_TYP_ANZEIGE \
+                        or ereignis_nr == EREIGNIS_KEINE_ZUGFAHRSTRASSE and self.graph.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE] \
                         or ereignis_nr == EREIGNIS_KEINE_RANGIERFAHRSTRASSE and self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER:
                     logging.debug("{}: Keine Fahrstrasse einrichten (Ereignis Nr. {})".format(element_richtung, ereignis_nr))
                     kante.keine_fahrstr_einrichten = element_richtung
@@ -137,12 +137,12 @@ class FahrstrGraphKnoten(Knoten):
                 zeile = -1
 
                 # Hauptsignale im Fahrweg, die nicht Zielsignal sind, auf -1 stellen:
-                if self.graph.fahrstr_typ == FAHRSTR_TYP_ZUG and (signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_LZB) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_LZB)):
-                    zeile = signal.get_hsig_zeile(FAHRSTR_TYP_LZB, -1)
+                if self.graph.fahrstr_typ == FAHRSTR_TYP_ZUG and (signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_ANZEIGE) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_ANZEIGE)):
+                    zeile = signal.get_hsig_zeile(FAHRSTR_TYP_ANZEIGE, -1)
                     if zeile is None:
-                        logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp LZB und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
+                        logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Anzeige und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                     else:
-                        logging.debug("{}: LZB-Hauptsignal bei Zugfahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
+                        logging.debug("{}: Anzeige-Hauptsignal bei Zugfahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                         verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_RANGIER):
                     if (self.graph.fahrstr_typ == FAHRSTR_TYP_RANGIER) or (signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0):
@@ -150,7 +150,7 @@ class FahrstrGraphKnoten(Knoten):
                         if zeile is None:
                             logging.warn("{} enthaelt keine passende Zeile fuer Fahrstrassentyp Rangier und Geschwindigkeit -1. Die Signalverknuepfung wird nicht eingerichtet.".format(signal))
                         else:
-                            logging.debug("{}: Rangiersignal bei Zug- oder LZB-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
+                            logging.debug("{}: Rangiersignal bei Zug- oder Anzeige-Fahrstrasse umstellen (Geschwindigkeit -1/Zeile {})".format(signal, zeile))
                             verkn = True
                 elif signal.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_FAHRWEG) or signal.ist_fahrstr_start_sig(FAHRSTR_TYP_FAHRWEG):
                     if signal.sigflags & SIGFLAG_FAHRWEGSIGNAL_WEICHENANIMATION == 0:

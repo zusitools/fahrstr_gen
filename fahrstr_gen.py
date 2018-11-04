@@ -85,14 +85,14 @@ def finde_fahrstrassen(args):
             fahrstr_typen.append(FAHRSTR_TYP_RANGIER)
         elif s.startswith("z"):
             fahrstr_typen.append(FAHRSTR_TYP_ZUG)
-        elif s.startswith("l"):
-            fahrstr_typen.append(FAHRSTR_TYP_LZB)
+        elif s.startswith("a") or s.startswith("l"):
+            fahrstr_typen.append(FAHRSTR_TYP_ANZEIGE)
 
     for fahrstr_typ in fahrstr_typen:
         logging.debug("Generiere Fahrstrassen vom Typ {}".format(str_fahrstr_typ(fahrstr_typ)))
         fahrstr_suche = FahrstrassenSuche(fahrstr_typ, args.alternative_fahrwege, bedingungen,
-                vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] else None,
-                flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB]) else None,
+                vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE] else None,
+                flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE]) else None,
                 loeschfahrstrassen_namen)
         graph = FahrstrGraph(fahrstr_typ)
 
@@ -143,8 +143,8 @@ def finde_fahrstrassen(args):
                     alt_vs_neu[("TypRangier", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
                 elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_ZUG:
                     alt_vs_neu[("TypZug", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
-                elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_LZB:
-                    alt_vs_neu[("TypLZB", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
+                elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_ANZEIGE:
+                    alt_vs_neu[("TypAnzeige", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
 
             for (typ, name), fahrstrasse in sorted(alt_vs_neu.items(), key = operator.itemgetter(0)):
                 try:
@@ -337,7 +337,7 @@ def gui():
             args.fahrstr_typen = ",".join([
                 "r" if var_typ_rangier.get() else "",
                 "z" if var_typ_zug.get() else "",
-                "l" if var_typ_lzb.get() else ""])
+                "a" if var_typ_anzeige.get() else ""])
             args.modus = 'vergleiche' if vergleiche else 'schreibe'
             args.alternative_fahrwege = var_alternative_fahrwege.get()
             args.flankenschutz = var_flankenschutz.get()
@@ -399,10 +399,10 @@ def gui():
     chk_typ_zug = tkinter.Checkbutton(frame_fahrstr_typen, text="Zugfahrstrassen", variable=var_typ_zug)
     chk_typ_zug.grid(row=0, column=2, sticky=tkinter.W)
 
-    var_typ_lzb = tkinter.BooleanVar()
-    var_typ_lzb.set(True)
-    chk_typ_lzb = tkinter.Checkbutton(frame_fahrstr_typen, text="LZB-Fahrstrassen", variable=var_typ_lzb)
-    chk_typ_lzb.grid(row=0, column=3, sticky=tkinter.W)
+    var_typ_anzeige = tkinter.BooleanVar()
+    var_typ_anzeige.set(True)
+    chk_typ_anzeige = tkinter.Checkbutton(frame_fahrstr_typen, text="Anzeige-Fahrstrassen", variable=var_typ_anzeige)
+    chk_typ_anzeige.grid(row=0, column=3, sticky=tkinter.W)
 
     frame_fahrstr_typen.grid(row=15, column=1, sticky=(tkinter.W,tkinter.E))
 
@@ -463,7 +463,7 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
         parser.add_argument('dateiname')
         parser.add_argument('--modus', choices=['schreibe', 'vergleiche', 'profile'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
-        parser.add_argument('--fahrstr_typen', default="zug,lzb", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, lzb)")
+        parser.add_argument('--fahrstr_typen', default="zug,anzeige", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, anzeige)")
         parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
         parser.add_argument('--kompat', action='store_true', help="Kompatibilitaetsmeldungen anzeigen")
         parser.add_argument('--debug', action='store_true', help="Kompatibilitaetsmeldungen und Debug-Ausgaben anzeigen")

@@ -191,7 +191,7 @@ class FahrstrassenSuche:
     # Gibt zurueck, ob fuer das angegebene Signal die Warnung ausgegeben werden soll,
     # dass es vom Zusi-3D-Editor auf einen Rangier-Fahrtbegriff gestellt werden wuerde.
     def _rangiersignal_in_zugfahrstr_warnung(self, signal):
-        return self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_LZB] and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and any(z.fahrstr_typ & FAHRSTR_TYP_RANGIER != 0 and z.hsig_geschw not in [0, -2, -999] for z in signal.zeilen)
+        return self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE] and signal.sigflags & SIGFLAG_RANGIERSIGNAL_BEI_ZUGFAHRSTR_UMSTELLEN != 0 and any(z.fahrstr_typ & FAHRSTR_TYP_RANGIER != 0 and z.hsig_geschw not in [0, -2, -999] for z in signal.zeilen)
 
     # Baut eine neue Fahrstrasse aus den angegebenen Einzelfahrstrassen zusammen,
     # `bedingte_register` hat die gleiche Laenge wie `einzelfahrstrassen`
@@ -215,7 +215,7 @@ class FahrstrassenSuche:
         else:
             result.zufallswert = float(result.ziel.signal().xml_knoten.get("ZufallsWert", 0))
 
-        result.name = "LZB: " if self.fahrstr_typ == FAHRSTR_TYP_LZB else ""
+        result.name = "Anzeige: " if self.fahrstr_typ == FAHRSTR_TYP_ANZEIGE else ""
 
         if result.start.reftyp == REFTYP_AUFGLEISPUNKT:
             result.name += "Aufgleispunkt"
@@ -489,7 +489,7 @@ class FahrstrassenSuche:
                 geschw_naechstes_hsig = result.start.signal().matrix_geschw(startsignal_verkn.zeile, spalte)
                 geschw_naechstes_hsig_startsignal_halt = 0
                 logging.debug("{}: Suche Vorsignale ab {}, Vsig-Geschwindigkeit {}/{}".format(result.name, vorsignal_knoten.signal(result.start.element_richtung.richtung), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
-                finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung=False, dunkelschaltung=self.fahrstr_typ == FAHRSTR_TYP_LZB)
+                finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung=False, dunkelschaltung=self.fahrstr_typ == FAHRSTR_TYP_ANZEIGE)
 
         if startsignal_verkn is not None:
             result.signale.append(startsignal_verkn)

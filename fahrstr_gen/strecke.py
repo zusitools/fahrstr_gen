@@ -302,7 +302,7 @@ class Signal:
         #  - Sie ist unabhaengig davon, ob andere Fahrstrassentypen als `fahrstr_typ` angekreuzt sind.
         #  - Sie verlangt eine Zeile mit v != 0 oder ein Ersatzsignal fuer `fahrstr_typ`, da sonst das
         #    Signal nicht sinnvoll angesteuert werden kann (Zusi steuert in diesem Fall die nicht existente Zeile -1 an).
-        return self.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER | FAHRSTR_TYP_ZUG | FAHRSTR_TYP_LZB) and (
+        return self.ist_hsig_fuer_fahrstr_typ(FAHRSTR_TYP_RANGIER | FAHRSTR_TYP_ZUG | FAHRSTR_TYP_ANZEIGE) and (
             any(zeile.fahrstr_typ & fahrstr_typ != 0 and (self.hat_ersatzsignal or zeile.hsig_geschw != 0) for zeile in self.zeilen))
 
     def ist_vsig(self):
