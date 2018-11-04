@@ -2,7 +2,7 @@
 
 from fahrstr_gen import modulverwaltung
 from fahrstr_gen.konstanten import *
-from fahrstr_gen.strecke import ist_fahrstr_start_sig, Element
+from fahrstr_gen.strecke import ist_fahrstr_start_sig
 from fahrstr_gen.fahrstr_suche import FahrstrassenSuche
 from fahrstr_gen.fahrstr_graph import FahrstrGraph
 from fahrstr_gen.vorsignal_graph import VorsignalGraph
