@@ -5,3 +5,4 @@ ZUSI3_DATAPATH=. ../fahrstr_gen.py --modus=vergleiche ./routes/UngueltigeRichtun
 ZUSI3_DATAPATH=. ../fahrstr_gen.py --modus=vergleiche ./routes/FahrstrStartZielSignalTest.st3
 ZUSI3_DATAPATH=. ../fahrstr_gen.py --modus=vergleiche ./routes/RegisterVerknuepfungUngueltigesModul.st3
 ZUSI3_DATAPATH=. ../fahrstr_gen.py --alternative_fahrwege --modus=vergleiche ./routes/AlternativeFahrwegeBahnsteigkreuzung.st3
+ZUSI3_DATAPATH=. ../fahrstr_gen.py --modus=vergleiche ./routes/SignalgeschwindigkeitAnzeigegefuehrt.st3

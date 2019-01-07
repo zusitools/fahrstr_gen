@@ -56,6 +56,7 @@ class FahrstrGraphKante:
         self.richtungsanzeiger = ""  # Richtungsanzeiger-Ziel dieses Abschnitts
 
         self.hat_ende_weichenbereich = False  # Liegt im Verlauf dieser Kante ein Ereignis "Ende Weichenbereich"?
+        self.hat_anzeige_geschwindigkeit = False # Liegt im Verlauf dieser Kante ein Ereignis "ETCS-Geschwindigkeit" oder "CIR-ELKE-Geschwindigkeit"
         self.keine_fahrstr_einrichten = None  # Das erste Ereignis "Keine Fahrstrasse einrichten" fuer den Fahrstrassentyp des Graphen im Verlauf dieser Kante
 
 class FahrstrGraphKnoten(Knoten):
@@ -256,6 +257,9 @@ class FahrstrGraphKnoten(Knoten):
                         logging.warn("Element {} enthaelt ein Ereignis \"Signalhaltfall\", aber es existiert kein passender Referenzpunkt. Die Signalhaltfall-Verknuepfung wird nicht eingerichtet.".format(element_richtung))
                     else:
                         kante.aufloesepunkte.append(refpunkt)
+
+                elif ereignis_nr == EREIGNIS_LZB_CIR_ELKE_GESCHWINDIGKEIT or ereignis_nr == EREIGNIS_ETCS_GESCHWINDIGKEIT:
+                    kante.hat_anzeige_geschwindigkeit = True
 
                 elif ereignis_nr == EREIGNIS_REGISTER_VERKNUEPFEN or ereignis_nr == EREIGNIS_REGISTER_BEDINGT_VERKNUEPFEN:
                     try:

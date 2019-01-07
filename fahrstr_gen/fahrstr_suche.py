@@ -311,6 +311,14 @@ class FahrstrassenSuche:
                             return None
                         else:
                             zeile_regulaer = result.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, result.rgl_ggl, result.richtungsanzeiger)
+                            zeile_regulaer_geschw = result.start.signal().zeilen[zeile_regulaer].hsig_geschw
+                            # Warne, wenn das Signal eine hoehere Geschwindigkeit anzeigt, als die Fahrstrasse zulaesst.
+                            # Warne nicht bei anzeigegefuehrten Fahrstrassen, wenn im Verlauf der Fahrstrasse ein
+                            # ETCS-/LZB-Geschwindigkeitsereignis liegt.
+                            if geschw_kleiner(result.signalgeschwindigkeit, zeile_regulaer_geschw) and (
+                                self.fahrstr_typ != FAHRSTR_TYP_ANZEIGE or
+                                not any(kante.hat_anzeige_geschwindigkeit for einzelfahrstrasse in einzelfahrstrassen for kante in einzelfahrstrasse.kantenliste())):
+                                    logging.warn("{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {} oder kleiner. Nutze Zeile mit hoeherer Geschwindigkeit {}.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit), str_geschw(zeile_regulaer_geschw)))
                             startsignal_verkn = FahrstrHauptsignal(result.start, zeile_regulaer, False)
             else:
                 # Kennlichtsignal ansteuern
