@@ -155,6 +155,9 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'
         else:
             return "{}{}[{}]".format(self.element.xml_knoten.get("Nr", "0"), "b" if self.richtung == NORM else "g", self.element.modul.name_kurz())
 
+    def laenge(self):
+        return self.element.laenge()
+
     def signal(self):
         return self.element.signal(self.richtung)
 
