@@ -137,7 +137,10 @@ def finde_fahrstrassen(args):
 
             alt_vs_neu = defaultdict(dict)
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
-                alt_vs_neu[(fahrstrasse_alt.get("FahrstrTyp", ""), fahrstrasse_alt.get("FahrstrName", ""))]["alt"] = fahrstrasse_alt
+                fahrstr_typ = fahrstrasse_alt.get("FahrstrTyp", "")
+                if fahrstr_typ == "TypLZB":
+                    fahrstr_typ = "TypAnzeige"
+                alt_vs_neu[(fahrstr_typ, fahrstrasse_alt.get("FahrstrName", ""))]["alt"] = fahrstrasse_alt
             for fahrstrasse_neu in fahrstrassen:
                 if fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_RANGIER:
                     alt_vs_neu[("TypRangier", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
