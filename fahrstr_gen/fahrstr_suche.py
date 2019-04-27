@@ -293,6 +293,7 @@ class FahrstrassenSuche:
                 # Startsignal ansteuern
                 if ist_fahrstr_start_sig(result.start.signal(), self.fahrstr_typ):
                     zeile_ersatzsignal = result.start.signal().get_hsig_ersatzsignal_zeile(result.rgl_ggl)
+                    zeile_ersatzsignal_fallback = result.start.signal().get_hsig_ersatzsignal_zeile(GLEIS_BAHNHOF if result.rgl_ggl == GLEIS_GEGENGLEIS else GLEIS_GEGENGLEIS)
                     zeile_regulaer = result.start.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
                     nutze_ersatzsignal = any(einzelfahrstrasse.ziel.signal().ist_hilfshauptsignal for einzelfahrstrasse in einzelfahrstrassen)
 
@@ -304,6 +305,9 @@ class FahrstrassenSuche:
                         nutze_ersatzsignal = True
 
                     if nutze_ersatzsignal:
+                        if zeile_ersatzsignal is None:
+                            logging.warn("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird ein anderes Ersatzsignal angesteuert.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
+                            zeile_ersatzsignal = zeile_ersatzsignal_fallback
                         if zeile_ersatzsignal is None:
                             logging.error("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
                             return None
