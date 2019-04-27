@@ -154,7 +154,7 @@ class FahrstrassenSuche:
             else:
                 self._suche_einzelfahrstrassen_rek(fahrstrasse.erweiterte_kopie(kante), ergebnis_liste)
 
-    def _get_fahrstrassen_rek(self, einzelfahrstr_liste, ziel_liste):
+    def _get_fahrstrassen_rek(self, einzelfahrstr_liste, out):
         letzte_fahrstrasse = einzelfahrstr_liste[-1]
         zielknoten = letzte_fahrstrasse.kanten.eintrag.ziel.knoten
         zielrichtung = letzte_fahrstrasse.kanten.eintrag.ziel.richtung
@@ -183,10 +183,10 @@ class FahrstrassenSuche:
             for bedingte_register in itertools.product(*get_bedingte_register_kombinationen(einzelfahrstr_liste)):
                 fstr = self._neue_fahrstrasse(einzelfahrstr_liste, bedingte_register)
                 if fstr is not None:
-                    ziel_liste.append(fstr)
+                    out.append(fstr)
         if fahrstr_weiterfuehren:
             for einzelfahrstrasse in self._get_einzelfahrstrassen(zielknoten, zielrichtung):
-                self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], ziel_liste)
+                self._get_fahrstrassen_rek(einzelfahrstr_liste + [einzelfahrstrasse], out)
 
     # Gibt zurueck, ob fuer das angegebene Signal die Warnung ausgegeben werden soll,
     # dass es vom Zusi-3D-Editor auf einen Rangier-Fahrtbegriff gestellt werden wuerde.
