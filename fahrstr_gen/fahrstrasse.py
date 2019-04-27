@@ -34,6 +34,8 @@ class Fahrstrasse:
         self.signalhaltfallpunkte = [] # [RefPunkt]
 
         self.laenge = 0
+        self.laenge_zusi = 0  # Die Laenge, wie sie Zusi berechnet (Bug moduluebergreifende Fahrstrassen)
+        self.laenge_zusi_vor_3_1_7_2 = 0  # Die Laenge, wie sie Zusi vor 3D-Editor 3.1.7.2 berechnet (Bug moduluebergreifende Fahrstrassen und inklusive Start-, exklusive Zielelement)
         self.signalgeschwindigkeit = -1.0
 
         self.rgl_ggl = GLEIS_BAHNHOF
@@ -99,6 +101,7 @@ class EinzelFahrstrasse:
 
         self.kanten = None  # ListenEintrag
         self.laenge = 0  # Laenge in Metern
+        self.laenge_zusi = 0  # Laenge in Metern, wie sie Zusi berechnet (Bug moduluebergreifende Fahrstrassen)
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
         self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
 
@@ -119,6 +122,7 @@ class EinzelFahrstrasse:
         self.ziel = kante.ziel
         self.kanten = ListenEintrag(kante, self.kanten)
         self.laenge += kante.laenge
+        self.laenge_zusi += kante.laenge_zusi
         if not self.hat_ende_weichenbereich:
             self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
         self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
@@ -128,6 +132,7 @@ class EinzelFahrstrasse:
         result.start = self.start
         result.kanten = self.kanten
         result.laenge = self.laenge
+        result.laenge_zusi = self.laenge_zusi
         result.signalgeschwindigkeit = self.signalgeschwindigkeit
         result.hat_ende_weichenbereich = self.hat_ende_weichenbereich
         result.erweitere(kante)

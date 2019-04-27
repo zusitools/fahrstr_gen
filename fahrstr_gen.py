@@ -162,8 +162,8 @@ def finde_fahrstrassen(args):
                     continue
 
                 laenge_alt = float(fahrstr_alt.get("Laenge", 0))
-                if abs(laenge_alt - fahrstr_neu.laenge) > 1 and abs(laenge_alt - fahrstr_neu.laenge_zusi) > 1:
-                    logging.info("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f}".format(name, laenge_alt, fahrstr_neu.laenge))
+                if abs(laenge_alt - fahrstr_neu.laenge) > 1 and abs(laenge_alt - fahrstr_neu.laenge_zusi) > 1 and abs(laenge_alt - fahrstr_neu.laenge_zusi_vor_3_1_7_2) > 1:
+                    logging.info("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f} ({:.2f}, {:.2f})".format(name, laenge_alt, fahrstr_neu.laenge, fahrstr_neu.laenge_zusi, fahrstr_neu.laenge_zusi_vor_3_1_7_2))
 
                 rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
                 if fahrstr_neu.rgl_ggl != rgl_ggl_alt:

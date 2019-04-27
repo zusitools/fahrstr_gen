@@ -42,6 +42,7 @@ class FahrstrGraphKante:
         self.ziel_vorgaenger_idx = None  # Vorgaenger-Index des vorletzten Elements im Zielknoten, wenn dieser mehr als einen Vorgaenger besitzt
 
         self.laenge = 0  # Laenge in Metern
+        self.laenge_zusi = 0  # Laenge in Metern, wie sie Zusi berechnet
         self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit auf diesem Abschnitt
 
         self.register = []  # [RefPunkt]
@@ -117,6 +118,11 @@ class FahrstrGraphKnoten(Knoten):
         element_richtung_vorgaenger = kante.start.element_und_richtung()
 
         while element_richtung is not None:
+            # Bug in Zusi bei der Laengenberechnung moduluebergreifender Fahrstrassen
+            if element_richtung_vorgaenger.element.modul != element_richtung.element.modul:
+                kante.laenge_zusi -= element_richtung_vorgaenger.element.laenge()
+                kante.laenge_zusi += element_richtung.element.laenge()
+
             # Bei Ereignis "Keine Fahrstrasse einrichten" sofort abbrechen (keine weiteren Ereignisse/Signale an diesem Element betrachten)
             for ereignis in element_richtung.ereignisse():
                 ereignis_nr = int(ereignis.get("Er", 0))
@@ -317,7 +323,9 @@ class FahrstrGraphKnoten(Knoten):
                         logging.warn("Ereignis \"Vorsignal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Spaltennummer {}. Die Vorsignalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
             kante.hat_ende_weichenbereich = kante.hat_ende_weichenbereich or hat_ende_weichenbereich
-            kante.laenge += element_richtung.element.laenge()
+            element_laenge = element_richtung.element.laenge()
+            kante.laenge += element_laenge
+            kante.laenge_zusi += element_laenge
 
             if self.graph.get_knoten(element_richtung.element) is not None:
                 if hat_aufloesepunkt and len(element_richtung.nachfolger()) > 1:

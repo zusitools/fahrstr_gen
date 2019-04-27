@@ -228,6 +228,7 @@ class FahrstrassenSuche:
         result.richtungsanzeiger = ""
         for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             result.laenge += einzelfahrstrasse.laenge
+            result.laenge_zusi += einzelfahrstrasse.laenge_zusi
 
             zielkante = einzelfahrstrasse.kanten.eintrag
             result.name += " -> {}".format(zielkante.ziel.signal().signalbeschreibung())
@@ -244,7 +245,7 @@ class FahrstrassenSuche:
 
         # Berechne Laenge, wie sie der Zusi-3D-Editor vor Version 3.1.7.2 berechnet hat
         # (inklusive Start- und exklusive Zielelement)
-        result.laenge_zusi = result.laenge + result.start.element_richtung.laenge() - result.ziel.element_richtung.laenge()
+        result.laenge_zusi_vor_3_1_7_2 = result.laenge_zusi + result.start.element_richtung.laenge() - result.ziel.element_richtung.laenge()
 
         # Durchnummerieren von Fahrstrassen mit gleichem Start und Ziel (seit 3D-Editor 3.1.0.2).
         # Der 3D-Editor nummeriert nur Fahrstrassen, die an einem Signal beginnen.
