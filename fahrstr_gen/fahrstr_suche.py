@@ -328,7 +328,7 @@ class FahrstrassenSuche:
                 # Kennlichtsignal ansteuern
                 gefunden = False
                 for zeilenidx, zeile in enumerate(einzelfahrstrasse.start.signal().zeilen):
-                    if zeile.hsig_geschw == -2.0:
+                    if zeile.fahrstr_typ & self.fahrstr_typ != 0 and zeile.hsig_geschw == -2.0:
                         refpunkt = einzelfahrstrasse.start.refpunkt(REFTYP_SIGNAL)
                         if refpunkt is None:
                             logging.error("{}: Element {} enthaelt ein Signal, aber es existiert kein passender Referenzpunkt. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrasse.start))
