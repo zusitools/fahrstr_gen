@@ -191,6 +191,8 @@ class FahrstrGraphKnoten(Knoten):
                         kante.signale.append(FahrstrHauptsignal(refpunkt, zeile, False))
                 else:
                     logging.debug("{}: wird nicht in die Fahrstrasse aufgenommen".format(signal))
+                    if signal.hat_gegengleisanzeiger_in_ersatzsignalmatrix:
+                        logging.warn("{}: hat Ereignis \"Gegengleis kennzeichnen\" in der Ersatzsignalmatrix und wuerde von Zusi in der Fahrstrasse verknuepft.".format(signal))
 
             # Signal am aktuellen Element (Gegenrichtung) in die Signalliste einfuegen
             element_richtung_gegenrichtung = element_richtung.gegenrichtung()

@@ -218,6 +218,7 @@ class Signal:
         self.ist_gleissperre = False
 
         self.gegengleisanzeiger = 0 # Signalbild-ID
+        self.hat_gegengleisanzeiger_in_ersatzsignalmatrix = False
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
         self.richtungsvoranzeiger = defaultdict(int) # Ziel -> Signalbild-ID
         self.hat_sigframes = False # Hat das Signal ueberhaupt Landschaftsdateien?
@@ -280,6 +281,16 @@ class Signal:
                                 logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsvoranzeiger\" ohne Text".format(self))
             elif n.tag == "Ersatzsignal":
                 self.hat_ersatzsignal = True
+                for matrixeintrag in n:
+                    if matrixeintrag.tag == "MatrixEintrag":
+                        for ereignis in matrixeintrag:
+                            if ereignis.tag == "Ereignis":
+                                ereignisnr = int(ereignis.get("Er", 0))
+                                if ereignisnr == EREIGNIS_GEGENGLEIS:
+                                    self.hat_gegengleisanzeiger_in_ersatzsignalmatrix = True
+                                    break
+                        if self.hat_gegengleisanzeiger_in_ersatzsignalmatrix:
+                            break
 
     def __repr__(self):
         if self.betrst == "" and self.name == "":
