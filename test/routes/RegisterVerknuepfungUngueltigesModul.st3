@@ -121,5 +121,13 @@
 </InfoNormRichtung>
 <NachGegen Nr="2"/>
 </StrElement>
+<Fahrstrasse FahrstrName="Aufgleispunkt -&gt; Anfang A" FahrstrTyp="TypZug" Laenge="100">
+<FahrstrStart Ref="1">
+<Datei Dateiname="routes\RegisterVerknuepfungUngueltigesModul.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\RegisterVerknuepfungUngueltigesModul.st3" NurInfo="1"/>
+</FahrstrZiel>
+</Fahrstrasse>
 </Strecke>
 </Zusi>

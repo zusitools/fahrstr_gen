@@ -311,7 +311,7 @@
 <Datei Dateiname="routes\FahrstrStartZielSignalTest.st3" NurInfo="1"/>
 </FahrstrSignal>
 </Fahrstrasse>
-<Fahrstrasse FahrstrName="LZB: Anfang A1 -&gt; Ende E1" FahrstrTyp="TypLZB" Laenge="60">
+<Fahrstrasse FahrstrName="Anzeige: Anfang A1 -&gt; Ende E1" FahrstrTyp="TypLZB" Laenge="60">
 <FahrstrStart Ref="1">
 <Datei Dateiname="routes\FahrstrStartZielSignalTest.st3" NurInfo="1"/>
 </FahrstrStart>
@@ -345,7 +345,7 @@
 <Datei Dateiname="routes\FahrstrStartZielSignalTest.st3" NurInfo="1"/>
 </FahrstrSignal>
 </Fahrstrasse>
-<Fahrstrasse FahrstrName="LZB: Mitte M1 -&gt; Ende E1" FahrstrTyp="TypLZB" Laenge="50">
+<Fahrstrasse FahrstrName="Anzeige: Mitte M1 -&gt; Ende E1" FahrstrTyp="TypLZB" Laenge="50">
 <FahrstrStart Ref="4">
 <Datei Dateiname="routes\FahrstrStartZielSignalTest.st3" NurInfo="1"/>
 </FahrstrStart>

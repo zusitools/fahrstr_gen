@@ -134,6 +134,7 @@ def finde_fahrstrassen(args):
 
         elif args.modus == 'vergleiche':
             logging.info("Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.")
+            unterschied = False
 
             alt_vs_neu = defaultdict(dict)
             for fahrstrasse_alt in strecke.findall("./Fahrstrasse"):
@@ -153,40 +154,48 @@ def finde_fahrstrassen(args):
                 try:
                     fahrstr_alt = fahrstrasse["alt"]
                 except KeyError:
+                    unterschied = True
                     logging.info("Fahrstrasse {} ({}) existiert in Zusi nicht".format(name, typ))
                     continue
                 try:
                     fahrstr_neu = fahrstrasse["neu"]
                 except KeyError:
+                    unterschied = True
                     logging.info("Fahrstrasse {} ({}) existiert in Zusi, wurde aber nicht erzeugt".format(name, typ))
                     continue
 
                 laenge_alt = float(fahrstr_alt.get("Laenge", 0))
                 if abs(laenge_alt - fahrstr_neu.laenge) > 1 and abs(laenge_alt - fahrstr_neu.laenge_zusi) > 1 and abs(laenge_alt - fahrstr_neu.laenge_zusi_vor_3_1_7_2) > 1:
+                    unterschied = True
                     logging.info("{}: unterschiedliche Laenge: {:.2f} vs. {:.2f} ({:.2f}, {:.2f})".format(name, laenge_alt, fahrstr_neu.laenge, fahrstr_neu.laenge_zusi, fahrstr_neu.laenge_zusi_vor_3_1_7_2))
 
                 rgl_ggl_alt = int(fahrstr_alt.get("RglGgl", 0))
                 if fahrstr_neu.rgl_ggl != rgl_ggl_alt:
+                    unterschied = True
                     logging.info("{}: unterschiedliche RglGgl-Spezifikation: {} vs {}".format(name, rgl_ggl_alt, fahrstr_neu.rgl_ggl))
 
                 streckenname_alt = fahrstr_alt.get("FahrstrStrecke", "")
                 if fahrstr_neu.streckenname != streckenname_alt:
+                    unterschied = True
                     logging.info("{}: unterschiedlicher Streckenname: {} vs {}".format(name, streckenname_alt, fahrstr_neu.streckenname))
 
                 zufallswert_alt = float(fahrstr_alt.get("ZufallsWert", 0))
                 if fahrstr_neu.zufallswert != zufallswert_alt:
+                    unterschied = True
                     logging.info("{}: unterschiedlicher Zufallswert: {} vs {}".format(name, zufallswert_alt, fahrstr_neu.zufallswert))
 
                 start_alt = fahrstr_alt.find("./FahrstrStart")
                 start_alt_refnr = int(start_alt.get("Ref", 0))
                 start_alt_modul = start_alt.find("./Datei").get("Dateiname", "")
                 if start_alt_refnr != fahrstr_neu.start.refnr or start_alt_modul.upper() != fahrstr_neu.start.element_richtung.element.modul.relpath.upper():
+                    unterschied = True
                     logging.info("{}: unterschiedlicher Start: {}@{} vs. {}@{}".format(name, start_alt_refnr, start_alt_modul, fahrstr_neu.start.refnr, fahrstr_neu.start.element_richtung.element.modul.relpath))
 
                 ziel_alt = fahrstr_alt.find("./FahrstrZiel")
                 ziel_alt_refnr = int(ziel_alt.get("Ref", 0))
                 ziel_alt_modul = ziel_alt.find("./Datei").get("Dateiname", "")
                 if ziel_alt_refnr != fahrstr_neu.ziel.refnr or ziel_alt_modul.upper() != fahrstr_neu.ziel.element_richtung.element.modul.relpath.upper():
+                    unterschied = True
                     logging.info("{}: unterschiedliches Ziel: {}@{} vs. {}@{}".format(name, ziel_alt_refnr, ziel_alt_modul, fahrstr_neu.ziel.refnr, fahrstr_neu.ziel.element_richtung.element.modul.relpath))
 
                 # Register
@@ -194,8 +203,10 @@ def finde_fahrstrassen(args):
                 register_neu = set((register_neu.refnr, register_neu.element_richtung.element.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
 
                 for refpunkt in sorted(register_alt - register_neu, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sorted(register_neu - register_alt, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Aufloesepunkte
@@ -203,8 +214,10 @@ def finde_fahrstrassen(args):
                 aufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
 
                 for refpunkt in sorted(aufloesepunkte_alt - aufloesepunkte_neu, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sorted(aufloesepunkte_neu - aufloesepunkte_alt, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Signalhaltfallpunkte
@@ -212,8 +225,10 @@ def finde_fahrstrassen(args):
                 sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.element_richtung.element.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
 
                 for refpunkt in sorted(sighaltfallpunkte_alt - sighaltfallpunkte_neu, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sorted(sighaltfallpunkte_neu - sighaltfallpunkte_alt, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Teilaufloesepunkte
@@ -221,8 +236,10 @@ def finde_fahrstrassen(args):
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
 
                 for refpunkt in sorted(teilaufloesepunkte_alt - teilaufloesepunkte_neu, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
                 for refpunkt in sorted(teilaufloesepunkte_neu - teilaufloesepunkte_alt, key = operator.itemgetter(0)):
+                    unterschied = True
                     logging.info("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
                 # Weichen
@@ -234,10 +251,13 @@ def finde_fahrstrassen(args):
 
                 for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in weichenstellungen:
+                        unterschied = True
                         logging.info("{}: Weichenstellung {} (Nachfolger {}) ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["neu"]))
                     elif "neu" not in weichenstellungen:
+                        unterschied = True
                         logging.info("{}: Weichenstellung {} (Nachfolger {}) ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"]))
                     elif weichenstellungen["alt"] != weichenstellungen["neu"]:
+                        unterschied = True
                         logging.info("{}: Weiche {} hat unterschiedliche Stellungen: {} vs. {}".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["alt"], weichenstellungen["neu"]))
 
                 # Hauptsignale
@@ -249,10 +269,13 @@ def finde_fahrstrassen(args):
 
                 for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in hsig:
+                        unterschied = True
                         logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif "neu" not in hsig:
+                        unterschied = True
                         logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt)))
                     elif hsig["alt"] != hsig["neu"]:
+                        unterschied = True
                         logging.info("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt), hsig["alt"], hsig["neu"]))
 
                 # Vorsignale
@@ -264,13 +287,21 @@ def finde_fahrstrassen(args):
 
                 for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in vsig:
+                        unterschied = True
                         logging.info("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif "neu" not in vsig:
+                        unterschied = True
                         logging.info("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
                     elif vsig["alt"] != vsig["neu"]:
+                        unterschied = True
                         logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
 
             logging.info("Fahrstrassen-Vergleich abgeschlossen.")
+            return 2 if unterschied else 0
+
+        return 0
+    else:
+        return 1
 
 # http://stackoverflow.com/a/35365616/1083696
 class LoggingHandlerFrame(tkinter.ttk.Frame):
@@ -490,4 +521,4 @@ if __name__ == '__main__':
             p.run('finde_fahrstrassen(args)')
             p.print_stats()
         else:
-            finde_fahrstrassen(args)
+            sys.exit(finde_fahrstrassen(args))
