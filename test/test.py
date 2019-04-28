@@ -92,6 +92,14 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("FahrstrLaengeTest.st3")
         self.assertEqual(retcode, 0)
 
+    def test_kennlichtsignal_hilfshauptsignal(self):
+        (retcode, stderr) = self.run_fahrstr_gen("KennlichtsignalHilfshauptsignal.st3")
+        self.assertEqual(retcode, 2)
+        self.assertSetEqual(self.get_vergleich_resultat(stderr), set([
+            "Anfang A1 -> Mitte M1 -> Ende E1: Hauptsignalverknuepfung (KENNLICHTSIGNALHILFSHAUPTSIGNAL.ST3,1) (Signal Anfang A1 an Element 1b) hat unterschiedliche Zeile: (0, False) vs. (0, True)",
+            "Anfang A2 -> Mitte M2 -> Ende E2: Hauptsignalverknuepfung (KENNLICHTSIGNALHILFSHAUPTSIGNAL.ST3,10) (Signal Anfang A2 an Element 7b) hat unterschiedliche Zeile: (0, True) vs. (0, False)",
+            ]))
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
     unittest.TextTestRunner(verbosity=2).run(suite)
