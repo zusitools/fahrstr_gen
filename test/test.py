@@ -100,6 +100,22 @@ class TestFahrstrGen(unittest.TestCase):
             "Anfang A2 -> Mitte M2 -> Ende E2: Hauptsignalverknuepfung (KENNLICHTSIGNALHILFSHAUPTSIGNAL.ST3,10) (Signal Anfang A2 an Element 7b) hat unterschiedliche Zeile: (0, True) vs. (0, False)",
             ]))
 
+    def test_weiche_an_modulgrenze_1(self):
+        (retcode, stderr) = self.run_fahrstr_gen("WeicheAnModulgrenzeModulA1.st3")
+        self.assertEqual(retcode, 0)
+
+    def test_weiche_an_modulgrenze_2(self):
+        (retcode, stderr) = self.run_fahrstr_gen("WeicheAnModulgrenzeModulA2.st3")
+        self.assertEqual(retcode, 0)
+
+    def test_weiche_an_modulgrenze_3(self):
+        (retcode, stderr) = self.run_fahrstr_gen("WeicheAnModulgrenzeModulA3.st3")
+        self.assertEqual(retcode, 2)
+        self.assertSetEqual(self.get_vergleich_resultat(stderr), set([
+            "Fahrstrasse Anfang A -> Bheim B (TypZug) existiert in Zusi nicht",
+            "Fahrstrasse Anfang A -> Cstadt C (TypZug) existiert in Zusi nicht",
+            ]))
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
     unittest.TextTestRunner(verbosity=2).run(suite)

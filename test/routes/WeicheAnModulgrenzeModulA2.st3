@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Zusi>
+<Info DateiTyp="Strecke" Version="A.1" MinVersion="A.1">
+</Info>
+<Strecke>
+<Datei/>
+<HintergrundDatei/>
+<BefehlsKonfiguration/>
+<Kachelpfad Dateiname="Kacheln\" NurInfo="1"/>
+<UTM/>
+<SkyDome>
+<HimmelTex Dateiname="_Setup\sky\sky.dds"/>
+<SonneTex Dateiname="_Setup\sky\sun.dds"/>
+<SonneHorizontTex Dateiname="_Setup\sky\sun_horizon.dds"/>
+<MondTex Dateiname="_Setup\sky\moon.dds"/>
+<SternTex Dateiname="_Setup\sky\star.dds"/>
+</SkyDome>
+<ModulDateien>
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</ModulDateien>
+<ModulDateien>
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulC2.st3" NurInfo="1"/>
+</ModulDateien>
+<ReferenzElemente ReferenzNr="1" StrElement="1" RefTyp="1" Info="Module boundary towards routes\WeicheAnModulgrenzeModulB2.st3"/>
+<ReferenzElemente ReferenzNr="2" StrElement="1" RefTyp="3" Info="Points "/>
+<ReferenzElemente ReferenzNr="3" StrElement="1" StrNorm="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="4" StrElement="1" RefTyp="2" Info="Register no. 5000"/>
+<ReferenzElemente ReferenzNr="5" StrElement="2" RefTyp="4" Info="Signal: Anfang A"/>
+<ReferenzElemente ReferenzNr="6" StrElement="2" StrNorm="1" RefTyp="2" Info="Register no. 5001"/>
+<ReferenzElemente ReferenzNr="7" StrElement="2" RefTyp="2" Info="Register no. 5001"/>
+<StrElement Nr="1" spTrass="27.7778">
+<g/>
+<b X="5"/>
+<InfoNormRichtung vMax="-1" Reg="5000"/>
+<InfoGegenRichtung vMax="-1" Reg="5000"/>
+<NachNorm Nr="2"/>
+<NachGegenModul Nr="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</NachGegenModul>
+<NachGegenModul Nr="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulC2.st3" NurInfo="1"/>
+</NachGegenModul>
+</StrElement>
+<StrElement Nr="2" spTrass="27.7778" Anschluss="256">
+<g X="5"/>
+<b X="10"/>
+<InfoNormRichtung vMax="-1" Reg="5001"/>
+<InfoGegenRichtung vMax="-1" Reg="5001">
+<Signal NameBetriebsstelle="Anfang" Stellwerk="Anfang Af" Signalname="A" SignalTyp="13" BoundingR="1">
+<p X="10"/>
+<phi Z="3.141593"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<HsigBegriff FahrstrTyp="6"/>
+<HsigBegriff HsigGeschw="-1" FahrstrTyp="2"/>
+<HsigBegriff HsigGeschw="11.1111" FahrstrTyp="4"/>
+<VsigBegriff VsigGeschw="-1"/>
+<MatrixEintrag MatrixGeschw="11.1111">
+<Ereignis Er="23"/>
+<Ereignis Er="32" Beschr="10A" Wert="70"/>
+</MatrixEintrag>
+<MatrixEintrag>
+<Ereignis Er="23"/>
+</MatrixEintrag>
+<MatrixEintrag MatrixGeschw="6.9444">
+<Ereignis Er="23"/>
+</MatrixEintrag>
+<MatrixEintrag MatrixGeschw="11.1111">
+<Ereignis Er="23"/>
+<Ereignis Er="32" Beschr="10A" Wert="70"/>
+<Ereignis Er="28"/>
+</MatrixEintrag>
+<Ersatzsignal ErsatzsigBezeichnung="Befehl" ErsatzsigID="0000010A">
+<MatrixEintrag MatrixGeschw="11.1111">
+<Ereignis Er="32" Wert="70"/>
+</MatrixEintrag>
+</Ersatzsignal>
+</Signal>
+</InfoGegenRichtung>
+<NachGegen Nr="1"/>
+</StrElement>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Bheim B" FahrstrTyp="TypZug" Laenge="15">
+<FahrstrStart Ref="5">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="4">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="6">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="3">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="5" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="5" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="5" FahrstrSignalErsatzsignal="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Bheim B2" FahrstrTyp="TypZug" Laenge="17.0711">
+<FahrstrStart Ref="5">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="8">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="4">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="6">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="9">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrWeiche Ref="5" FahrstrWeichenlage="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrWeiche Ref="5" FahrstrWeichenlage="2">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulB2.st3" NurInfo="1"/>
+</FahrstrWeiche>
+<FahrstrSignal Ref="5" FahrstrSignalErsatzsignal="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+<Fahrstrasse FahrstrName="Anfang A -&gt; Cstadt C" FahrstrTyp="TypZug" Laenge="15">
+<FahrstrStart Ref="5">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrStart>
+<FahrstrZiel Ref="2">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulC2.st3" NurInfo="1"/>
+</FahrstrZiel>
+<FahrstrRegister Ref="4">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrRegister Ref="3">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulC2.st3" NurInfo="1"/>
+</FahrstrRegister>
+<FahrstrSignal Ref="5" FahrstrSignalErsatzsignal="1">
+<Datei Dateiname="routes\WeicheAnModulgrenzeModulA2.st3" NurInfo="1"/>
+</FahrstrSignal>
+</Fahrstrasse>
+</Strecke>
+</Zusi>

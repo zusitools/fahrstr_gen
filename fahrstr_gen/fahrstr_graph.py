@@ -106,7 +106,14 @@ class FahrstrGraphKnoten(Knoten):
                 kante.hat_ende_weichenbereich = any(int(ereignis.get("Er", 0)) == 1000002 for ereignis in self.element.ereignisse(richtung))
                 if weichen_refpunkt is not None:
                     kante.start_nachfolger_idx = idx
-                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
+                    if n.element.modul == self.element.modul:
+                        kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, idx + 1))
+                    else:
+                        # Anwendungsfall von Weichen an Modulgrenzen sind alternative Versionen desselben Moduls.
+                        # Zusi geht davon aus, dass immer nur eine Version des Nachbarmoduls im Fahrplan enthalten ist
+                        # und somit nach dem Laden im Simulator das Element nur einen Nachfolger (Index 0) hat.
+                        # Somit ist nach Zusi-Logik keine Weichenverknuepfung notwendig.
+                        logging.debug(("Nachfolger Nr. {} von Element {} liegt in anderem Modul. Es wird keine Weichenverknuepfung in der Fahrstrasse erzeugt.").format(idx + 1, self.element.richtung(richtung)))
                 kante = self._neue_nachfolger_kante(kante, n)
                 if kante is not None:
                     self.nachfolger_kanten[key].append(kante)
@@ -357,7 +364,10 @@ class FahrstrGraphKnoten(Knoten):
 
                 try:
                     kante.ziel_vorgaenger_idx = ziel_vorgaenger.index(element_richtung_vorgaenger)
-                    kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, kante.ziel_vorgaenger_idx + 1))
+                    if element_richtung_vorgaenger.element.modul == element_richtung.element.modul:
+                        kante.weichen.append(FahrstrWeichenstellung(weichen_refpunkt, kante.ziel_vorgaenger_idx + 1))
+                    else:
+                        logging.debug(("Vorgaenger Nr. {} von Element {} liegt in anderem Modul. Es wird keine Weichenverknuepfung in der Fahrstrasse erzeugt.").format(kante.ziel_vorgaenger_idx + 1, element_richtung))
                 except ValueError:
                     logging.warn(("Stellung der stumpf befahrenen Weiche an Element {} von Element {} kommend konnte nicht ermittelt werden. " +
                             "Es werden keine Fahrstrassen ueber das letztere Element erzeugt.").format(element_richtung, element_richtung_vorgaenger))
