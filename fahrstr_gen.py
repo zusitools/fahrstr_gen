@@ -63,7 +63,7 @@ def finde_fahrstrassen(args):
     modulverwaltung.module = dict()
     modulverwaltung.dieses_modul = None
 
-    dieses_modul_relpath = modulverwaltung.get_zusi_relpath(args.dateiname)
+    dieses_modul_relpath = modulverwaltung.get_zusi_relpath(os.path.realpath(args.dateiname))
     modulverwaltung.dieses_modul = modulverwaltung.Modul(args.dateiname, dieses_modul_relpath)
     modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
 

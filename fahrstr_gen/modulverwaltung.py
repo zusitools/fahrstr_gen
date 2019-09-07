@@ -5,6 +5,7 @@ import os
 import tempfile
 import shutil
 from collections import defaultdict
+from functools import lru_cache
 
 from .konstanten import *
 
@@ -129,6 +130,7 @@ def read_registry_strings(keys, valuenames):
     return result if len(result) else None
 
 # aus zusicommon, angepasst
+@lru_cache(maxsize=None)
 def get_zusi_datapath():
     result = os.environ.get("ZUSI3_DATAPATH", None)
 
@@ -142,10 +144,12 @@ def get_zusi_datapath():
             (winreg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Zusi3"),
             (winreg.HKEY_CURRENT_USER, "Software\\Zusi3"),
             (winreg.HKEY_CURRENT_USER, "Software\\Wow6432Node\\Zusi3"),
-        ], set(["DatenVerzeichnis", "DatenDir", "DatenVerzeichnisDemo", "DatenDirDemo"]))
+        ], set(["DatenVerzeichnis", "DatenVerzeichnisSteam", "DatenVerzeichnisDemo", "DatenDir", "DatenDirDemo"]))
         if registry_values is not None:
             if "DatenVerzeichnis" in registry_values:
                 return registry_values["DatenVerzeichnis"]
+            elif "DatenVerzeichnisSteam" in registry_values:
+                return registry_values["DatenVerzeichnisSteam"]
             elif "DatenDir" in registry_values:
                 return registry_values["DatenDir"]
             elif "DatenVerzeichnisDemo" in registry_values:
@@ -155,11 +159,52 @@ def get_zusi_datapath():
     except ImportError:
         return ""
 
+    return ""
+
+@lru_cache(maxsize=None)
+def get_zusi_datapath_official():
+    result = os.environ.get("ZUSI3_DATAPATH_OFFICIAL", None)
+
+    if result is not None:
+        return result
+
+    try:
+        import winreg
+        registry_values = read_registry_strings([
+            (winreg.HKEY_LOCAL_MACHINE, "Software\\Zusi3"),
+            (winreg.HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Zusi3"),
+            (winreg.HKEY_CURRENT_USER, "Software\\Zusi3"),
+            (winreg.HKEY_CURRENT_USER, "Software\\Wow6432Node\\Zusi3"),
+        ], set(["DatenVerzeichnisOffiziell", "DatenVerzeichnisOffiziellSteam", ]))
+        if registry_values is not None:
+            if "DatenVerzeichnisOffiziell" in registry_values:
+                return registry_values["DatenVerzeichnisOffiziell"]
+            elif "DatenVerzeichnisOffiziellSteam" in registry_values:
+                return registry_values["DatenVerzeichnisOffiziellSteam"]
+    except ImportError:
+        return ""
+
+    return get_zusi_datapath()
+
 # Konvertiert einen Dateisystempfad in einen Pfad relativ zum Zusi-Dateiverzeichnis mit Backslash als Verzeichnistrenner.
 def get_zusi_relpath(realpath):
-    if not os.path.isabs(realpath):
-        realpath = os.path.abspath(realpath)
-    return os.path.relpath(realpath, get_zusi_datapath()).replace('/', '\\')
+    try:
+        candidate1 = os.path.relpath(realpath, get_zusi_datapath())
+    except ValueError:
+        candidate1 = None
+
+    try:
+        candidate2 = os.path.relpath(realpath, get_zusi_datapath_official())
+    except ValueError:
+        candidate2 = None
+
+    if candidate1 is None:
+        if candidate2 is None:
+            raise Exception("Kann {} nicht in Zusi-relativen Pfad umwandeln (Datenverzeichnis: {}, Datenverzeichnis offiziell: {})".format(realpath, get_zusi_datapath(), get_zusi_datapath_official()))
+        else:
+            return candidate2.replace('/', '\\')
+    else:
+        return candidate1.replace('/', '\\')
 
 # Gibt eine kanonische Version des angegebenen Zusi-Pfades zurueck.
 def normalize_zusi_relpath(relpath):
@@ -167,7 +212,11 @@ def normalize_zusi_relpath(relpath):
 
 # Konvertiert einen Zusi-Pfad (relativ zum Zusi-Datenverzeichnis) in einen Pfad auf dem aktuellen Dateisystem.
 def get_abspath(zusi_relpath):
-    return path_insensitive(os.path.join(get_zusi_datapath(), zusi_relpath.lstrip('\\').strip().replace('\\', os.sep)))
+    zusi_relpath = zusi_relpath.lstrip('\\').strip().replace('\\', os.sep)
+    result = path_insensitive(os.path.join(get_zusi_datapath(), zusi_relpath))
+    if os.path.exists(result):
+        return result
+    return path_insensitive(os.path.join(get_zusi_datapath_official(), zusi_relpath))
 
 # Relativer Zusi-Pfad -> (Modul oder None, wenn das Modul nicht existiert)
 module = dict()
@@ -231,7 +280,7 @@ def get_modul_by_name(relpath, fallback):
     if relpath_norm not in module:
         dateiname = get_abspath(relpath)
         try:
-            logging.debug("Lade Modul {}".format(relpath))
+            logging.debug("Lade Modul {} ({})".format(relpath, dateiname))
             module[relpath_norm] = Modul(dateiname, relpath)
         except FileNotFoundError:
             logging.warn("Moduldatei {} nicht gefunden".format(dateiname))
