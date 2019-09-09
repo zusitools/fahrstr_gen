@@ -25,11 +25,28 @@ import tkinter.ttk
 logging.COMPAT = 15
 logging.addLevelName(logging.COMPAT, 'COMPAT')
 
-def refpunkt_fmt(refpunkt):
+def refpunkt_fmt(refpunkt, print_signal=False):
     pfad = refpunkt[1]
-    if pfad.rfind('\\') != -1:
-        pfad = pfad[pfad.rfind('\\')+1:]
-    return "({},{})".format(pfad, refpunkt[0])
+    normpath = modulverwaltung.normalize_zusi_relpath(pfad)
+    last_backslash = pfad.rfind('\\')
+    if last_backslash != -1:
+        pfad = pfad[last_backslash+1:]
+
+    detail = ""
+    try:
+        modul = modulverwaltung.module[normpath]
+        if modul is not None:
+            rp = modul.referenzpunkte_by_nr[refpunkt[0]]
+            if rp is None:
+                detail = " (?)"
+            elif print_signal:
+                sig = rp.signal()
+                detail = " (?)" if sig is None else " ({})".format(sig)
+            else:
+                detail = " ({})".format(rp)
+    except KeyError:
+        pass
+    return "({},{}){}".format(pfad, refpunkt[0], detail)
 
 def abfrage_janein_cli(frage):
     antwort = '?'
@@ -270,13 +287,13 @@ def finde_fahrstrassen(args):
                 for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in hsig:
                         unterschied = True
-                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt)))
+                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt, print_signal=True)))
                     elif "neu" not in hsig:
                         unterschied = True
-                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt)))
+                        logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(hsig_refpunkt, print_signal=True)))
                     elif hsig["alt"] != hsig["neu"]:
                         unterschied = True
-                        logging.info("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt), hsig["alt"], hsig["neu"]))
+                        logging.info("{}: Hauptsignalverknuepfung {} hat unterschiedliche Zeile: {} vs. {}".format(name, refpunkt_fmt(hsig_refpunkt, print_signal=True), hsig["alt"], hsig["neu"]))
 
                 # Vorsignale
                 vsig_alt_vs_neu = defaultdict(dict)
@@ -288,13 +305,13 @@ def finde_fahrstrassen(args):
                 for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
                     if "alt" not in vsig:
                         unterschied = True
-                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt)))
+                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt, print_signal=True)))
                     elif "neu" not in vsig:
                         unterschied = True
-                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt)))
+                        logging.info("{}: Vorsignalverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(vsig_refpunkt, print_signal=True)))
                     elif vsig["alt"] != vsig["neu"]:
                         unterschied = True
-                        logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt), vsig["alt"], vsig["neu"]))
+                        logging.info("{}: Vorsignalverknuepfung {} hat unterschiedliche Spalte: {} vs. {}".format(name, refpunkt_fmt(vsig_refpunkt, print_signal=True), vsig["alt"], vsig["neu"]))
 
             logging.info("Fahrstrassen-Vergleich abgeschlossen.")
             return 2 if unterschied else 0
