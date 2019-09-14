@@ -101,6 +101,8 @@ class FahrstrGraphKnoten(Knoten):
                     return
 
             for idx, n in enumerate(nachfolger):
+                if n is None:
+                    continue
                 kante = FahrstrGraphKante(self.richtung(richtung))
                 # Ende Weichenbereich wirkt schon im Startelement
                 kante.hat_ende_weichenbereich = any(int(ereignis.get("Er", 0)) == 1000002 for ereignis in self.element.ereignisse(richtung))
