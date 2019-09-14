@@ -449,7 +449,7 @@ class FahrstrassenSuche:
                                     if not hochsignalisierung:
                                         spalte_alt = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) # mit dem alten Algorithmus
                                         if spalte != spalte_alt:
-                                            logging.log(logging.COMPAT, "{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
+                                            logging.debug("{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
                                     if len(vsig.signal().richtungsvoranzeiger) > 0:
                                         spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
 
