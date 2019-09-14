@@ -34,7 +34,7 @@ class FahrstrGraph(Streckengraph):
 # einer Folge von gerichteten Streckenelementen zwischen den beiden Knoten (exklusive Start, inklusive Ziel, inklusive Start-Weichenstellung).
 class FahrstrGraphKante:
     def __init__(self, start):
-        assert(start is not None)
+        assert start is not None
         self.start = start  # KnotenUndRichtung
         self.ziel = None  # KnotenUndRichtung
 
@@ -348,7 +348,7 @@ class FahrstrGraphKnoten(Knoten):
                 element_richtung = None
                 break
 
-            assert(len(nachfolger) == 1)  # sonst waere es ein Knoten
+            assert len(nachfolger) == 1  # sonst waere es ein Knoten
             element_richtung_vorgaenger = element_richtung
             element_richtung = nachfolger[0]
 

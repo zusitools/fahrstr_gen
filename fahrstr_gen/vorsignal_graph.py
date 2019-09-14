@@ -107,7 +107,7 @@ class VorsignalGraphKnoten(Knoten):
                 element_richtung = None
                 break
 
-            assert(len(vorgaenger) == 1)  # sonst waere es ein Knoten
+            assert len(vorgaenger) == 1  # sonst waere es ein Knoten
             element_richtung = vorgaenger[0]
 
         return kante

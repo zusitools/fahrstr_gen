@@ -59,7 +59,7 @@ def abfrage_janein_gui(frage):
 
 abfrage_janein = abfrage_janein_cli
 
-nat_sort_regex = re.compile('(\d+)')
+nat_sort_regex = re.compile(r'(\d+)')
 
 def nat_sort_key(s):
     # http://stackoverflow.com/a/5967539
@@ -113,7 +113,7 @@ def finde_fahrstrassen(args):
                 loeschfahrstrassen_namen)
         graph = FahrstrGraph(fahrstr_typ)
 
-        for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key = lambda t: t[0]):
+        for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key=lambda t: t[0]):
             if str_element in modulverwaltung.dieses_modul.referenzpunkte:
                 for richtung in [NORM, GEGEN]:
                     if any(
@@ -123,7 +123,7 @@ def finde_fahrstrassen(args):
                         ):
 
                         knoten = graph.get_knoten(str_element)
-                        assert(knoten is not None)
+                        assert knoten is not None
                         fahrstrassen.extend(fahrstr_suche.get_fahrstrassen(knoten, richtung))
 
     strecke = modulverwaltung.dieses_modul.root.find("./Strecke")
@@ -133,7 +133,7 @@ def finde_fahrstrassen(args):
                 strecke.remove(fahrstrasse_alt)
             # N.B. sort() und sorted() sind stabile Sortierverfahren.
             # Das ist hier notwendig, da die Information ueber den Vorrangstrang nur implizit (ueber die Reihenfolge) in der Fahrstrassenliste enthalten ist.
-            for fahrstrasse_neu in sorted(fahrstrassen, key = fahrstr_sort_key):
+            for fahrstrasse_neu in sorted(fahrstrassen, key=fahrstr_sort_key):
                 logging.info("Fahrstrasse erzeugt: {}".format(fahrstrasse_neu.name))
                 strecke.append(fahrstrasse_neu.to_xml())
             modulverwaltung.dieses_modul.schreibe_moduldatei()
@@ -167,7 +167,7 @@ def finde_fahrstrassen(args):
                 elif fahrstrasse_neu.fahrstr_typ == FAHRSTR_TYP_ANZEIGE:
                     alt_vs_neu[("TypAnzeige", fahrstrasse_neu.name)]["neu"] = fahrstrasse_neu
 
-            for (typ, name), fahrstrasse in sorted(alt_vs_neu.items(), key = operator.itemgetter(0)):
+            for (typ, name), fahrstrasse in sorted(alt_vs_neu.items(), key=operator.itemgetter(0)):
                 try:
                     fahrstr_alt = fahrstrasse["alt"]
                 except KeyError:
@@ -219,10 +219,10 @@ def finde_fahrstrassen(args):
                 register_alt = set((int(register_alt.get("Ref", 0)), register_alt.find("./Datei").get("Dateiname", "").upper()) for register_alt in fahrstr_alt.iterfind("./FahrstrRegister"))
                 register_neu = set((register_neu.refnr, register_neu.element_richtung.element.modul.relpath.upper()) for register_neu in fahrstr_neu.register)
 
-                for refpunkt in sorted(register_alt - register_neu, key = operator.itemgetter(0)):
+                for refpunkt in sorted(register_alt - register_neu, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Registerverknuepfung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in sorted(register_neu - register_alt, key = operator.itemgetter(0)):
+                for refpunkt in sorted(register_neu - register_alt, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Registerverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
@@ -230,10 +230,10 @@ def finde_fahrstrassen(args):
                 aufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrAufloesung"))
                 aufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.aufloesepunkte)
 
-                for refpunkt in sorted(aufloesepunkte_alt - aufloesepunkte_neu, key = operator.itemgetter(0)):
+                for refpunkt in sorted(aufloesepunkte_alt - aufloesepunkte_neu, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Aufloesepunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in sorted(aufloesepunkte_neu - aufloesepunkte_alt, key = operator.itemgetter(0)):
+                for refpunkt in sorted(aufloesepunkte_neu - aufloesepunkte_alt, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Aufloesepunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
@@ -241,10 +241,10 @@ def finde_fahrstrassen(args):
                 sighaltfallpunkte_alt = set((int(haltfall.get("Ref", 0)), haltfall.find("./Datei").get("Dateiname", "").upper()) for haltfall in fahrstr_alt.iterfind("./FahrstrSigHaltfall"))
                 sighaltfallpunkte_neu = set((haltfall.refnr, haltfall.element_richtung.element.modul.relpath.upper()) for haltfall in fahrstr_neu.signalhaltfallpunkte)
 
-                for refpunkt in sorted(sighaltfallpunkte_alt - sighaltfallpunkte_neu, key = operator.itemgetter(0)):
+                for refpunkt in sorted(sighaltfallpunkte_alt - sighaltfallpunkte_neu, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in sorted(sighaltfallpunkte_neu - sighaltfallpunkte_alt, key = operator.itemgetter(0)):
+                for refpunkt in sorted(sighaltfallpunkte_neu - sighaltfallpunkte_alt, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Signalhaltfallpunkt {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
@@ -252,10 +252,10 @@ def finde_fahrstrassen(args):
                 teilaufloesepunkte_alt = set((int(aufl.get("Ref", 0)), aufl.find("./Datei").get("Dateiname", "").upper()) for aufl in fahrstr_alt.iterfind("./FahrstrTeilaufloesung"))
                 teilaufloesepunkte_neu = set((aufl.refnr, aufl.element_richtung.element.modul.relpath.upper()) for aufl in fahrstr_neu.teilaufloesepunkte)
 
-                for refpunkt in sorted(teilaufloesepunkte_alt - teilaufloesepunkte_neu, key = operator.itemgetter(0)):
+                for refpunkt in sorted(teilaufloesepunkte_alt - teilaufloesepunkte_neu, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Teilaufloesung {} ist in Zusi vorhanden, wurde aber nicht erzeugt".format(name, refpunkt_fmt(refpunkt)))
-                for refpunkt in sorted(teilaufloesepunkte_neu - teilaufloesepunkte_alt, key = operator.itemgetter(0)):
+                for refpunkt in sorted(teilaufloesepunkte_neu - teilaufloesepunkte_alt, key=operator.itemgetter(0)):
                     unterschied = True
                     logging.info("{}: Teilaufloesung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(refpunkt)))
 
@@ -266,7 +266,7 @@ def finde_fahrstrassen(args):
                 for weiche_neu in fahrstr_neu.weichen:
                     weichenstellungen_alt_vs_neu[(weiche_neu.refpunkt.refnr, weiche_neu.refpunkt.element_richtung.element.modul.relpath.upper())]["neu"] = weiche_neu.weichenlage
 
-                for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                for weichen_refpunkt, weichenstellungen in sorted(weichenstellungen_alt_vs_neu.items(), key=operator.itemgetter(0)):
                     if "alt" not in weichenstellungen:
                         unterschied = True
                         logging.info("{}: Weichenstellung {} (Nachfolger {}) ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(weichen_refpunkt), weichenstellungen["neu"]))
@@ -284,7 +284,7 @@ def finde_fahrstrassen(args):
                 for hsig_neu in fahrstr_neu.signale:
                     hsig_alt_vs_neu[(hsig_neu.refpunkt.refnr, hsig_neu.refpunkt.element_richtung.element.modul.relpath.upper())]["neu"] = (hsig_neu.zeile, hsig_neu.ist_ersatzsignal)
 
-                for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                for hsig_refpunkt, hsig in sorted(hsig_alt_vs_neu.items(), key=operator.itemgetter(0)):
                     if "alt" not in hsig:
                         unterschied = True
                         logging.info("{}: Hauptsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(hsig_refpunkt, print_signal=True)))
@@ -302,7 +302,7 @@ def finde_fahrstrassen(args):
                 for vsig_neu in fahrstr_neu.vorsignale:
                     vsig_alt_vs_neu[(vsig_neu.refpunkt.refnr, vsig_neu.refpunkt.element_richtung.element.modul.relpath.upper())]["neu"] = vsig_neu.spalte
 
-                for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key = operator.itemgetter(0)):
+                for vsig_refpunkt, vsig in sorted(vsig_alt_vs_neu.items(), key=operator.itemgetter(0)):
                     if "alt" not in vsig:
                         unterschied = True
                         logging.info("{}: Vorsignalverknuepfung {} ist in Zusi nicht vorhanden".format(name, refpunkt_fmt(vsig_refpunkt, print_signal=True)))
@@ -484,9 +484,9 @@ def gui():
     frame_start.columnconfigure(0, weight=1)
     frame_start.columnconfigure(1, weight=1)
 
-    btn_start_vergleiche = tkinter.Button(frame_start, text="Fahrstr. erzeugen + mit existierenden vergleichen", command=lambda : btn_start_callback(True))
+    btn_start_vergleiche = tkinter.Button(frame_start, text="Fahrstr. erzeugen + mit existierenden vergleichen", command=lambda: btn_start_callback(True))
     btn_start_vergleiche.grid(row=0, column=0, sticky='we')
-    btn_start_schreibe = tkinter.Button(frame_start, text="Fahrstr. erzeugen + ST3-Datei schreiben", command=lambda : btn_start_callback(False))
+    btn_start_schreibe = tkinter.Button(frame_start, text="Fahrstr. erzeugen + ST3-Datei schreiben", command=lambda: btn_start_callback(False))
     btn_start_schreibe.grid(row=0, column=1, sticky='we')
 
     ent_log = LoggingHandlerFrame(frame)

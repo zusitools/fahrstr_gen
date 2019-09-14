@@ -67,7 +67,7 @@ def _path_insensitive(path):
     else:
         return
 
-class RefPunkt(object):
+class RefPunkt:
     def __init__(self, refnr, reftyp, element_richtung):
         self.refnr = refnr
         self.reftyp = reftyp
@@ -89,7 +89,7 @@ class RefPunkt(object):
 
     def to_xml(self, node):
         node.attrib["Ref"] = str(self.refnr)
-        ET.SubElement(node, 'Datei', { "Dateiname": self.element_richtung.element.modul.relpath, "NurInfo": "1" })
+        ET.SubElement(node, 'Datei', {"Dateiname": self.element_richtung.element.modul.relpath, "NurInfo": "1" })
 
 # aus zusicommon
 # From the first key in "keys" that contains a value, returns a dictionary

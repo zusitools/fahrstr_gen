@@ -116,7 +116,7 @@ class EinzelFahrstrasse:
         return "EinzelFahrstrasse<{}>".format(weg)
 
     def erweitere(self, kante):
-        assert(kante.ziel is not None)
+        assert kante.ziel is not None
         if self.start is None:
             self.start = kante.start
         self.ziel = kante.ziel

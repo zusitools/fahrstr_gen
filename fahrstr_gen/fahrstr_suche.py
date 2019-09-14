@@ -198,8 +198,8 @@ class FahrstrassenSuche:
     # und enthaelt fuer jede Einzelfahrstrasse die zu aktivierenden bedingten Register
     # (Paare aus Referenzpunkt und Beschreibung)
     def _neue_fahrstrasse(self, einzelfahrstrassen, bedingte_register):
-        assert(len(einzelfahrstrassen) > 0)
-        assert(len(bedingte_register) == len(einzelfahrstrassen))
+        assert len(einzelfahrstrassen) > 0
+        assert len(bedingte_register) == len(einzelfahrstrassen)
         result = Fahrstrasse(self.fahrstr_typ)
         hat_bedingte_register = any(len(_) for _ in bedingte_register)
 
@@ -207,7 +207,7 @@ class FahrstrassenSuche:
         result.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_SIGNAL)
         if result.start is None or not ist_fahrstr_start_sig(result.start.signal(), self.fahrstr_typ):
             result.start = einzelfahrstrassen[0].start.refpunkt(REFTYP_AUFGLEISPUNKT)
-            assert(result.start is not None)
+            assert result.start is not None
 
         result.ziel = einzelfahrstrassen[-1].ziel.refpunkt(REFTYP_SIGNAL)
         if hat_bedingte_register:

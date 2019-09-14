@@ -72,7 +72,7 @@ class FlankenschutzGraphKnoten(Knoten):
                         element_richtung = None
                         break
 
-                    assert(len(nachfolger_liste) == 1) # sonst waere es ein Knoten
+                    assert len(nachfolger_liste) == 1 # sonst waere es ein Knoten
                     element_richtung_vorgaenger = element_richtung
                     element_richtung = nachfolger_liste[0]
 

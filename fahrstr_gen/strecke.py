@@ -330,7 +330,7 @@ class Signal:
     # Wenn solche eine Zeile nicht existiert, wird die Zeile mit der naechstgroesseren Geschwindigkeit genommen.
     # Richtungs- und Gegengleisanzeiger werden nicht betrachtet.
     def get_hsig_zeile(self, fahrstr_typ, zielgeschwindigkeit):
-        assert(zielgeschwindigkeit != 0)
+        assert zielgeschwindigkeit != 0
         zeile_kleinergleich, geschw_kleinergleich = None, 0
         zeile_groesser, geschw_groesser = None, -1
 
@@ -481,7 +481,7 @@ class Signal:
                 return idx
 
         # Nicht gefunden. Matrix erweitern.
-        assert(len(self.matrix) == len(self.zeilen) * len(self.spalten))
+        assert len(self.matrix) == len(self.zeilen) * len(self.spalten)
 
         # Neuer <VsigBegriff>-Knoten
         vsig_begriff_knoten = ET.Element("VsigBegriff")
