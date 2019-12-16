@@ -258,7 +258,10 @@ class FahrstrGraphKnoten(Knoten):
                     kante.streckenname = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
-                    kante.richtungsanzeiger = ereignis.get("Beschr", "")
+                    if self.graph.fahrstr_typ == FAHRSTR_TYP_ANZEIGE and int(ereignis.get("Wert", 0)) == 1:
+                        logging.debug("Element {}: Ignoriere Ereignis \"Richtungsanzeiger-Ziel\" in Anzeige-Fahrstrasse".format(element_richtung))
+                    else:
+                        kante.richtungsanzeiger = ereignis.get("Beschr", "")
 
                 elif ereignis_nr == EREIGNIS_FAHRSTRASSE_AUFLOESEN:
                     refpunkt = element_richtung.refpunkt(REFTYP_AUFLOESEPUNKT)

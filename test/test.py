@@ -116,6 +116,10 @@ class TestFahrstrGen(unittest.TestCase):
             "Fahrstrasse Anfang A -> Cstadt C (TypZug) existiert in Zusi nicht",
             ]))
 
+    def test_zs2_dunkel_in_anzeigefahrstrasse(self):
+        (retcode, stderr) = self.run_fahrstr_gen("Zs2DunkelInAnzeigefahrstrasse.st3")
+        self.assertEqual(retcode, 0)
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
     unittest.TextTestRunner(verbosity=2).run(suite)
