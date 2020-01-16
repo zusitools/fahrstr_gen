@@ -472,19 +472,19 @@ class FahrstrassenSuche:
                                 zeile = kante.ziel.signal().get_hsig_zeile(self.fahrstr_typ, signalgeschwindigkeit_neu) # TODO: Richtungsanzeiger beachten?
                                 if spalte is None:
                                     logging.warn("{}: {} hat Hochsignalisierung aktiviert, aber keine Zeile fuer Typ {}, Geschwindigkeit {}. Es werden keine weiteren Vorsignale gesucht.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit_neu)))
-                                    return
+                                    continue
 
                                 spalte = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig)
                                 if spalte is None:
                                     spalte = 0
                                 if spalte >= len(kante.ziel.signal().spalten):
-                                    return
+                                    continue
 
                                 spalte_startsignal_halt = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
                                 if spalte_startsignal_halt is None:
                                     spalte_startsignal_halt = 0
                                 if spalte_startsignal_halt >= len(kante.ziel.signal().spalten):
-                                    return
+                                    continue
 
                                 geschw_naechstes_hsig_neu = kante.ziel.signal().matrix_geschw(zeile, spalte)
                                 geschw_naechstes_hsig_startsignal_halt_neu = kante.ziel.signal().matrix_geschw(zeile, spalte_startsignal_halt)
