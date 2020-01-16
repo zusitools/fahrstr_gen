@@ -464,39 +464,42 @@ class FahrstrassenSuche:
                                 else:
                                     logging.log(logging.COMPAT, "{}: Vorsignalsuche: {} wird vom Startsignal der Fahrstrasse nicht beeinflusst (gleiche Spalte {} fuer Geschwindigkeiten {} und {}) und daher nicht verknuepft".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
 
-                        if not kante.vorher_keine_vsig_verknuepfung and kante.ziel is not None and not kante.ziel.knoten.ist_besucht():
-                            kante.ziel.knoten.markiere_besucht()
+                        # Rekursiver Aufruf fuer Folgekanten
+                        if kante.vorher_keine_vsig_verknuepfung or kante.ziel is None or kante.ziel.knoten.ist_besucht():
+                            continue
 
-                            if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG) and \
-                                    kante.ziel.signal().sigflags & SIGFLAG_HOCHSIGNALISIERUNG != 0:
-                                zeile = kante.ziel.signal().get_hsig_zeile(self.fahrstr_typ, signalgeschwindigkeit_neu) # TODO: Richtungsanzeiger beachten?
-                                if spalte is None:
-                                    logging.warn("{}: {} hat Hochsignalisierung aktiviert, aber keine Zeile fuer Typ {}, Geschwindigkeit {}. Es werden keine weiteren Vorsignale gesucht.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit_neu)))
-                                    continue
+                        kante.ziel.knoten.markiere_besucht()
 
-                                spalte = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig)
-                                if spalte is None:
-                                    spalte = 0
-                                if spalte >= len(kante.ziel.signal().spalten):
-                                    continue
+                        if ist_hsig_fuer_fahrstr_typ(kante.ziel.signal(), FAHRSTR_TYP_ZUG) and \
+                                kante.ziel.signal().sigflags & SIGFLAG_HOCHSIGNALISIERUNG != 0:
+                            zeile = kante.ziel.signal().get_hsig_zeile(self.fahrstr_typ, signalgeschwindigkeit_neu) # TODO: Richtungsanzeiger beachten?
+                            if spalte is None:
+                                logging.warn("{}: {} hat Hochsignalisierung aktiviert, aber keine Zeile fuer Typ {}, Geschwindigkeit {}. Es werden keine weiteren Vorsignale gesucht.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit_neu)))
+                                continue
 
-                                spalte_startsignal_halt = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
-                                if spalte_startsignal_halt is None:
-                                    spalte_startsignal_halt = 0
-                                if spalte_startsignal_halt >= len(kante.ziel.signal().spalten):
-                                    continue
+                            spalte = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig)
+                            if spalte is None:
+                                spalte = 0
+                            if spalte >= len(kante.ziel.signal().spalten):
+                                continue
 
-                                geschw_naechstes_hsig_neu = kante.ziel.signal().matrix_geschw(zeile, spalte)
-                                geschw_naechstes_hsig_startsignal_halt_neu = kante.ziel.signal().matrix_geschw(zeile, spalte_startsignal_halt)
-                                if geschw_naechstes_hsig_neu != geschw_naechstes_hsig_startsignal_halt_neu:
-                                    if geschw_kleiner(geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu):
-                                        logging.warn("{}: {} hat Hochsignalisierung aktiviert und wechselt beim Stellen der Fahrstrasse auf eine niedrigere Geschwindigkeit (von {} auf {})".format(result.name, kante.ziel.signal(), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu), str_geschw(geschw_naechstes_hsig_neu)))
-                                    logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu), str_geschw(geschw_naechstes_hsig_neu), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu)))
-                                    finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu, True, dunkelschaltung)
-                                else:
-                                    logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst die Vorsignalstellung nicht. Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu)))
+                            spalte_startsignal_halt = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
+                            if spalte_startsignal_halt is None:
+                                spalte_startsignal_halt = 0
+                            if spalte_startsignal_halt >= len(kante.ziel.signal().spalten):
+                                continue
+
+                            geschw_naechstes_hsig_neu = kante.ziel.signal().matrix_geschw(zeile, spalte)
+                            geschw_naechstes_hsig_startsignal_halt_neu = kante.ziel.signal().matrix_geschw(zeile, spalte_startsignal_halt)
+                            if geschw_naechstes_hsig_neu != geschw_naechstes_hsig_startsignal_halt_neu:
+                                if geschw_kleiner(geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu):
+                                    logging.warn("{}: {} hat Hochsignalisierung aktiviert und wechselt beim Stellen der Fahrstrasse auf eine niedrigere Geschwindigkeit (von {} auf {})".format(result.name, kante.ziel.signal(), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu), str_geschw(geschw_naechstes_hsig_neu)))
+                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu), str_geschw(geschw_naechstes_hsig_neu), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu)))
+                                finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu, True, dunkelschaltung)
                             else:
-                                finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit_neu, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung, dunkelschaltung)
+                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst die Vorsignalstellung nicht. Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu)))
+                        else:
+                            finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit_neu, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung, dunkelschaltung)
 
                 spalte = result.start.signal().get_vsig_spalte(0)
                 if spalte is None:
