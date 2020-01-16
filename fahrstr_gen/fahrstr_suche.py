@@ -505,6 +505,7 @@ class FahrstrassenSuche:
                 self.vorsignal_graph.markiere_unbesucht()
                 geschw_naechstes_hsig = result.start.signal().matrix_geschw(startsignal_verkn.zeile, spalte)
                 geschw_naechstes_hsig_startsignal_halt = 0
+                logging.debug("{}: Bestimme Geschwindigkeit fuer Vorsignalsuche aus Zeile {}, Spalte {} der Matrix des Startsignals => v={}".format(result.name, startsignal_verkn.zeile, spalte, str_geschw(geschw_naechstes_hsig)))
                 logging.debug("{}: Suche Vorsignale ab {}, Vsig-Geschwindigkeit {}/{}".format(result.name, vorsignal_knoten.signal(result.start.element_richtung.richtung), str_geschw(geschw_naechstes_hsig), str_geschw(geschw_naechstes_hsig_startsignal_halt)))
                 finde_vsig_rek(vorsignal_knoten, result.start.element_richtung.richtung, -1.0, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung=False, dunkelschaltung=self.fahrstr_typ == FAHRSTR_TYP_ANZEIGE)
 
