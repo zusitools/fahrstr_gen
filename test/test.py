@@ -120,6 +120,15 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("Zs2DunkelInAnzeigefahrstrasse.st3")
         self.assertEqual(retcode, 0)
 
+    def test_weiche_ohne_referenzpunkt(self):
+        (retcode, stderr) = self.run_fahrstr_gen("WeicheOhneReferenzpunkt.st3")
+        self.assertEqual(retcode, 2)
+        self.assertSetEqual(self.get_vergleich_resultat(stderr), set([
+            "Fahrstrasse Anfang A -> Ende E1 (TypZug) existiert in Zusi, wurde aber nicht erzeugt",
+            "Fahrstrasse Anfang A -> Ende E2 (TypZug) existiert in Zusi, wurde aber nicht erzeugt",
+            ]))
+
+
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
     unittest.TextTestRunner(verbosity=2).run(suite)

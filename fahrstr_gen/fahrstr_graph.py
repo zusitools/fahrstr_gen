@@ -96,9 +96,8 @@ class FahrstrGraphKnoten(Knoten):
                 if weichen_refpunkt is None:
                     logging.warn(("Element {} hat mehr als einen Nachfolger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
                             "Es werden keine Fahrstrassen ueber dieses Element erzeugt.").format(
-                            self.element.element.attrib["Nr"], "blauer" if richtung == NORM else "gruener"))
-                    self.nachfolger_kanten[key] = [None] * len(nachfolger)
-                    return
+                            self.element.xml_knoten.get("Nr", 0), "blauer" if richtung == NORM else "gruener"))
+                    nachfolger = []
 
             for idx, n in enumerate(nachfolger):
                 if n is None:
