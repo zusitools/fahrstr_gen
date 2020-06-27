@@ -149,7 +149,7 @@ def finde_fahrstrassen(args):
             logging.info("{} Streckenelemente in {} Modulen".format(anzahl_elemente, len(modulverwaltung.module)))
 
         elif args.modus == 'vergleiche':
-            logging.info("Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.")
+            logging.info("Vergleiche Fahrstrassen aus der ST3-Datei mit neu erzeugten (existierend vs. neu).")
             unterschied = False
 
             alt_vs_neu = defaultdict(dict)

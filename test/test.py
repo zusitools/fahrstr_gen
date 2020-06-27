@@ -24,7 +24,7 @@ class TestFahrstrGen(unittest.TestCase):
         for line in stderr.splitlines():
             m = r.match(line)
             if m is not None:
-                if m.group(1) == "Vergleiche erzeugte Fahrstrassen mit denen aus der ST3-Datei.":
+                if m.group(1) == "Vergleiche Fahrstrassen aus der ST3-Datei mit neu erzeugten (existierend vs. neu).":
                     vergleich_aktiv = True
                 elif m.group(1) == "Fahrstrassen-Vergleich abgeschlossen.":
                     vergleich_aktiv = False
