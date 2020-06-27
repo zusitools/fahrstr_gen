@@ -198,7 +198,7 @@ def get_zusi_relpath(realpath):
     except ValueError:
         candidate2 = None
 
-    if candidate1 is None:
+    if candidate1 is None or candidate1.startswith(os.pardir):
         if candidate2 is None:
             raise Exception("Kann {} nicht in Zusi-relativen Pfad umwandeln (Datenverzeichnis: {}, Datenverzeichnis offiziell: {})".format(realpath, get_zusi_datapath(), get_zusi_datapath_official()))
         else:
@@ -211,10 +211,10 @@ def normalize_zusi_relpath(relpath):
     return relpath.upper().lstrip('\\').strip()
 
 # Konvertiert einen Zusi-Pfad (relativ zum Zusi-Datenverzeichnis) in einen Pfad auf dem aktuellen Dateisystem.
-def get_abspath(zusi_relpath):
+def get_abspath(zusi_relpath, force_user_dir=False):
     zusi_relpath = zusi_relpath.lstrip('\\').strip().replace('\\', os.sep)
     result = path_insensitive(os.path.join(get_zusi_datapath(), zusi_relpath))
-    if os.path.exists(result):
+    if force_user_dir or os.path.exists(result):
         return result
     return path_insensitive(os.path.join(get_zusi_datapath_official(), zusi_relpath))
 
@@ -268,7 +268,9 @@ class Modul:
             fp.write(b"\xef\xbb\xbf")
             fp.write(u'<?xml version="1.0" encoding="UTF-8"?>\r\n'.encode("utf-8"))
             writeuglyxml(fp, self.root)
-        shutil.copyfile(fp.name, self.dateiname)
+        out_filename = get_abspath(self.relpath, force_user_dir=True)
+        os.makedirs(os.path.dirname(out_filename), exist_ok=True)
+        shutil.copyfile(fp.name, out_filename)
         os.remove(fp.name)
 
 # Liefert das angegebene Modul oder None zurueck (relpath leer = Fallback)

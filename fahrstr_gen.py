@@ -81,8 +81,7 @@ def finde_fahrstrassen(args):
     modulverwaltung.dieses_modul = None
 
     dieses_modul_relpath = modulverwaltung.get_zusi_relpath(os.path.realpath(args.dateiname))
-    modulverwaltung.dieses_modul = modulverwaltung.Modul(args.dateiname, dieses_modul_relpath)
-    modulverwaltung.module[modulverwaltung.normalize_zusi_relpath(dieses_modul_relpath)] = modulverwaltung.dieses_modul
+    modulverwaltung.dieses_modul = modulverwaltung.get_modul_by_name(dieses_modul_relpath, "")
 
     loeschfahrstrassen_namen = [n.get("FahrstrName", "") for n in modulverwaltung.dieses_modul.root.findall("./Strecke/LoeschFahrstrasse")]
 
