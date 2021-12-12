@@ -129,6 +129,10 @@ class TestFahrstrGen(unittest.TestCase):
             "Fahrstrasse Anfang A -> Ende E2 (TypZug) existiert in Zusi, wurde aber nicht erzeugt",
             ]))
 
+    def test_zugdeckungssignal(self):
+        (retcode, stderr) = self.run_fahrstr_gen("Zugdeckungssignal.st3")
+        self.assertEqual(retcode, 0)
+
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
