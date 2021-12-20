@@ -7,7 +7,7 @@ import operator
 
 from .konstanten import *
 from .fahrstrasse import EinzelFahrstrasse, Fahrstrasse, FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
-from .strecke import ist_fahrstr_start_sig, ist_hsig_fuer_fahrstr_typ, geschw_kleiner, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
+from .strecke import ist_fahrstr_start_sig, ist_hsig_fuer_fahrstr_typ, ist_zusatzsignal_fuer_fahrstr_typ, geschw_kleiner, geschw_min, str_geschw, gegenrichtung, str_rgl_ggl
 from . import modulverwaltung
 
 import logging
@@ -117,7 +117,7 @@ class FahrstrassenSuche:
             if len(einzelfahrstrassen) > 1:
                 logging.debug("{} Einzelfahrstrassen zu {} gefunden: {}".format(
                     len(einzelfahrstrassen), ziel_refpunkt.signal(),
-                    " / ".join("{} km/h, {:.2f} m".format(str_geschw(einzelfahrstrasse.signalgeschwindigkeit), einzelfahrstrasse.laenge) for einzelfahrstrasse, idx in einzelfahrstrassen)))
+                    " / ".join("{} km/h, {:.2f} m".format(" + ".join(str_geschw(v1) for v1 in einzelfahrstrasse.signalgeschwindigkeiten), einzelfahrstrasse.laenge) for einzelfahrstrasse, idx in einzelfahrstrassen)))
 
             if self.alternative_fahrwege:
                 result.extend(einzelfahrstrassen)
@@ -271,37 +271,85 @@ class FahrstrassenSuche:
             logging.error("{}: Zielelement {} hat keinen Referenzpunkt mit Typ Signal. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, einzelfahrstrassen[-1].ziel))
             return None
 
-        # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse
+
+
+        # Berechnen von result.signalgeschwindigkeiten, vorerst ohne Einfluss von Signalen
+        for einzelfahrstrasse in reversed(einzelfahrstrassen):
+            for idx, geschwindigkeit in enumerate(reversed(einzelfahrstrasse.signalgeschwindigkeiten)):
+                if idx == 0:
+                    result.signalgeschwindigkeiten[0] = geschw_min(result.signalgeschwindigkeiten[0], geschwindigkeit)
+                else:
+                    result.signalgeschwindigkeiten.insert(0, geschwindigkeit)
+            if len(einzelfahrstrasse.signalgeschwindigkeiten) > 1:
+                logging.debug("Einzel-Fahrstrasse hat {} Signalgeschwindigkeiten: {}".format(len(result.signalgeschwindigkeiten), ", ".join("{}".format(str_geschw(v1)) for v1 in result.signalgeschwindigkeiten) ))
+        
+        if len(result.signalgeschwindigkeiten) > 1:
+            logging.debug("{}: Fahrstrasse hat {} Signalgeschwindigkeiten: {}".format(result.name, len(result.signalgeschwindigkeiten), ", ".join("{}".format(str_geschw(v1)) for v1 in result.signalgeschwindigkeiten) ))
+
+        # Ereignis "Signalgeschwindigkeit" im Zielsignal setzt Geschwindigkeit fuer die gesamte Fahrstrasse bis zum Zs3
         if result.ziel.signal().signalgeschwindigkeit is not None:
-            result.signalgeschwindigkeit = result.ziel.signal().signalgeschwindigkeit
-            logging.debug("{}: Ereignis \"Signalgeschwindigkeit\" in der Signalmatrix des Zielsignals bestimmt die Signalgeschwindigkeit in der Fahrstrasse".format(result.name))
-        else:
-            for einzelfahrstrasse in einzelfahrstrassen:
-                result.signalgeschwindigkeit = geschw_min(result.signalgeschwindigkeit, einzelfahrstrasse.signalgeschwindigkeit)
-
-        logging.debug("{}: Steuere Hauptsignale an mit Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\", Gleistyp {} ({})".format(result.name, str_geschw(result.signalgeschwindigkeit), result.richtungsanzeiger, result.rgl_ggl, str_rgl_ggl(result.rgl_ggl)))
-
-        flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
+            result.signalgeschwindigkeiten[len(result.signalgeschwindigkeiten) - 1] = result.ziel.signal().signalgeschwindigkeit
 
         # Workaround fuer Bug/undokumentierte Beschraenkung in Zusi: Das Startsignal muss immer das letzte Signal in der Fahrstrasse sein.
         # Ansonsten werden Ersatzsignale nicht korrekt angesteuert.
         # Speichere es hier zwischen und fuege es am Ende hinzu.
         startsignal_verkn = None
 
-        for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
+        # Einfuegen der Signale, ggf. updaten der signalgeschwindigkeit, wenn diese durch ein Zielsignal gesetzt wird
+        idx_signalgeschwindigkeit = len(result.signalgeschwindigkeiten) - 1
+        aktuelle_signalgeschwindigkeit = result.signalgeschwindigkeiten[idx_signalgeschwindigkeit]
+        for idx2, einzelfahrstrasse in enumerate(reversed(einzelfahrstrassen)):
+            idx = len(einzelfahrstrassen) - idx2 - 1
+
+            # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
+            if idx == len(einzelfahrstrassen) - 1:
+                for zeilenidx, zeile in enumerate(result.ziel.signal().zeilen):
+                    if zeile.hsig_geschw == -999.0:
+                        logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
+                        result.signale.append(FahrstrHauptsignal(result.ziel, zeilenidx, False))
+                        if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
+                            logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
+                        break
+
+            for kante in reversed(einzelfahrstrasse.kantenliste()):
+                for signal_verkn in reversed(kante.signale):
+                    if signal_verkn.zeile != -1:
+                        result.signale.append(signal_verkn)
+                    else:
+                        zeile = signal_verkn.refpunkt.signal().get_hsig_zeile(self.fahrstr_typ, aktuelle_signalgeschwindigkeit)
+                        if zeile is None:
+                            logging.warn("{}: {} hat keine Zeile fuer Typ {}, Geschwindigkeit {} und wird daher nicht in der Fahrstrasse verknuepft.".format(result.name, signal_verkn.refpunkt.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(aktuelle_signalgeschwindigkeit)))
+                        else:
+                            zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, result.rgl_ggl, result.richtungsanzeiger)
+                            result.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))
+
+                        if ist_zusatzsignal_fuer_fahrstr_typ(signal_verkn.refpunkt.signal(), self.fahrstr_typ):
+                            if signal_verkn.refpunkt.signal().zs3signalgeschwindigkeiten[zeile] > 0:
+                                logging.debug("Zusatzsanzeiger {} hat Geschw-Ereignis: {}".format(kante.ziel, str_geschw(signal_verkn.refpunkt.signal().zs3signalgeschwindigkeiten[zeile])))
+                                result.signalgeschwindigkeiten[idx_signalgeschwindigkeit - 1] = signal_verkn.refpunkt.signal().zs3signalgeschwindigkeiten[zeile]
+
+                if kante.hat_zusatzanzeiger:
+                    idx_signalgeschwindigkeit -= 1
+                    aktuelle_signalgeschwindigkeit = result.signalgeschwindigkeiten[idx_signalgeschwindigkeit]
+                    logging.debug("Zusatzsanzeiger verknuepft: {}; zulaufende Geschwindigkeit {} in Einzelfstr {}".format(kante.ziel, str_geschw(aktuelle_signalgeschwindigkeit), einzelfahrstrasse))
+
+
+            assert idx_signalgeschwindigkeit == 0 or idx > 0
+
+
             if idx == 0:
                 # Startsignal ansteuern
                 if ist_fahrstr_start_sig(result.start.signal(), self.fahrstr_typ):
                     zeile_ersatzsignal = result.start.signal().get_hsig_ersatzsignal_zeile(result.rgl_ggl)
                     zeile_ersatzsignal_fallback = result.start.signal().get_hsig_ersatzsignal_zeile(GLEIS_BAHNHOF if result.rgl_ggl == GLEIS_GEGENGLEIS else GLEIS_GEGENGLEIS)
-                    zeile_regulaer = result.start.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
+                    zeile_regulaer = result.start.signal().get_hsig_zeile(self.fahrstr_typ, aktuelle_signalgeschwindigkeit)
                     nutze_ersatzsignal = einzelfahrstrassen[-1].ziel.signal().ist_hilfshauptsignal
 
                     if nutze_ersatzsignal and zeile_ersatzsignal is None:
                         logging.warn("{}: Startsignal (Element {}) hat keine Ersatzsignal-Zeile {} Ereignis \"Gegengleis kennzeichnen\" (fuer Gleistyp \"{}\"). Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die regulaere Matrix angesteuert.".format(result.name, result.start, "mit" if result.rgl_ggl == GLEIS_GEGENGLEIS else "ohne", str_rgl_ggl(result.rgl_ggl)))
                         nutze_ersatzsignal = False
                     elif not nutze_ersatzsignal and zeile_regulaer is None:
-                        logging.warn("{}: Startsignal hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
+                        logging.warn("{}: Startsignal hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Zwecks Kompatibilitaet mit dem Zusi-3D-Editor wird die Ersatzsignal-Matrix angesteuert.".format(result.name, str_fahrstr_typ(self.fahrstr_typ), str_geschw(aktuelle_signalgeschwindigkeit)))
                         nutze_ersatzsignal = True
 
                     if nutze_ersatzsignal:
@@ -315,15 +363,15 @@ class FahrstrassenSuche:
                             startsignal_verkn = FahrstrHauptsignal(result.start, zeile_ersatzsignal, True)
                     else:
                         if zeile_regulaer is None:
-                            logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
+                            logging.error("{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {}. Die Fahrstrasse wird nicht eingerichtet.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(aktuelle_signalgeschwindigkeit)))
                             return None
                         else:
                             zeile_regulaer = result.start.signal().get_richtungsanzeiger_zeile(zeile_regulaer, result.rgl_ggl, result.richtungsanzeiger)
                             zeile_regulaer_geschw = result.start.signal().zeilen[zeile_regulaer].hsig_geschw
                             # Warne, wenn das Signal eine hoehere Geschwindigkeit anzeigt, als die Fahrstrasse zulaesst.
                             # Warne nicht, wenn im Verlauf der Fahrstrasse ein ETCS-/LZB-Geschwindigkeitsereignis liegt.
-                            if geschw_kleiner(result.signalgeschwindigkeit, zeile_regulaer_geschw):
-                                msg = "{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {} oder kleiner. Nutze Zeile mit hoeherer Geschwindigkeit {}.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit), str_geschw(zeile_regulaer_geschw))
+                            if geschw_kleiner(aktuelle_signalgeschwindigkeit, zeile_regulaer_geschw):
+                                msg = "{}: Startsignal (Element {}) hat keine Zeile fuer Typ {}, Geschwindigkeit {} oder kleiner. Nutze Zeile mit hoeherer Geschwindigkeit {}.".format(result.name, result.start, str_fahrstr_typ(self.fahrstr_typ), str_geschw(aktuelle_signalgeschwindigkeit), str_geschw(zeile_regulaer_geschw))
                                 if not any(kante.hat_anzeige_geschwindigkeit for einzelfahrstrasse in einzelfahrstrassen for kante in einzelfahrstrasse.kantenliste()):
                                     logging.warn(msg)
                                 else:
@@ -353,19 +401,21 @@ class FahrstrassenSuche:
                 if self._rangiersignal_in_zugfahrstr_warnung(einzelfahrstrasse.start.signal()):
                     logging.warn("{}: Kennlichtsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Rangierfahrt-Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
 
-            # Zielsignal ansteuern mit Geschwindigkeit -999, falls vorhanden
-            if idx == len(einzelfahrstrassen) - 1:
-                for zeilenidx, zeile in enumerate(result.ziel.signal().zeilen):
-                    if zeile.hsig_geschw == -999.0:
-                        logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
-                        result.signale.append(FahrstrHauptsignal(result.ziel, zeilenidx, False))
-                        if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
-                            logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
-                        break
-
             if self._rangiersignal_in_zugfahrstr_warnung(result.ziel.signal()):
                 logging.warn("{}: Zielsignal ({}, Ref. {}) wuerde vom Zusi-3D-Editor auf einen Fahrtbegriff gestellt, da \"Rangiersignal in Zugfahrstrasse umstellen\" aktiviert ist.".format(result.name, result.ziel.signal(), result.ziel.refnr))
 
+        signale_reversed = result.signale
+        result.signale = []
+        for signal in reversed(signale_reversed):
+            result.signale.append(signal)
+
+
+
+        logging.debug("{}: Steuere Hauptsignale an mit Signalgeschwindigkeit {}, Richtungsanzeiger \"{}\", Gleistyp {} ({})".format(result.name, str_geschw(aktuelle_signalgeschwindigkeit), result.richtungsanzeiger, result.rgl_ggl, str_rgl_ggl(result.rgl_ggl)))
+
+        flankenschutz_stellungen = []  # [FahrstrWeichenstellung]
+
+        for idx, einzelfahrstrasse in enumerate(einzelfahrstrassen):
             for kante in einzelfahrstrasse.kantenliste():
                 result.register.extend(kante.register)
                 result.weichen.extend(kante.weichen)
@@ -377,16 +427,6 @@ class FahrstrassenSuche:
                         else:
                             result.teilaufloesepunkte.append(refpunkt)
                 result.signalhaltfallpunkte.extend([refpunkt for refpunkt in kante.aufloesepunkte if refpunkt.reftyp == REFTYP_SIGNALHALTFALL])
-                for signal_verkn in kante.signale:
-                    if signal_verkn.zeile != -1:
-                        result.signale.append(signal_verkn)
-                    else:
-                        zeile = signal_verkn.refpunkt.signal().get_hsig_zeile(self.fahrstr_typ, result.signalgeschwindigkeit)
-                        if zeile is None:
-                            logging.warn("{}: {} hat keine Zeile fuer Typ {}, Geschwindigkeit {} und wird daher nicht in der Fahrstrasse verknuepft.".format(result.name, signal_verkn.refpunkt.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(result.signalgeschwindigkeit)))
-                        else:
-                            zeile = signal_verkn.refpunkt.signal().get_richtungsanzeiger_zeile(zeile, result.rgl_ggl, result.richtungsanzeiger)
-                            result.signale.append(FahrstrHauptsignal(signal_verkn.refpunkt, zeile, False))
                 result.vorsignale.extend(kante.vorsignale)
 
                 # Flankenschutz
@@ -447,9 +487,9 @@ class FahrstrassenSuche:
                                 if spalte is None:
                                     spalte = vsig.signal().get_vsig_spalte(geschw_naechstes_hsig)
                                     if not hochsignalisierung:
-                                        spalte_alt = vsig.signal().get_vsig_spalte(result.signalgeschwindigkeit) # mit dem alten Algorithmus
+                                        spalte_alt = vsig.signal().get_vsig_spalte(aktuelle_signalgeschwindigkeit) # mit dem alten Algorithmus
                                         if spalte != spalte_alt:
-                                            logging.debug("{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(result.signalgeschwindigkeit)))
+                                            logging.debug("{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(aktuelle_signalgeschwindigkeit)))
                                     if len(vsig.signal().richtungsvoranzeiger) > 0:
                                         spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
 
@@ -458,7 +498,7 @@ class FahrstrassenSuche:
                                 # Erzeuge Vsig-Verknuepfung nur, wenn die Stellung des Fahrstrassen-Startsignals einen Einfluss auf die gewaehlte Vsig-Spalte hat.
                                 if spalte != spalte_startsignal_halt:
                                     if spalte is None:
-                                        logging.warn("{}: An {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(result.name, vsig.signal(), vsig.element_richtung, str_geschw(result.signalgeschwindigkeit)))
+                                        logging.warn("{}: An {} ({}) wurde keine Vorsignalspalte fuer Geschwindigkeit {} gefunden".format(result.name, vsig.signal(), vsig.element_richtung, str_geschw(aktuelle_signalgeschwindigkeit)))
                                     else:
                                         result.vorsignale.append(FahrstrVorsignal(vsig, spalte))
                                 else:

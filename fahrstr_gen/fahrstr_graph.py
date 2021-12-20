@@ -5,7 +5,7 @@ from collections import namedtuple, defaultdict, OrderedDict
 
 from .konstanten import *
 from .modulverwaltung import get_modul_by_name
-from .strecke import ist_hsig_fuer_fahrstr_typ, ist_fahrstr_start_sig, gegenrichtung, geschw_min
+from .strecke import ist_hsig_fuer_fahrstr_typ, ist_zusatzsignal_fuer_fahrstr_typ, ist_fahrstr_start_sig, gegenrichtung, geschw_min, str_geschw
 from .streckengraph import Streckengraph, Knoten
 from .fahrstrasse import FahrstrHauptsignal, FahrstrVorsignal, FahrstrWeichenstellung
 
@@ -26,6 +26,8 @@ class FahrstrGraph(Streckengraph):
                 super()._ist_knoten(element) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(NORM), self.fahrstr_typ) or
                 ist_hsig_fuer_fahrstr_typ(element.signal(GEGEN), self.fahrstr_typ) or
+                ist_zusatzsignal_fuer_fahrstr_typ(element.signal(NORM), self.fahrstr_typ) or
+                ist_zusatzsignal_fuer_fahrstr_typ(element.signal(GEGEN), self.fahrstr_typ) or
                 ist_fahrstr_start_sig(element.signal(NORM), self.fahrstr_typ) or
                 ist_fahrstr_start_sig(element.signal(GEGEN), self.fahrstr_typ) or
                 (self.fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_RANGIER] and any(refpunkt.reftyp == REFTYP_AUFGLEISPUNKT for refpunkt in element.modul.referenzpunkte[element])))
@@ -59,6 +61,7 @@ class FahrstrGraphKante:
         self.hat_ende_weichenbereich = False  # Liegt im Verlauf dieser Kante ein Ereignis "Ende Weichenbereich"?
         self.hat_anzeige_geschwindigkeit = False # Liegt im Verlauf dieser Kante ein Ereignis "ETCS-Geschwindigkeit" oder "CIR-ELKE-Geschwindigkeit"
         self.keine_fahrstr_einrichten = None  # Das erste Ereignis "Keine Fahrstrasse einrichten" fuer den Fahrstrassentyp des Graphen im Verlauf dieser Kante
+        self.hat_zusatzanzeiger = False # Endet diese Kante auf ein allein stehendes Zs3
 
 class FahrstrGraphKnoten(Knoten):
     def __init__(self, graph, element):
@@ -118,6 +121,8 @@ class FahrstrGraphKnoten(Knoten):
                 kante = self._neue_nachfolger_kante(kante, n)
                 if kante is not None:
                     self.nachfolger_kanten[key].append(kante)
+            for kante in self.nachfolger_kanten[key]:
+                logging.debug("Nachfolgerkanten {} nach {} hat vMax {}".format(kante.start, kante.ziel, str_geschw(kante.signalgeschwindigkeit)))
         return self.nachfolger_kanten[key]
 
     # Erweitert die angegebene Kante, die am Nachfolger 'element_richtung' dieses Knotens beginnt.
@@ -146,7 +151,12 @@ class FahrstrGraphKnoten(Knoten):
                 break
 
             # Signal am aktuellen Element in die Signalliste einfuegen, falls es nicht Zielsignal der Kante ist
+            # Abschliessende allein stehende Zs3 dennoch einfuegen
             signal = element_richtung.signal()
+            if signal is not None and signal.ist_zusatzsignal_fuer_fahrstr_typ(self.graph.fahrstr_typ):
+                kante.hat_zusatzanzeiger = True
+                logging.info("{} Signal als Zs3-Signal detektiert".format(signal))
+            
             if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
                 verkn = False
                 zeile = -1

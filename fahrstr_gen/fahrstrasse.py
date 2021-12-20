@@ -36,7 +36,7 @@ class Fahrstrasse:
         self.laenge = 0
         self.laenge_zusi = 0  # Die Laenge, wie sie Zusi berechnet (Bug moduluebergreifende Fahrstrassen)
         self.laenge_zusi_vor_3_1_7_2 = 0  # Die Laenge, wie sie Zusi vor 3D-Editor 3.1.7.2 berechnet (Bug moduluebergreifende Fahrstrassen und inklusive Start-, exklusive Zielelement)
-        self.signalgeschwindigkeit = -1.0
+        self.signalgeschwindigkeiten = [-1.0]
 
         self.rgl_ggl = GLEIS_BAHNHOF
         self.streckenname = ""
@@ -102,7 +102,8 @@ class EinzelFahrstrasse:
         self.kanten = None  # ListenEintrag
         self.laenge = 0  # Laenge in Metern
         self.laenge_zusi = 0  # Laenge in Metern, wie sie Zusi berechnet (Bug moduluebergreifende Fahrstrassen)
-        self.signalgeschwindigkeit = -1.0  # Minimale Signalgeschwindigkeit
+        self.signalgeschwindigkeiten = []   # Minimale Signalgeschwindigkeit getrennt nach allen allein stehenden Zs3
+        self.signalgeschwindigkeiten.append(-1.0)
         self.hat_ende_weichenbereich = False  # Wurde im Verlauf der Erstellung dieser Fahrstrasse schon ein Weichenbereich-Ende angetroffen?
 
     def __repr__(self):
@@ -124,7 +125,9 @@ class EinzelFahrstrasse:
         self.laenge += kante.laenge
         self.laenge_zusi += kante.laenge_zusi
         if not self.hat_ende_weichenbereich:
-            self.signalgeschwindigkeit = geschw_min(self.signalgeschwindigkeit, kante.signalgeschwindigkeit)
+            self.signalgeschwindigkeiten[len(self.signalgeschwindigkeiten) - 1] = geschw_min(self.signalgeschwindigkeiten[len(self.signalgeschwindigkeiten) - 1], kante.signalgeschwindigkeit)
+        if kante.hat_zusatzanzeiger:
+            self.signalgeschwindigkeiten.append(-1)
         self.hat_ende_weichenbereich = self.hat_ende_weichenbereich or kante.hat_ende_weichenbereich
 
     def erweiterte_kopie(self, kante):
@@ -133,7 +136,7 @@ class EinzelFahrstrasse:
         result.kanten = self.kanten
         result.laenge = self.laenge
         result.laenge_zusi = self.laenge_zusi
-        result.signalgeschwindigkeit = self.signalgeschwindigkeit
+        result.signalgeschwindigkeiten = self.signalgeschwindigkeiten.copy()
         result.hat_ende_weichenbereich = self.hat_ende_weichenbereich
         result.erweitere(kante)
         return result

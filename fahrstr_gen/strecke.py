@@ -214,6 +214,7 @@ class Signal:
         self.spalten = []
         self.matrix = []
         self.signalgeschwindigkeit = None
+        self.zs3signalgeschwindigkeiten = []
         self.ist_hilfshauptsignal = False
         self.ist_gleissperre = False
 
@@ -226,6 +227,7 @@ class Signal:
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
         self.hsig_fuer = 0  # Fahrstrassentypen, fuer die dies ein Hauptsignal ist
+        self.zusatzsignal_fuer = 0
 
         self.vsig_verkn_warnung = False # Wurde Warnung ausgegeben?
 
@@ -235,6 +237,8 @@ class Signal:
                 hsig_geschw = float(n.get("HsigGeschw", 0))
                 if hsig_geschw == 0:
                     self.hsig_fuer |= fahrstr_typ
+                elif hsig_geschw > 0:
+                    self.zusatzsignal_fuer |= fahrstr_typ
                 self.zeilen.append(SignalZeile(fahrstr_typ, hsig_geschw))
             elif n.tag == "VsigBegriff":
                 self.spalten.append(float(n.attrib.get("VsigGeschw", 0)))
@@ -292,6 +296,23 @@ class Signal:
                         if self.hat_gegengleisanzeiger_in_ersatzsignalmatrix:
                             break
 
+        vsigeintraege = len(self.spalten)
+        signalv = -1
+        for n in self.matrix:
+            vsigeintraege -= 1
+            for ereignis in n:
+                if ereignis.tag == "Ereignis":
+                    ereignisnr = int(ereignis.get("Er", 0))
+                    if ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
+                        signalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                        if signalgeschwindigkeit != 0:
+                            signalv = geschw_min(signalv, signalgeschwindigkeit)
+            if vsigeintraege == 0:
+                self.zs3signalgeschwindigkeiten.append(signalv)
+                vsigeintraege = len(self.spalten)
+                signalv = -1
+        self.zs3signalgeschwindigkeiten.append(signalv)
+
     def __repr__(self):
         if self.betrst == "" and self.name == "":
             return "Signal an Element {}".format(self.element_richtung)
@@ -306,6 +327,10 @@ class Signal:
 
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return self.hsig_fuer & fahrstr_typ != 0
+
+    def ist_zusatzsignal_fuer_fahrstr_typ(self, fahrstr_typ):
+        # Verwendung fuer allein stehende Zs3
+        return self.zusatzsignal_fuer & fahrstr_typ != 0 and not self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
 
     def ist_fahrstr_start_sig(self, fahrstr_typ):
         # Zusi-Logik: Das Signal muss ein Hauptsignal fuer mindestens einen der bei der
@@ -506,6 +531,9 @@ class Signal:
 
 def ist_hsig_fuer_fahrstr_typ(signal, fahrstr_typ):
     return signal is not None and signal.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
+
+def ist_zusatzsignal_fuer_fahrstr_typ(signal, fahrstr_typ):
+    return signal is not None and signal.ist_zusatzsignal_fuer_fahrstr_typ(fahrstr_typ)
 
 def ist_fahrstr_start_sig(signal, fahrstr_typ):
     return signal is not None and signal.ist_fahrstr_start_sig(fahrstr_typ)
