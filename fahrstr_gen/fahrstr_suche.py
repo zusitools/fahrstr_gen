@@ -274,12 +274,15 @@ class FahrstrassenSuche:
 
 
         # Berechnen von result.signalgeschwindigkeiten, vorerst ohne Einfluss von Signalen
-        for einzelfahrstrasse in reversed(einzelfahrstrassen):
-            for idx, geschwindigkeit in enumerate(reversed(einzelfahrstrasse.signalgeschwindigkeiten)):
+        signalgeschwindigkeiten_min = -1
+        for einzelfahrstrasse in einzelfahrstrassen:
+            for idx, geschwindigkeit in enumerate(einzelfahrstrasse.signalgeschwindigkeiten):
+                geschwindigkeit = geschw_min(signalgeschwindigkeiten_min, geschwindigkeit)
                 if idx == 0:
-                    result.signalgeschwindigkeiten[0] = geschw_min(result.signalgeschwindigkeiten[0], geschwindigkeit)
+                    result.signalgeschwindigkeiten[len(result.signalgeschwindigkeiten) - 1] = geschw_min(result.signalgeschwindigkeiten[len(result.signalgeschwindigkeiten) - 1], geschwindigkeit)
                 else:
-                    result.signalgeschwindigkeiten.insert(0, geschwindigkeit)
+                    result.signalgeschwindigkeiten.append(geschwindigkeit)
+                signalgeschwindigkeiten_min = geschw_min(signalgeschwindigkeiten_min, geschwindigkeit)
             if len(einzelfahrstrasse.signalgeschwindigkeiten) > 1:
                 logging.debug("Einzel-Fahrstrasse hat {} Signalgeschwindigkeiten: {}".format(len(result.signalgeschwindigkeiten), ", ".join("{}".format(str_geschw(v1)) for v1 in result.signalgeschwindigkeiten) ))
         

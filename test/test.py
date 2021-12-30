@@ -121,6 +121,14 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("Zs2DunkelInAnzeigefahrstrasse.st3")
         self.assertEqual(retcode, 0)
 
+    def test_zs3_heruntersignalisieren(self):
+        (retcode, stderr) = self.run_fahrstr_gen("Zs3Heruntersignalisieren.st3")
+        self.assertEqual(retcode, 0)
+
+    def test_zs3_nicht_hochsignalisieren(self):
+        (retcode, stderr) = self.run_fahrstr_gen("Zs3NichtHochsignalisieren.st3")
+        self.assertEqual(retcode, 0)
+
     def test_weiche_ohne_referenzpunkt(self):
         (retcode, stderr) = self.run_fahrstr_gen("WeicheOhneReferenzpunkt.st3")
         self.assertEqual(retcode, 2)
