@@ -155,7 +155,7 @@ class FahrstrGraphKnoten(Knoten):
             signal = element_richtung.signal()
             if signal is not None and signal.ist_zusatzsignal_fuer_fahrstr_typ(self.graph.fahrstr_typ):
                 kante.hat_zusatzanzeiger = True
-                logging.info("{} Signal als Zs3-Signal detektiert".format(signal))
+                logging.info("{} Signal als allein stehendes Geschwindigkeitssignal detektiert".format(signal))
             
             if signal is not None and not signal.ist_hsig_fuer_fahrstr_typ(self.graph.fahrstr_typ):
                 verkn = False

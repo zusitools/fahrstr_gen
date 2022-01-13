@@ -330,7 +330,7 @@ class Signal:
 
     def ist_zusatzsignal_fuer_fahrstr_typ(self, fahrstr_typ):
         # Verwendung fuer allein stehende Zs3
-        return self.zusatzsignal_fuer & fahrstr_typ != 0 and not self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ)
+        return self.zusatzsignal_fuer & fahrstr_typ != 0 and not self.ist_hsig_fuer_fahrstr_typ(fahrstr_typ) and not self.ist_vsig()
 
     def ist_fahrstr_start_sig(self, fahrstr_typ):
         # Zusi-Logik: Das Signal muss ein Hauptsignal fuer mindestens einen der bei der
