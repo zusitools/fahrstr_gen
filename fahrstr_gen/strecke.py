@@ -183,16 +183,16 @@ class ElementUndRichtung(namedtuple('ElementUndRichtung', ['element', 'richtung'
         return self.element.vorgaenger(self.richtung)
 
 def geschw_min(v1, v2):
-    if v1 < 0:
+    if v1 < 0 and v2 >= 0:
         return v2
-    if v2 < 0:
+    if v2 < 0 and v1 >= 0:
         return v1
     return min(v1, v2)
 
 def geschw_kleiner(v1, v2):
-    if v2 < 0:
+    if v2 < 0 and v1 >= 0:
         return v1 >= 0
-    if v1 < 0:
+    if v1 < 0 and v2 >= 0:
         return False
     return v1 < v2
 
