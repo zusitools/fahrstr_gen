@@ -201,6 +201,7 @@ str_geschw = lambda v : "oo<{:.0f}>".format(v) if v < 0 else "{:.0f}".format(v *
 float_geschw = lambda v : float("Infinity") if v < 0 else v
 
 SignalZeile = namedtuple('SignalZeile', ['fahrstr_typ', 'hsig_geschw'])
+SignalZelle = namedtuple('SignalZelle', ['naechste_vorsignalgeschwindigkeit', 'node'])
 
 class Signal:
     def __init__(self, element_richtung, xml_knoten):
@@ -245,18 +246,21 @@ class Signal:
             elif n.tag == "SignalFrame":
                 self.hat_sigframes = True
             elif n.tag == "MatrixEintrag":
-                self.matrix.append(n)
+                naechste_vorsignalgeschwindigkeit = float(n.get("MatrixGeschw", 0))
                 for ereignis in n:
                     if ereignis.tag == "Ereignis":
                         ereignisnr = int(ereignis.get("Er", 0))
+                        beschr = ereignis.get("Beschr", "")
                         if ereignisnr == EREIGNIS_HILFSHAUPTSIGNAL:
                             self.ist_hilfshauptsignal = True
                         elif ereignisnr == EREIGNIS_ENTGLEISEN and float(ereignis.get("Wert", 0)) == 0:
                             self.ist_gleissperre = True
-                        elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None:
+                        elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and self.signalgeschwindigkeit is None and beschr != "vsig":
                             signalgeschwindigkeit = float(ereignis.get("Wert", 0))
                             if signalgeschwindigkeit != 0:
                                 self.signalgeschwindigkeit = signalgeschwindigkeit
+                        elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and beschr == "vsig":
+                            naechste_vorsignalgeschwindigkeit = float(ereignis.get("Wert", 0))
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
                             signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
                             if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
@@ -264,7 +268,6 @@ class Signal:
                             else:
                                 logging.warn("{}: Matrix enthaelt Ereignis \"Gegengleis kennzeichnen\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
                         elif ereignisnr == EREIGNIS_RICHTUNGSANZEIGER_ZIEL:
-                            beschr = ereignis.get("Beschr", "")
                             if len(beschr):
                                 signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
                                 if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
@@ -274,7 +277,6 @@ class Signal:
                             else:
                                 logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsanzeiger-Ziel\" ohne Text".format(self))
                         elif ereignisnr == EREIGNIS_RICHTUNGSVORANZEIGER:
-                            beschr = ereignis.get("Beschr", "")
                             if len(beschr):
                                 signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
                                 if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
@@ -283,6 +285,7 @@ class Signal:
                                     logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsvoranzeiger\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
                             else:
                                 logging.warn("{}: Matrix enthaelt Ereignis \"Richtungsvoranzeiger\" ohne Text".format(self))
+                self.matrix.append(SignalZelle(naechste_vorsignalgeschwindigkeit, n))
             elif n.tag == "Ersatzsignal":
                 self.hat_ersatzsignal = True
                 for matrixeintrag in n:
@@ -300,10 +303,11 @@ class Signal:
         signalv = -1
         for n in self.matrix:
             vsigeintraege -= 1
-            for ereignis in n:
+            for ereignis in n.node:
                 if ereignis.tag == "Ereignis":
                     ereignisnr = int(ereignis.get("Er", 0))
-                    if ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT:
+                    beschr = ereignis.get("Beschr", "")
+                    if ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and beschr != "vsig":
                         signalgeschwindigkeit = float(ereignis.get("Wert", 0))
                         if signalgeschwindigkeit != 0:
                             signalv = geschw_min(signalv, signalgeschwindigkeit)
@@ -323,7 +327,7 @@ class Signal:
         return "{} {}".format(self.betrst, self.name)
 
     def matrix_geschw(self, zeile, spalte):
-        return float(self.matrix[zeile * len(self.spalten) + spalte].get("MatrixGeschw", 0))
+        return self.matrix[zeile * len(self.spalten) + spalte].naechste_vorsignalgeschwindigkeit
 
     def ist_hsig_fuer_fahrstr_typ(self, fahrstr_typ):
         return self.hsig_fuer & fahrstr_typ != 0
@@ -404,7 +408,7 @@ class Signal:
             return zeilenidx_original
 
         # Erweitere Signalbild der ersten Spalte der Originalzeile um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(self.matrix[zeilenidx_original * len(self.spalten)].get("Signalbild", 0))
+        zielsignalbild = int(self.matrix[zeilenidx_original * len(self.spalten)].node.get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
@@ -415,7 +419,7 @@ class Signal:
         # Suche existierende Zeile mit dem neuen Signalbild.
         zeile_original = self.zeilen[zeilenidx_original]
         for idx, zeile in enumerate(self.zeilen):
-            if zeile.fahrstr_typ == zeile_original.fahrstr_typ and zeile.hsig_geschw == zeile_original.hsig_geschw and int(self.matrix[idx * len(self.spalten)].get("Signalbild", 0)) == zielsignalbild:
+            if zeile.fahrstr_typ == zeile_original.fahrstr_typ and zeile.hsig_geschw == zeile_original.hsig_geschw and int(self.matrix[idx * len(self.spalten)].node.get("Signalbild", 0)) == zielsignalbild:
                 return idx
 
         # Nicht gefunden, Matrix erweitern.
@@ -432,8 +436,8 @@ class Signal:
         # Neue <MatrixEintrag>-Knoten
         for eintrag in self.matrix[zeilenidx_original * len(self.spalten) : (zeilenidx_original+1) * len(self.spalten)]:
             neuer_eintrag = deepcopy(eintrag)
-            neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
-            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, -1)
+            neuer_eintrag.node.set("Signalbild", str(int(neuer_eintrag.node.get("Signalbild", 0)) | neue_signalframes))
+            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag.node, -1)
             self.matrix.append(neuer_eintrag)
 
         self.element_richtung.element.modul.geaendert = True
@@ -492,7 +496,7 @@ class Signal:
             return spaltenidx_original
 
         # Erweitere Signalbild der ersten Zeile der Originalspalte um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(self.matrix[spaltenidx_original].get("Signalbild", 0))
+        zielsignalbild = int(self.matrix[spaltenidx_original].node.get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
@@ -502,7 +506,7 @@ class Signal:
 
         # Suche existierende Spalte mit dem neuen Signalbild.
         for idx, vsig_geschw in enumerate(self.spalten):
-            if vsig_geschw == self.spalten[spaltenidx_original] and int(self.matrix[idx].get("Signalbild", 0)) == zielsignalbild:
+            if vsig_geschw == self.spalten[spaltenidx_original] and int(self.matrix[idx].node.get("Signalbild", 0)) == zielsignalbild:
                 return idx
 
         # Nicht gefunden. Matrix erweitern.
@@ -517,9 +521,9 @@ class Signal:
         # Neue <MatrixEintrag>-Knoten
         for idx in range(0, len(self.zeilen)):
             neuer_eintrag = deepcopy(self.matrix[idx * (len(self.spalten) + 1) + spaltenidx_original])
-            neuer_eintrag.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
+            neuer_eintrag.node.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
             neuer_eintrag_idx = idx * (len(self.spalten) + 1) + (len(self.spalten) - 1)
-            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag, neuer_eintrag_idx)
+            kindknoten_einfuegen(self.xml_knoten, neuer_eintrag.node, neuer_eintrag_idx)
             self.matrix.insert(neuer_eintrag_idx + 1, neuer_eintrag)
 
         self.element_richtung.element.modul.geaendert = True
