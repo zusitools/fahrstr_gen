@@ -76,6 +76,39 @@ def fahrstr_sort_key(fahrstrasse):
     else:
         return (nat_sort_key(fahrstrasse.start.signal().signalbeschreibung()), [])
 
+def finde_fahrstrassenkonfig(alte_args):
+    neue_args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz', 'fahrstr_typen', 'keine_alternative_fahrwege', 'kein_flankenschutz'])
+    neue_args.dateiname = alte_args.dateiname
+    neue_args.modus = alte_args.modus
+    if alte_args.bedingungen is None and os.path.exists(alte_args.dateiname.replace(".st3", ".fahrstr_gen.xml")):
+        neue_args.bedingungen = alte_args.dateiname.replace(".st3", ".fahrstr_gen.xml")
+    elif alte_args.bedingungen == "" or alte_args.dateiname == "null":
+        neue_args.bedingungen = None
+    else:
+        neue_args.bedingungen = alte_args.bedingungen
+    
+    neue_args.fahrstr_typen = alte_args.fahrstr_typen
+    neue_args.alternative_fahrwege = alte_args.alternative_fahrwege
+    neue_args.flankenschutz = alte_args.flankenschutz
+    
+    if neue_args.bedingungen is not None and not alte_args.minimal:
+        bedingungsdatei = ET.parse(neue_args.bedingungen).getroot()
+        if neue_args.fahrstr_typen == "auto":
+            neue_args.fahrstr_typen = bedingungsdatei.get("fahrstr_typen", "auto")
+        if not neue_args.alternative_fahrwege and bedingungsdatei.get("alternative_fahrwege", "0") != "0":
+            neue_args.alternative_fahrwege = True
+        if not neue_args.flankenschutz and bedingungsdatei.get("flankenschutz", "0") != "0":
+            neue_args.flankenschutz = True
+        if bedingungsdatei.get("alternative_fahrwege", "0") == "0":
+            neue_args.keine_alternative_fahrwege = True #Die keine-Konfigurationen sind für die automatische Konfiguration der GUI
+        if bedingungsdatei.get("flankenschutz", "0") == "0":
+            neue_args.kein_flankenschutz = True
+    
+    if neue_args.fahrstr_typen == "auto":
+        neue_args.fahrstr_typen = "auto,zug,anzeige"
+    
+    return neue_args
+
 def finde_fahrstrassen(args):
     modulverwaltung.module = dict()
     modulverwaltung.dieses_modul = None
@@ -101,7 +134,7 @@ def finde_fahrstrassen(args):
             fahrstr_typen.append(FAHRSTR_TYP_RANGIER)
         elif s.startswith("z"):
             fahrstr_typen.append(FAHRSTR_TYP_ZUG)
-        elif s.startswith("a") or s.startswith("l"):
+        elif (s.startswith("a") and s != "auto") or s.startswith("l"):
             fahrstr_typen.append(FAHRSTR_TYP_ANZEIGE)
 
     for fahrstr_typ in fahrstr_typen:
@@ -379,7 +412,7 @@ def gui():
         ent_log.clear()
 
         try:
-            args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz'])
+            args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz', 'fahrstr_typen'])
             args.dateiname = ent_dateiname.get()
             args.fahrstr_typen = ",".join([
                 "r" if var_typ_rangier.get() else "",
@@ -403,6 +436,33 @@ def gui():
         if os.path.exists(bedingungen_filename):
             ent_bedingungen.delete(0, tkinter.END)
             ent_bedingungen.insert(0, bedingungen_filename)
+            
+            try:
+                alte_args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz'])
+                alte_args.dateiname = ent_dateiname.get()
+                alte_args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
+                neue_args = finde_fahrstrassenkonfig(args)
+                if not (","+neue_args.fahrstr_typen+",").contains(",auto,"):
+                    var_typ_rangier.set(False)
+                    var_typ_zug.set(False)
+                    var_typ_anzeige.set(False)
+                    for s in map(lambda s: s.lower().strip(), neue_args.fahrstr_typen.split(",")):
+                        if s.startswith("r"):
+                            var_typ_rangier.set(True)
+                        elif s.startswith("z"):
+                            var_typ_zug.set(True)
+                        elif (s.startswith("a") and s != "auto") or s.startswith("l"):
+                            var_typ_anzeige.set(True)
+                if neue_args.alternative_fahrwege:
+                    var_alternative_fahrwege.set(True)
+                if neue_args.keine_alternative_fahrwege:
+                    var_alternative_fahrwege.set(False)
+                if neue_args.flankenschutz:
+                    var_flankenschutz.set(True)
+                if neue_args.kein_flankenschutz:
+                    var_flankenschutz.set(False)
+            except Exception as e:
+                e = e
 
     def btn_bedingungen_callback():
         filename = tkinter.filedialog.askopenfilename(initialdir=os.path.join(modulverwaltung.get_zusi_datapath(), 'Routes'))
@@ -510,13 +570,15 @@ if __name__ == '__main__':
         parser = argparse.ArgumentParser(description='Fahrstrassengenerierung fuer ein Zusi-3-Modul')
         parser.add_argument('dateiname')
         parser.add_argument('--modus', choices=['schreibe', 'vergleiche', 'profile'], default='schreibe', help="Modus \"vergleiche\" schreibt die Fahrstrassen nicht, sondern gibt stattdessen die Unterschiede zu den bestehenden Fahrstrassen aus.")
-        parser.add_argument('--fahrstr_typen', default="zug,anzeige", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, anzeige)")
-        parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
         parser.add_argument('--kompat', action='store_true', help="Kompatibilitaetsmeldungen anzeigen")
         parser.add_argument('--debug', action='store_true', help="Kompatibilitaetsmeldungen und Debug-Ausgaben anzeigen")
-        parser.add_argument('--alternative_fahrwege', action='store_true', help="Alternative Fahrwege einrichten (Fahrstrassen fuer alle moeglichen Fahrwege zwischen Start- und Zielsignal erzeugen statt nur fuer den zuerst gefundenen)")
         parser.add_argument('--bedingungen', help="Datei mit Bedingungen fuer die Fahrstrassengenerierung")
-        parser.add_argument('--flankenschutz', action='store_true', help="Weichen in Flankenschutzstellung in Fahrstrassen verknuepfen")
+        parser.add_argument('--auto', action='store_true', help="Versucht die Datei mit Bedingungen automatisch zu ermittlen. (Standardwert)")
+        parser.add_argument('--profile', choices=['profile', 'line_profiler'], help=argparse.SUPPRESS)
+        parser.add_argument('--fahrstr_typen', default="auto", help="Kommagetrennte Liste von zu generierenden Fahrstrassen-Typen (rangier, zug, anzeige). Ist eine Bedingungsdatei angegeben, wird dieser Wert aus dieser augelesen.")
+        parser.add_argument('--alternative_fahrwege', action='store_true', help="Alternative Fahrwege einrichten (Fahrstrassen fuer alle moeglichen Fahrwege zwischen Start- und Zielsignal erzeugen statt nur fuer den zuerst gefundenen). Ist eine Bedingungsdatei angegeben, wird dieser Wert aus dieser augelesen.")
+        parser.add_argument('--flankenschutz', action='store_true', help="Weichen in Flankenschutzstellung in Fahrstrassen verknuepfen. Ist eine Bedingungsdatei angegeben, wird dieser Wert aus dieser augelesen.")
+        parser.add_argument('--minimal', action='store_true', help="Liest die Werte für fahrstr_typen, alternative_fahrwege und flankenschutz nicht aus der Bedingungsdatei aus")
         args = parser.parse_args()
 
         logging.basicConfig(format='%(relativeCreated)d:%(levelname)s:%(message)s', level=(logging.DEBUG if args.debug else logging.COMPAT if args.kompat else logging.INFO))
@@ -537,4 +599,4 @@ if __name__ == '__main__':
             p.run('finde_fahrstrassen(args)')
             p.print_stats()
         else:
-            sys.exit(finde_fahrstrassen(args))
+            sys.exit(finde_fahrstrassen(finde_fahrstrassenkonfig(args)))

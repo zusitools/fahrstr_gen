@@ -129,6 +129,10 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("Zs3NichtHochsignalisieren.st3")
         self.assertEqual(retcode, 0)
 
+    def test_vsigv(self):
+        (retcode, stderr) = self.run_fahrstr_gen("VsigV.st3")
+        self.assertEqual(retcode, 0)
+
     def test_weiche_ohne_referenzpunkt(self):
         (retcode, stderr) = self.run_fahrstr_gen("WeicheOhneReferenzpunkt.st3")
         self.assertEqual(retcode, 2)
