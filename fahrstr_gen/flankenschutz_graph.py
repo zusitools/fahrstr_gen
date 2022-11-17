@@ -95,7 +95,7 @@ class FlankenschutzGraphKnoten(Knoten):
                         weichen_refpunkt = element_richtung.element.refpunkt(gegenrichtung(element_richtung.richtung), REFTYP_WEICHE)
                         if weichen_refpunkt is None:
                             logging.warn(("Element {} hat mehr als einen Vorgaenger in {} Richtung, aber keinen Referenzpunkteintrag vom Typ Weiche. " +
-                                    "Diese Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung))
+                                    "Diese Weiche wird nicht in Flankenschutzstellung gebracht.").format(element_richtung, gegenrichtung(element_richtung.richtung)))
                         else:
                             result.append(FahrstrFlankenschutzWeichenstellung(weichen_refpunkt, 2 if vorgaenger_index == 0 else 1, laenge))
 
