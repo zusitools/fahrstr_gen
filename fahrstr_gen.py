@@ -412,7 +412,7 @@ def gui():
         ent_log.clear()
 
         try:
-            args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz', 'fahrstr_typen'])
+            args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz', 'fahrstr_typen', 'minimal'])
             args.dateiname = ent_dateiname.get()
             args.fahrstr_typen = ",".join([
                 "r" if var_typ_rangier.get() else "",
@@ -438,11 +438,13 @@ def gui():
             ent_bedingungen.insert(0, bedingungen_filename)
             
             try:
-                alte_args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz'])
+                alte_args = namedtuple('args', ['dateiname', 'modus', 'alternative_fahrwege', 'bedingungen', 'flankenschutz', 'fahrstr_typen', 'minimal'])
                 alte_args.dateiname = ent_dateiname.get()
                 alte_args.bedingungen = None if ent_bedingungen.get() == '' else ent_bedingungen.get()
-                neue_args = finde_fahrstrassenkonfig(args)
-                if not (","+neue_args.fahrstr_typen+",").contains(",auto,"):
+                alte_args.minimal = False
+                alte_args.fahrstr_typen = 'auto'
+                neue_args = finde_fahrstrassenkonfig(alte_args)
+                if not (","+neue_args.fahrstr_typen+",").find(",auto,") >= 0:
                     var_typ_rangier.set(False)
                     var_typ_zug.set(False)
                     var_typ_anzeige.set(False)

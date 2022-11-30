@@ -473,9 +473,10 @@ class FahrstrassenSuche:
                         else:
                             signalgeschwindigkeit_neu = geschw_min(signalgeschwindigkeit, kante.signalgeschwindigkeit)
 
+                        spalte = None
                         for vsig in kante.vorsignale:
                             if not any(vsig == vsig_existiert.refpunkt for vsig_existiert in result.vorsignale):
-                                logging.debug("Vorsignal an {}".format(vsig))
+                                logging.debug("Vorsignal an {} (geplante Gewschwindigkeit: {})".format(vsig, str_geschw(geschw_naechstes_hsig)))
                                 spalte = None
                                 spalte_startsignal_halt = None
                                 if dunkelschaltung:
@@ -518,6 +519,10 @@ class FahrstrassenSuche:
                             zeile = kante.ziel.signal().get_hsig_zeile(self.fahrstr_typ, signalgeschwindigkeit_neu) # TODO: Richtungsanzeiger beachten?
                             if spalte is None:
                                 logging.warn("{}: {} hat Hochsignalisierung aktiviert, aber keine Zeile fuer Typ {}, Geschwindigkeit {}. Es werden keine weiteren Vorsignale gesucht.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit_neu)))
+                                continue
+
+                            if zeile is None:
+                                logging.warn("{}: {} Keine passende Zelle fuer Typ {}, Geschwindigkeit {} gefunden.".format(result.name, kante.ziel.signal(), str_fahrstr_typ(self.fahrstr_typ), str_geschw(signalgeschwindigkeit_neu)))
                                 continue
 
                             spalte = kante.ziel.signal().get_vsig_spalte(geschw_naechstes_hsig)
