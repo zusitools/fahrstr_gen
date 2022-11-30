@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Bedingungen>
+<Bedingungen alternative_fahrwege="0" flankenschutz="1" fahrstr_typen="auto">
   <Bedingung EinzelFahrstrName="Altenbeken D -> Altenbeken D2I">
     <FahrstrWeiche Ref="827" FahrstrWeichenlage="2">
       <Datei Dateiname="routes\Deutschland\32U_0005_0057\000496_005734_Altenbeken\Altenbeken_1985.st3" NurInfo="1"/>
