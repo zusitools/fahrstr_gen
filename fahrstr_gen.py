@@ -90,6 +90,8 @@ def finde_fahrstrassenkonfig(alte_args):
     neue_args.fahrstr_typen = alte_args.fahrstr_typen
     neue_args.alternative_fahrwege = alte_args.alternative_fahrwege
     neue_args.flankenschutz = alte_args.flankenschutz
+    neue_args.keine_alternative_fahrwege = False #Die keine-Konfigurationen sind für die automatische Konfiguration der GUI
+    neue_args.kein_flankenschutz = False
     
     if neue_args.bedingungen is not None and not alte_args.minimal:
         bedingungsdatei = ET.parse(neue_args.bedingungen).getroot()
