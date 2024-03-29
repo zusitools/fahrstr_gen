@@ -327,9 +327,13 @@ class FahrstrGraphKnoten(Knoten):
                         logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Referenzpunkt-Nummer \"{}\". Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Wert", 0)))
                         continue
 
+                    if not refpunkt.signal:
+                        logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt Verweis auf Element ohne Signal. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung))
+                        continue
+
                     try:
                         kante.signale.append(FahrstrHauptsignal(refpunkt, int(ereignis.get("Beschr", "")), False))
-                        logging.debug("{}: wird per \"Signal an Fahrstrasse verknuepfen\" an Element {} in dessen Fahrstrassen aufgenommen".format(refpunkt.signal(), element_richtung))
+                        logging.debug("{} an Element {}: wird per \"Signal in Fahrstrasse verknuepfen\" an Element {} in dessen Fahrstrassen aufgenommen".format(refpunkt.signal(), refpunkt, element_richtung))
                     except ValueError:
                         logging.warn("Ereignis \"Signal in Fahrstrasse verknuepfen\" an Element {} enthaelt ungueltige Zeilennummer {}. Die Signalverknuepfung wird nicht eingerichtet.".format(element_richtung, ereignis.get("Beschr", "")))
 
