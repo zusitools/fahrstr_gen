@@ -227,6 +227,7 @@ class Signal:
         self.hat_ersatzsignal = False
 
         self.sigflags = int(self.xml_knoten.get("SignalFlags", 0))
+        self.sigtyp = int(self.xml_knoten.get("SignalTyp", 0))
         self.hsig_fuer = 0  # Fahrstrassentypen, fuer die dies ein Hauptsignal ist
         self.zusatzsignal_fuer = 0
 
@@ -521,7 +522,7 @@ class Signal:
         # Neue <MatrixEintrag>-Knoten
         for idx in range(0, len(self.zeilen)):
             neuer_eintrag = deepcopy(self.matrix[idx * (len(self.spalten) + 1) + spaltenidx_original])
-            neuer_eintrag.node.set("Signalbild", str(int(neuer_eintrag.get("Signalbild", 0)) | neue_signalframes))
+            neuer_eintrag.node.set("Signalbild", str(int(neuer_eintrag.node.get("Signalbild", 0)) | neue_signalframes))
             neuer_eintrag_idx = idx * (len(self.spalten) + 1) + (len(self.spalten) - 1)
             kindknoten_einfuegen(self.xml_knoten, neuer_eintrag.node, neuer_eintrag_idx)
             self.matrix.insert(neuer_eintrag_idx + 1, neuer_eintrag)

@@ -311,7 +311,7 @@ class FahrstrassenSuche:
                         logging.debug("{}: Zielsignal {} wird in der Fahrstrasse verknuepft (Zeile fuer Geschwindigkeit -999)".format(result.name, result.ziel.signal()))
                         result.signale.append(FahrstrHauptsignal(result.ziel, zeilenidx, False))
                         if result.ziel.element_richtung.element.modul != modulverwaltung.dieses_modul:
-                            logging.info("{}: {} (Ref. {}) wuerde vom Zusi-3D-Editor momentan nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
+                            logging.debug("{}: {} (Ref. {}) wurde bisher vom Zusi-3D-Editor nicht als Zielsignal angesteuert, da es in einem anderen Modul liegt".format(result.name, result.ziel.signal(), result.ziel.refnr))
                         break
 
             for kante in reversed(einzelfahrstrasse.kantenliste()):
@@ -495,7 +495,12 @@ class FahrstrassenSuche:
                                         if spalte != spalte_alt:
                                             logging.debug("{}: Vorsignalsuche: {} wird mit dem neuen Algorithmus auf Spalte {} ({}) statt {} ({}) gestellt".format(result.name, vsig.signal(), spalte, str_geschw(geschw_naechstes_hsig), spalte_alt, str_geschw(aktuelle_signalgeschwindigkeit)))
                                     if len(vsig.signal().richtungsvoranzeiger) > 0:
-                                        spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
+                                        logging.debug("{}: Vorsignalsuche: {} Suche Richtungsvoranzeiger \"{}\" Spalte {} Ggl {}".format(result.name, vsig.signal(), result.richtungsanzeiger, spalte, result.rgl_ggl))
+                                        try:
+                                            spalte = vsig.signal().get_richtungsvoranzeiger_spalte(0 if spalte is None else spalte, result.rgl_ggl, result.richtungsanzeiger)
+                                        except:
+                                            logging.error("{}: Vorsignalsuche: {} Scheitern der Suche Richtungsvoranzeiger \"{}\" Spalte {} Ggl {}".format(result.name, vsig.signal(), result.richtungsanzeiger, spalte, result.rgl_ggl))
+                                            raise
 
                                     spalte_startsignal_halt = vsig.signal().get_vsig_spalte(geschw_naechstes_hsig_startsignal_halt)
 
@@ -542,10 +547,10 @@ class FahrstrassenSuche:
                             if geschw_naechstes_hsig_neu != geschw_naechstes_hsig_startsignal_halt_neu:
                                 if geschw_kleiner(geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu):
                                     logging.warn("{}: {} hat Hochsignalisierung aktiviert und wechselt beim Stellen der Fahrstrasse auf eine niedrigere Geschwindigkeit (von {} auf {})".format(result.name, kante.ziel.signal(), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu), str_geschw(geschw_naechstes_hsig_neu)))
-                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {}/{}".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu), str_geschw(geschw_naechstes_hsig_neu), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu)))
+                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), suche weitere Vorsignale mit Vsig-Geschwindigkeit {} (vergleichswert Halt: {})".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu), str_geschw(geschw_naechstes_hsig_neu), str_geschw(geschw_naechstes_hsig_startsignal_halt_neu)))
                                 finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, -1, geschw_naechstes_hsig_neu, geschw_naechstes_hsig_startsignal_halt_neu, True, dunkelschaltung)
                             else:
-                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst die Vorsignalstellung nicht. Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu)))
+                                logging.debug("{}: Hochsignalisierung an {} aktiviert (aktive Zeile: Zeile {} fuer Geschwindigkeit {}), aber Startsignal beeinflusst kuenftige Vorsignalstellungen nicht mehr (Spalte {} fuer {} vs {} fuer {}). Suche keine weiteren Vorsignale.".format(result.name, kante.ziel.signal(), zeile, str_geschw(signalgeschwindigkeit_neu), spalte, str_geschw(geschw_naechstes_hsig), spalte_startsignal_halt, str_geschw(geschw_naechstes_hsig_startsignal_halt)))
                         else:
                             finde_vsig_rek(kante.ziel.knoten, kante.ziel.richtung, signalgeschwindigkeit_neu, geschw_naechstes_hsig, geschw_naechstes_hsig_startsignal_halt, hochsignalisierung, dunkelschaltung)
 
