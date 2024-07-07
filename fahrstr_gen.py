@@ -123,9 +123,12 @@ def finde_fahrstrassen(args):
     fahrstrassen = []
 
     bedingungen = dict()
+    keine_deckungssignal_namen_in_fstr_name = False
     if args.bedingungen is not None:
-        for bedingung in ET.parse(args.bedingungen).getroot().findall("Bedingung"):
+        bedingungsdatei_inhalt = ET.parse(args.bedingungen).getroot()
+        for bedingung in bedingungsdatei_inhalt.findall("Bedingung"):
             bedingungen[bedingung.attrib["EinzelFahrstrName"]] = bedingung
+        keine_deckungssignal_namen_in_fstr_name = bedingungsdatei_inhalt.get("keine_deckungssignal_namen_in_fstr_name", "0") != "0"
 
     vorsignal_graph = VorsignalGraph()
     flankenschutz_graph = FlankenschutzGraph()
@@ -144,7 +147,7 @@ def finde_fahrstrassen(args):
         fahrstr_suche = FahrstrassenSuche(fahrstr_typ, args.alternative_fahrwege, bedingungen,
                 vorsignal_graph if fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE] else None,
                 flankenschutz_graph if args.flankenschutz and (fahrstr_typ in [FAHRSTR_TYP_ZUG, FAHRSTR_TYP_ANZEIGE]) else None,
-                loeschfahrstrassen_namen)
+                loeschfahrstrassen_namen, keine_deckungssignal_namen_in_fstr_name)
         graph = FahrstrGraph(fahrstr_typ)
 
         for nr, str_element in sorted(modulverwaltung.dieses_modul.streckenelemente.items(), key=lambda t: t[0]):
