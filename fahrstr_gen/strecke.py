@@ -219,6 +219,7 @@ class Signal:
         self.ist_hilfshauptsignal = False
         self.ist_gleissperre = False
 
+        self.regelgleisanzeiger = 0 # Signalbild-ID
         self.gegengleisanzeiger = 0 # Signalbild-ID
         self.hat_gegengleisanzeiger_in_ersatzsignalmatrix = False
         self.richtungsanzeiger = defaultdict(int) # Ziel-> Signalbild-ID
@@ -262,6 +263,12 @@ class Signal:
                                 self.signalgeschwindigkeit = signalgeschwindigkeit
                         elif ereignisnr == EREIGNIS_SIGNALGESCHWINDIGKEIT and beschr == "vsig":
                             naechste_vorsignalgeschwindigkeit = float(ereignis.get("Wert", 0))
+                        elif ereignisnr == EREIGNIS_REGELGLEIS:
+                            signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
+                            if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
+                                self.regelgleisanzeiger |= 1 << signalbegriff_nr
+                            else:
+                                logging.warn("{}: Matrix enthaelt Ereignis \"Regelgleis kennzeichnen\" mit Signalbegriff-Nr. {}, die nicht im Bereich 0..63 liegt".format(self, signalbegriff_nr))
                         elif ereignisnr == EREIGNIS_GEGENGLEIS:
                             signalbegriff_nr = int(float(ereignis.get("Wert", 0)))
                             if signalbegriff_nr >= 0 and signalbegriff_nr <= 63:
@@ -401,21 +408,20 @@ class Signal:
     def get_richtungsanzeiger_zeile(self, zeilenidx_original, rgl_ggl, richtungsanzeiger_ziel):
         if not self.hat_sigframes:
             return zeilenidx_original
-        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
-            return zeilenidx_original
-        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsanzeiger:
-            return zeilenidx_original
-        if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
-            return zeilenidx_original
 
-        # Erweitere Signalbild der ersten Spalte der Originalzeile um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(self.matrix[zeilenidx_original * len(self.spalten)].node.get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
+        elif rgl_ggl == GLEIS_REGELGLEIS:
+            neue_signalframes |= self.regelgleisanzeiger
         if richtungsanzeiger_ziel != '' and richtungsanzeiger_ziel in self.richtungsanzeiger:
             neue_signalframes |= self.richtungsanzeiger[richtungsanzeiger_ziel]
-        zielsignalbild |= neue_signalframes
+
+        if not neue_signalframes:
+            return zeilenidx_original
+
+        # Erweitere Signalbild der ersten Spalte der Originalzeile um Richtungs- und Gegengleisanzeiger.
+        zielsignalbild = int(self.matrix[zeilenidx_original * len(self.spalten)].node.get("Signalbild", 0)) | neue_signalframes
 
         # Suche existierende Zeile mit dem neuen Signalbild.
         zeile_original = self.zeilen[zeilenidx_original]
@@ -489,21 +495,20 @@ class Signal:
     def get_richtungsvoranzeiger_spalte(self, spaltenidx_original, rgl_ggl, richtungsanzeiger_ziel):
         if not self.hat_sigframes:
             return spaltenidx_original
-        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel == '':
-            return spaltenidx_original
-        if rgl_ggl != GLEIS_GEGENGLEIS and richtungsanzeiger_ziel not in self.richtungsvoranzeiger:
-            return spaltenidx_original
-        if richtungsanzeiger_ziel == '' and self.gegengleisanzeiger == 0:
-            return spaltenidx_original
 
-        # Erweitere Signalbild der ersten Zeile der Originalspalte um Richtungs- und Gegengleisanzeiger.
-        zielsignalbild = int(self.matrix[spaltenidx_original].node.get("Signalbild", 0))
         neue_signalframes = 0
         if rgl_ggl == GLEIS_GEGENGLEIS:
             neue_signalframes |= self.gegengleisanzeiger
+        elif rgl_ggl == GLEIS_REGELGLEIS:
+            neue_signalframes |= self.regelgleisanzeiger
         if richtungsanzeiger_ziel != '' and richtungsanzeiger_ziel in self.richtungsvoranzeiger:
             neue_signalframes |= self.richtungsvoranzeiger[richtungsanzeiger_ziel]
-        zielsignalbild |= neue_signalframes
+
+        if not neue_signalframes:
+            return spaltenidx_original
+
+        # Erweitere Signalbild der ersten Zeile der Originalspalte um Richtungs- und Gegengleisanzeiger.
+        zielsignalbild = int(self.matrix[spaltenidx_original].node.get("Signalbild", 0)) | neue_signalframes
 
         # Suche existierende Spalte mit dem neuen Signalbild.
         for idx, vsig_geschw in enumerate(self.spalten):

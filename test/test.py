@@ -145,7 +145,10 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("Zugdeckungssignal.st3")
         self.assertEqual(retcode, 0)
 
+    def test_regelgleisanzeiger(self):
+        (retcode, stderr) = self.run_fahrstr_gen("Regelgleisanzeiger.st3")
+        self.assertEqual(retcode, 0)
+
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestFahrstrGen)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    unittest.main()
