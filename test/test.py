@@ -77,6 +77,10 @@ class TestFahrstrGen(unittest.TestCase):
         (retcode, stderr) = self.run_fahrstr_gen("FahrstrStartZielSignalTest.st3")
         self.assertEqual(retcode, 0)
 
+    def test_refpunkt_nr_rundung(self):
+        (retcode, stderr) = self.run_fahrstr_gen("RefpunktNrRundung.st3")
+        self.assertEqual(retcode, 0)
+
     def test_register_verkn_ungueltiges_modul(self):
         (retcode, stderr) = self.run_fahrstr_gen("RegisterVerknuepfungUngueltigesModul.st3")
         self.assertEqual(retcode, 0)
